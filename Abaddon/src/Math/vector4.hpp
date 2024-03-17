@@ -22,6 +22,18 @@ namespace math
 		void Normalize();
 		vector4<T> GetNormalized() const;
 
+#pragma region StaticMethods
+		static const vector4<T> zero()
+		{
+			return { 0, 0, 0, 0 };
+		}
+
+		static const vector4<T> one()
+		{
+			return { 1, 1, 1, 1 };
+		}
+#pragma endregion
+
 		vector4<T>& operator=(const vector4<T>& aOtherVector) = default;
 	};
 

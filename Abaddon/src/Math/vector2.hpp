@@ -20,6 +20,38 @@ namespace math
 		void Normalize();
 		vector2<T> GetNormalized() const;
 
+#pragma region StaticMethods
+		static const vector2<T> zero()
+		{
+			return { 0, 0 };
+		}
+
+		static const vector2<T> one()
+		{
+			return { 1, 1 };
+		}
+
+		static const vector2<T> right()
+		{
+			return { 1, 0 };
+		}
+
+		static const vector2<T> left()
+		{
+			return { -1, 0 };
+		}
+
+		static const vector2<T> up()
+		{
+			return { 0, 1 };
+		}
+
+		static const vector2<T> down()
+		{
+			return { 0, -1 };
+		}
+#pragma endregion
+
 		vector2<T>& operator=(const vector2<T>& aOtherVector) = default;
 	};
 

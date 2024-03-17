@@ -8,6 +8,7 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
 {
 	Assimp::Importer importer;
 	auto modelData = importer.ReadFile("Models/" + aFilePath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+
 	if (!modelData)
 	{
 		LOG_ERROR("Failed to load model '" + aFilePath + "'");
@@ -65,7 +66,8 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
 	myModelData.myTransformCBuffer.Init(eBindType::VertexShader);
 	myModelData.myTransformCBuffer.myData.myTransformation =
 		DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixTranslation(0, 0, 2) *
+			DirectX::XMMatrixRotationRollPitchYaw(myRotation.x, myRotation.y, myRotation.z) *
+			DirectX::XMMatrixTranslation(myPositon.x, myPositon.y, myPositon.z) *
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
 		);
@@ -78,12 +80,29 @@ void Model::Update(std::shared_ptr<Camera> aCamera)
 	// Transform buffer
 	myModelData.myTransformCBuffer.myData.myTransformation =
 		DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixTranslation(0, 0, 2) *
+			DirectX::XMMatrixRotationRollPitchYaw(myRotation.x, myRotation.y, myRotation.z) *
+			DirectX::XMMatrixTranslation(myPositon.x, myPositon.y, myPositon.z) *
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
 		);
 	myModelData.myTransformCBuffer.ApplyChanges();
 	myModelData.myTransformCBuffer.Bind();
+}
+
+const math::vector3<float>& Model::GetPosition()
+{
+	return myPositon;
+}
+
+const math::vector3<float>& Model::GetRotation()
+{
+	return myRotation;
+}
+
+void Model::Transform(math::vector3<float> aPosition, math::vector3<float> aRotation)
+{
+	myPositon += aPosition;
+	myRotation += aRotation;
 }
 
 ModelData& Model::GetModelData()
