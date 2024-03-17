@@ -23,6 +23,48 @@ namespace math
 		void Normalize();
 		vector3<T> GetNormalized() const;
 
+#pragma region StaticMethods
+		static const vector3<T> zero()
+		{
+			return { 0, 0, 0 };
+		}
+
+		static const vector3<T> one()
+		{
+			return { 1, 1, 1 };
+		}
+
+		static const vector3<T> forward()
+		{
+			return { 0, 0, 1 };
+		}
+
+		static const vector3<T> back()
+		{
+			return { 0, 0, -1 };
+		}
+
+		static const vector3<T> right()
+		{
+			return { 1, 0, 0 };
+		}
+
+		static const vector3<T> left()
+		{
+			return { -1, 0, 0 };
+		}
+
+		static const vector3<T> up()
+		{
+			return { 0, 1, 0 };
+		}
+
+		static const vector3<T> down()
+		{
+			return { 0, -1, 0 };
+		}
+#pragma endregion
+
 		vector3<T>& operator=(const vector3<T>& aOtherVector) = default;
 	};
 
@@ -116,6 +158,14 @@ namespace math
 	{
 		return (aVector1.x != aVector2.x || aVector1.y != aVector2.y || aVector1.z != aVector2.z);
 	}
+
+	//template<class T>
+	//std::basic_ostream<std::string> operator<<(std::basic_ostream<std::string>& aOutStream, const vector3<T>& aVector)
+	//{
+	//	std::string vectorString = "(" + std::to_string(aVector.x) + ", " + std::to_string(aVector.y) + ", " + std::to_string(aVector.z) + ")";
+	//	aOutStream.put(vectorString);
+	//	return aOutStream;
+	//}
 #pragma endregion
 
 #pragma region Methods

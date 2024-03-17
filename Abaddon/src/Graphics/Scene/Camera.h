@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 #include "DirectXTex/DirectXTex.h"
 #include "Tools/Input.h"
+#include "Math/vectors.h"
 
 using namespace DirectX;
 
@@ -39,10 +40,7 @@ private:
 	XMVECTOR myCamTarget;
 	XMVECTOR myCamUp;
 
-	float myInputLeftRight = 0.0f;
-	float myInputBackForward = 0.0f;
-	float myInputUpDown = 0.0f;
-	float myCamYaw = 0.0f;
-	float myCamPitch = 0.0f;
+	math::vector3<float> myDir = { 0, 0, 0 };
+	math::vector2<float> myRot = { 0, 0 };
 };
 

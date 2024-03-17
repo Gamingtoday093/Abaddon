@@ -8,36 +8,45 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
 {
 	Assimp::Importer importer;
 	auto modelData = importer.ReadFile(aFilePath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-
-	// Vertex Buffer
-	std::vector<Vertex> vertexList;
-	for (int mIndex = 0; mIndex < modelData->mNumMeshes; mIndex++)
+	if (!modelData)
 	{
-		auto mesh = modelData->mMeshes[mIndex];
-
-		for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
-		{
-			auto vertex = mesh->mVertices[vIndex];
-			vertexList.push_back({ vertex.x, vertex.y, vertex.z, 0, 0 });
-		}
+		LOG_ERROR("Failed to load model '" + aFilePath + "'");
+		Assert(false);
 	}
-	myModelData.myVertexBuffer.Init(vertexList);
 
-	// Index
-	std::vector<unsigned short> indexList;
-	for (int mIndex = 0; mIndex < modelData->mNumMeshes; mIndex++)
-	{
-		auto mesh = modelData->mMeshes[mIndex];
+    // Vertex Buffer & Index Buffer
+    std::vector<Vertex> vertexList;
+    std::vector<unsigned short> indexList;
+    for (int mIndex = 0; mIndex < modelData->mNumMeshes; mIndex++)
+    {
+        auto mesh = modelData->mMeshes[mIndex];
+        int indexOffset = vertexList.size();
 
-		for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
-		{
-			auto face = mesh->mFaces[fIndex];
-			indexList.push_back(face.mIndices[0]);
-			indexList.push_back(face.mIndices[1]);
-			indexList.push_back(face.mIndices[2]);
-		}
-	}
-	myModelData.myIndexBuffer.Init(indexList);
+        for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
+        {
+            auto vertex = mesh->mVertices[vIndex];
+			aiVector3D* textureCoords = mesh->mTextureCoords[0];
+			if (textureCoords)
+			{
+				vertexList.push_back({ vertex.x, vertex.y, vertex.z, mesh->mTextureCoords[0][vIndex].x, mesh->mTextureCoords[0][vIndex].y });
+			}
+			else
+			{
+				vertexList.push_back({ vertex.x, vertex.y, vertex.z, 0, 0 });
+			}
+        }
+
+        for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
+        {
+            auto face = mesh->mFaces[fIndex];
+
+            indexList.push_back(face.mIndices[0] + indexOffset);
+            indexList.push_back(face.mIndices[1] + indexOffset);
+            indexList.push_back(face.mIndices[2] + indexOffset);
+        }
+    }
+    myModelData.myVertexBuffer.Init(vertexList);
+    myModelData.myIndexBuffer.Init(indexList);
 
 	// Input Layout
 	myModelData.myInputLayout.Init({
@@ -55,9 +64,8 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
 	myModelData.myTransformCBuffer.Init(eBindType::VertexShader);
 	myModelData.myTransformCBuffer.myData.myTransformation =
 		DirectX::XMMatrixTranspose(
-			//DirectX::XMMatrixRotationZ(0) *
-			//DirectX::XMMatrixRotationY(0) *
-			DirectX::XMMatrixTranslation(0, 0, 2) *
+			DirectX::XMMatrixRotationRollPitchYaw(myRotation.x, myRotation.y, myRotation.z) *
+			DirectX::XMMatrixTranslation(myPositon.x, myPositon.y, myPositon.z) *
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
 		);
@@ -70,14 +78,29 @@ void Model::Update(std::shared_ptr<Camera> aCamera)
 	// Transform buffer
 	myModelData.myTransformCBuffer.myData.myTransformation =
 		DirectX::XMMatrixTranspose(
-			//DirectX::XMMatrixRotationZ(0) *
-			//DirectX::XMMatrixRotationY(0) *
-			DirectX::XMMatrixTranslation(0, 0, 2) *
+			DirectX::XMMatrixRotationRollPitchYaw(myRotation.x, myRotation.y, myRotation.z) *
+			DirectX::XMMatrixTranslation(myPositon.x, myPositon.y, myPositon.z) *
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
 		);
 	myModelData.myTransformCBuffer.ApplyChanges();
 	myModelData.myTransformCBuffer.Bind();
+}
+
+const math::vector3<float>& Model::GetPosition()
+{
+	return myPositon;
+}
+
+const math::vector3<float>& Model::GetRotation()
+{
+	return myRotation;
+}
+
+void Model::Transform(math::vector3<float> aPosition, math::vector3<float> aRotation)
+{
+	myPositon += aPosition;
+	myRotation += aRotation;
 }
 
 ModelData& Model::GetModelData()

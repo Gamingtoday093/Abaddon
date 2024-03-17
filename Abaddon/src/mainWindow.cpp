@@ -116,9 +116,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	scene.Init(myInput);
 
 	// Init
-	std::shared_ptr<Model> monkey = std::make_shared<Model>();
-	monkey->LoadModel("blenderMonkey.obj", scene.GetCamera());
-	scene.AddModel(monkey);
+	std::shared_ptr<Model> rose = std::make_shared<Model>();
+	rose->LoadModel("C:\\Users\\Admin\\Desktop\\Rose.obj", scene.GetCamera());
+	scene.AddModel(rose);
+
+	std::shared_ptr<Model> house = std::make_shared<Model>();
+	house->LoadModel("C:\\Users\\Admin\\Desktop\\House.obj", scene.GetCamera());
+	scene.AddModel(house);
+
+	math::vector3<float> movementDirection = { 0, 0, 0 };
+	float movementSpeed = 1.f;
+
+	//math::vector3<float>::forward()
+
+	auto testVector = math::vector3<float>::forward();
 
 	// Loop
 	bool running = true;
@@ -144,6 +155,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		myInput.Update();
 
 		// Game loop --------------
+		movementDirection = { 0, 0, 0 };
+		if (!myInput.IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
+		{
+			if (myInput.IsKeyDown((int)eKeys::W))
+			{
+				movementDirection.z += 1;
+			}
+			if (myInput.IsKeyDown((int)eKeys::A))
+			{
+				movementDirection.x -= 1;
+			}
+			if (myInput.IsKeyDown((int)eKeys::S))
+			{
+				movementDirection.z -= 1;
+			}
+			if (myInput.IsKeyDown((int)eKeys::D))
+			{
+				movementDirection.x += 1;
+			}
+			if (movementDirection.LengthSqr() > 0)
+			{
+				movementDirection.Normalize();
+			}
+		}
+
+		house->Transform(movementDirection * movementSpeed, house->GetRotation());
+
 		scene.Update();
 		// ------------------------
 
