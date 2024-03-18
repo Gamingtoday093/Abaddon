@@ -70,6 +70,12 @@ void Input::MouseInsideWindowUpdate(bool aState)
 	myMouseInsideWindow = aState;
 }
 
+short Input::GetScrollDelta()
+{
+	myTentativeScrollDelta = 0;
+	return -myCurrentScrollDelta;
+}
+
 bool Input::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -105,7 +111,9 @@ bool Input::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)
 			myTentativeMousePos.x = LOWORD(lParam);
 			myTentativeMousePos.y = HIWORD(lParam);
 			return true;
-
+		case WM_MOUSEWHEEL:
+			myTentativeScrollDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			return true;
 	}
 }
 
@@ -115,4 +123,6 @@ void Input::Update()
 	myCurrentState = myTentativeState;
 	myPreviousMousePos = myCurrentMousePos;
 	myCurrentMousePos = myTentativeMousePos;
+	myPreviousScrollDelta = myCurrentScrollDelta;
+	myCurrentScrollDelta = myTentativeScrollDelta;
 }

@@ -117,11 +117,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	// Init
 	std::shared_ptr<Model> rose = std::make_shared<Model>();
-	rose->LoadModel("C:\\Users\\Admin\\Desktop\\Rose.obj", scene.GetCamera());
+	rose->LoadModel("Rose.obj", scene.GetCamera());
 	scene.AddModel(rose);
 
+	std::shared_ptr<Model> landscape = std::make_shared<Model>();
+	landscape->LoadModel("Landscape.fbx", scene.GetCamera());
+	scene.AddModel(landscape);
+
 	std::shared_ptr<Model> house = std::make_shared<Model>();
-	house->LoadModel("C:\\Users\\Admin\\Desktop\\House.obj", scene.GetCamera());
+	house->LoadModel("House.obj", scene.GetCamera());
 	scene.AddModel(house);
 
 	math::vector3<float> movementDirection = { 0, 0, 0 };
@@ -156,28 +160,25 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 		// Game loop --------------
 		movementDirection = { 0, 0, 0 };
-		if (!myInput.IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
+		if (myInput.IsKeyDown((int)eKeys::W))
 		{
-			if (myInput.IsKeyDown((int)eKeys::W))
-			{
-				movementDirection.z += 1;
-			}
-			if (myInput.IsKeyDown((int)eKeys::A))
-			{
-				movementDirection.x -= 1;
-			}
-			if (myInput.IsKeyDown((int)eKeys::S))
-			{
-				movementDirection.z -= 1;
-			}
-			if (myInput.IsKeyDown((int)eKeys::D))
-			{
-				movementDirection.x += 1;
-			}
-			if (movementDirection.LengthSqr() > 0)
-			{
-				movementDirection.Normalize();
-			}
+			movementDirection.z += 1;
+		}
+		if (myInput.IsKeyDown((int)eKeys::A))
+		{
+			movementDirection.x -= 1;
+		}
+		if (myInput.IsKeyDown((int)eKeys::S))
+		{
+			movementDirection.z -= 1;
+		}
+		if (myInput.IsKeyDown((int)eKeys::D))
+		{
+			movementDirection.x += 1;
+		}
+		if (movementDirection.LengthSqr() > 0)
+		{
+			movementDirection.Normalize();
 		}
 
 		house->Transform(movementDirection * movementSpeed, house->GetRotation());

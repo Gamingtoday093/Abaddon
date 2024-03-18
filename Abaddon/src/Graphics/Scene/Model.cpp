@@ -4,7 +4,7 @@
 #include "Assimp/scene.h"
 #include "Assimp/postprocess.h"
 
-void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
+void Model::LoadModel(std::string aFilePath, std::shared_ptr<FirstPersonCamera> aCamera)
 {
 	Assimp::Importer importer;
 	auto modelData = importer.ReadFile(aFilePath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
@@ -73,7 +73,7 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera)
 	myModelData.myTransformCBuffer.Bind();
 }
 
-void Model::Update(std::shared_ptr<Camera> aCamera)
+void Model::Update(std::shared_ptr<FirstPersonCamera> aCamera)
 {
 	// Transform buffer
 	myModelData.myTransformCBuffer.myData.myTransformation =

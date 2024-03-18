@@ -1,11 +1,7 @@
 #include "pch.h"
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 
-Camera::Camera(Input& aInput) : myInput(aInput)
-{
-}
-
-void Camera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
+void FirstPersonCamera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
 {
 	myFirstPerson = aFirstPerson;
 
@@ -24,36 +20,36 @@ void Camera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
 	CalculateMatrix();
 }
 
-void Camera::Update()
+void FirstPersonCamera::Update()
 {
 	UpdateInput();
 	CalculateMatrix();
 }
 
-XMMATRIX Camera::GetMatrix()
+XMMATRIX FirstPersonCamera::GetMatrix()
 {
 	return myCameraMatrix;
 }
 
-void Camera::CalculateMatrix()
+void FirstPersonCamera::CalculateMatrix()
 {
 	// Reset values
 	myCamForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	myCamRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	myCamRotationMatrix = XMMatrixIdentity();
-
+	
 	// Calculates new forward direction based on cameras rotation
 	myCamRotationMatrix = XMMatrixRotationRollPitchYaw(myRot.x, myRot.y, 0);
 	myCamTarget = XMVector3TransformCoord(myDefaultForward, myCamRotationMatrix);
 	myCamTarget = XMVector3Normalize(myCamTarget);
-
+	
 	// Calculate new left, right and up direction based on cameras rotation
 	if (myFirstPerson) 
 	{
 		// First Person camera
 		XMMATRIX RotateYTempMatrix;
 		RotateYTempMatrix = XMMatrixRotationY(myRot.y);
-
+	
 		myCamRight = XMVector3TransformCoord(myDefaultRight, RotateYTempMatrix);
 		myCamForward = XMVector3TransformCoord(myDefaultForward, RotateYTempMatrix);
 		myCamUp = XMVector3TransformCoord(myCamUp, RotateYTempMatrix);
@@ -65,24 +61,24 @@ void Camera::CalculateMatrix()
 		myCamForward = XMVector3TransformCoord(myDefaultForward, myCamRotationMatrix);
 		myCamUp = XMVector3Cross(myCamForward, myCamRight);
 	}
-
+	
 	// Update position
 	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamRight, myDir.x));
 	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamForward, myDir.z));
 	myCamPosition = XMVectorAdd(myCamPosition, XMVECTOR({ 0.0f, myDir.y, 0.0f, 0.0f }));
-
+	
 	myDir = math::vector3<float>::zero();
-
+	
 	// Calculate final target
 	myCamTarget = XMVectorAdd(myCamPosition, myCamTarget);
-
+	
 	// Set camera matrix
 	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, myCamTarget, myCamUp);
 }
 
-void Camera::UpdateInput()
+void FirstPersonCamera::UpdateInput()
 {
-	if (myInput.IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
+	if (myInput.IsMouseButtonDown((int)eKeys::MBUTTON))
 	{
 		myRot.x += myInput.GetMouseDelta().y * myRotationSpeed;
 		myRot.y += myInput.GetMouseDelta().x * myRotationSpeed;
@@ -113,8 +109,9 @@ void Camera::UpdateInput()
 	{
 		myDir.y -= 1;
 	}
-	if (myDir.LengthSqr() > 0)
+	if (myDir.LengthSqr() > 1)
 	{
 		myDir.Normalize();
 	}
+	myDir *= myMovementSpeed;
 }

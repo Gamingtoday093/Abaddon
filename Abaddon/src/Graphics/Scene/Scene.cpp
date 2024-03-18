@@ -3,7 +3,7 @@
 
 void Scene::Init(Input& aInput)
 {
-	myCamera = std::make_shared<Camera>(aInput);
+	myCamera = std::make_shared<FirstPersonCamera>(aInput);
 	myCamera->Init(0.2f, 0.005f);
 }
 
@@ -17,7 +17,7 @@ void Scene::Update()
 	}
 }
 
-std::shared_ptr<Camera> Scene::GetCamera()
+std::shared_ptr<FirstPersonCamera> Scene::GetCamera()
 {
 	return myCamera;
 }

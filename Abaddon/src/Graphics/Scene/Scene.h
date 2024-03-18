@@ -1,5 +1,5 @@
 #pragma once
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 #include "Model.h"
 
 class Scene
@@ -13,11 +13,11 @@ public:
 
 	void AddModel(std::shared_ptr<Model> aModel);
 
-	std::shared_ptr<Camera> GetCamera();
+	std::shared_ptr<FirstPersonCamera> GetCamera();
 	std::vector<std::shared_ptr<Model>> GetModels();
 
 private:
-	std::shared_ptr<Camera> myCamera;
+	std::shared_ptr<FirstPersonCamera> myCamera;
 	std::vector<std::shared_ptr<Model>> myModels;
 };
 

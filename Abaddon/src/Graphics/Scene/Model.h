@@ -2,7 +2,7 @@
 #include "Graphics/Vertex.h"
 #include "Graphics/Bindables/Bindables.h"
 
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 #include "Math/vector3.hpp"
 
 struct ModelData
@@ -26,8 +26,8 @@ public:
 	Model() = default;
 	~Model() = default;
 
-	void LoadModel(std::string aFilePath, std::shared_ptr<Camera> aCamera);
-	void Update(std::shared_ptr<Camera> aCamera);
+	void LoadModel(std::string aFilePath, std::shared_ptr<FirstPersonCamera> aCamera);
+	void Update(std::shared_ptr<FirstPersonCamera> aCamera);
 	const math::vector3<float>& GetPosition();
 	const math::vector3<float>& GetRotation();
 	void Transform(math::vector3<float> aPosition, math::vector3<float> aRotation);

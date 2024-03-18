@@ -259,6 +259,7 @@ public:
 	void ResetMouseDelta();
 	const bool GetMouseInsideWindow();
 	void MouseInsideWindowUpdate(bool aState);
+	short GetScrollDelta();
 	bool UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam);
 	void Update();
 
@@ -269,5 +270,8 @@ private:
 	POINT myTentativeMousePos;
 	POINT myCurrentMousePos;
 	POINT myPreviousMousePos;
+	short myTentativeScrollDelta;
+	short myCurrentScrollDelta;
+	short myPreviousScrollDelta;
 	bool myMouseInsideWindow = true;
 };
