@@ -7,24 +7,26 @@
 void Model::LoadModel(std::string aFilePath, std::shared_ptr<FirstPersonCamera> aCamera)
 {
 	Assimp::Importer importer;
-	auto modelData = importer.ReadFile(aFilePath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+	auto modelData = importer.ReadFile("Models/" + aFilePath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+
 	if (!modelData)
 	{
 		LOG_ERROR("Failed to load model '" + aFilePath + "'");
 		Assert(false);
 	}
 
-    // Vertex Buffer & Index Buffer
-    std::vector<Vertex> vertexList;
-    std::vector<unsigned short> indexList;
-    for (int mIndex = 0; mIndex < modelData->mNumMeshes; mIndex++)
-    {
-        auto mesh = modelData->mMeshes[mIndex];
-        int indexOffset = vertexList.size();
+	// Vertex Buffer & Index Buffer
+	std::vector<Vertex> vertexList;
+	std::vector<unsigned short> indexList;
+	for (int mIndex = 0; mIndex < modelData->mNumMeshes; mIndex++)
+	{
+		auto mesh = modelData->mMeshes[mIndex];
+		int indexOffset = vertexList.size();
 
-        for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
-        {
-            auto vertex = mesh->mVertices[vIndex];
+		for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
+		{
+			auto vertex = mesh->mVertices[vIndex];
+			
 			aiVector3D* textureCoords = mesh->mTextureCoords[0];
 			if (textureCoords)
 			{
@@ -34,19 +36,19 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<FirstPersonCamera> 
 			{
 				vertexList.push_back({ vertex.x, vertex.y, vertex.z, 0, 0 });
 			}
-        }
+		}
 
-        for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
-        {
-            auto face = mesh->mFaces[fIndex];
+		for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
+		{
+			auto face = mesh->mFaces[fIndex];
 
-            indexList.push_back(face.mIndices[0] + indexOffset);
-            indexList.push_back(face.mIndices[1] + indexOffset);
-            indexList.push_back(face.mIndices[2] + indexOffset);
-        }
-    }
-    myModelData.myVertexBuffer.Init(vertexList);
-    myModelData.myIndexBuffer.Init(indexList);
+			indexList.push_back(face.mIndices[0] + indexOffset);
+			indexList.push_back(face.mIndices[1] + indexOffset);
+			indexList.push_back(face.mIndices[2] + indexOffset);
+		}
+	}
+	myModelData.myVertexBuffer.Init(vertexList);
+	myModelData.myIndexBuffer.Init(indexList);
 
 	// Input Layout
 	myModelData.myInputLayout.Init({
@@ -55,7 +57,7 @@ void Model::LoadModel(std::string aFilePath, std::shared_ptr<FirstPersonCamera> 
 		}, "VertexShader_vs.cso");
 
 	// SRV
-	myModelData.mySRV.Init(L"rock.png");
+	myModelData.mySRV.Init("sand.jpg");
 
 	// Sampler
 	myModelData.mySampler.Init();
