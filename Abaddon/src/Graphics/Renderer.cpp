@@ -35,3 +35,11 @@ void Renderer::Render(ModelData& aModelData, TextureData& aTextureData, Transfor
 	// Draw textured model
 	DX11::ourContext->DrawIndexed(aModelData.myIndexBuffer.GetIndexAmount(), 0, 0);
 }
+
+void Renderer::RenderSkybox(std::shared_ptr<Cube> aCube, std::shared_ptr<CubeTexture> aCubeTexture)
+{
+	aCube->Bind();
+	aCubeTexture->Bind();
+
+	DX11::ourContext->DrawIndexed(36, 0, 0);
+}

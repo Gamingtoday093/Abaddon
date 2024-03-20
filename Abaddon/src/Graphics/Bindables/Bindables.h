@@ -5,6 +5,9 @@
 #include "CBuffer.hpp"
 #include "SRV.h"
 #include "Sampler.h"
+#include "VertexShader.h"
+#include "Rasterizer.h"
+#include "PixelShader.h"
 
 struct ModelData
 {

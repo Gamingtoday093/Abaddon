@@ -14,6 +14,13 @@ Input& Input::GetInstance()
 	return *myInstance;
 }
 
+Input& Input::GetInstance()
+{
+	static Input instance;
+
+	return instance;
+}
+
 bool Input::IsKeyDown(const int aKeyCode) const
 {
 	return myCurrentState[aKeyCode] && myPreviousState[aKeyCode];
@@ -64,12 +71,18 @@ void Input::ResetMouseDelta()
 
 const bool Input::GetMouseInsideWindow()
 {
-	return  myMouseInsideWindow;
+	return myMouseInsideWindow;
 }
 
 void Input::MouseInsideWindowUpdate(bool aState)
 {
 	myMouseInsideWindow = aState;
+}
+
+short Input::GetScrollDelta()
+{
+	//myTentativeScrollDelta = 0;
+	return -myCurrentScrollDelta;
 }
 
 bool Input::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)
@@ -107,7 +120,9 @@ bool Input::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)
 			myTentativeMousePos.x = LOWORD(lParam);
 			myTentativeMousePos.y = HIWORD(lParam);
 			return true;
-
+		case WM_MOUSEWHEEL:
+			myTentativeScrollDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			return true;
 	}
 }
 
@@ -117,4 +132,7 @@ void Input::Update()
 	myCurrentState = myTentativeState;
 	myPreviousMousePos = myCurrentMousePos;
 	myCurrentMousePos = myTentativeMousePos;
+	myPreviousScrollDelta = myCurrentScrollDelta;
+	myCurrentScrollDelta = myTentativeScrollDelta;
+	if (myPreviousScrollDelta == myTentativeScrollDelta) myTentativeScrollDelta = 0;
 }
