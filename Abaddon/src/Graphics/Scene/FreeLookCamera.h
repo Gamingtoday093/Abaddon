@@ -7,12 +7,12 @@
 
 using namespace DirectX;
 
-class TopDownCamera : public Camera
+class FreeLookCamera : public Camera
 {
 public:
-	TopDownCamera() : Camera() { }
+	FreeLookCamera() : Camera() {}
 
-	void Init(float aMovementSpeed, float aRotationSpeed, float aZoomSpeed, float aStartZoom, float aMinZoom, float aMaxZoom, math::vector3<float> aStartOrbit, math::vector2<float> aStartRotation, float aMinRotation, float aMaxRotation);
+	void Init(float aMovementSpeedMultiplier, float aStartMovementSpeed, float aMinMovementSpeed, float aMaxMovementSpeed, float aRotationSpeed);
 	void Update() override;
 	math::vector3<float> GetPosition() override;
 	math::vector4<float> GetRotation() override;
@@ -24,24 +24,23 @@ private:
 	void UpdateInput() override;
 
 	float myMovementSpeed;
-	float myRotationSpeed;
-	float myZoomSpeed;
-	float myMinZoom;
-	float myMaxZoom;
-	float myMinRotation;
-	float myMaxRotation;
 
-	XMMATRIX myCameraMatrix;
+	float myMovementSpeedMultiplier;
+	float myMinMovementSpeed;
+	float myMaxMovementSpeed;
+	float myRotationSpeed;
 
 private:
 	// Variables used to calculate Camera Matrix
+	XMVECTOR Forward;
+	XMVECTOR Up;
+	XMMATRIX myCamRotationMatrix;
+
 	XMVECTOR myCamPosition;
-	XMVECTOR myCamOrbitTarget;
+	XMVECTOR myCamTarget;
 	XMVECTOR myCamUp;
 
 	math::vector3<float> myDir;
 	math::vector2<float> myRot;
-
-	float myZoom;
 };
 

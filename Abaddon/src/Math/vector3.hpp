@@ -22,6 +22,7 @@ namespace math
 		vector3<T> Cross(const vector3<T>& aOtherVector) const;
 		void Normalize();
 		vector3<T> GetNormalized() const;
+		float AngleBetween(const vector3<T>& aOtherVector) const;
 
 #pragma region StaticMethods
 		static const vector3<T> zero()
@@ -209,6 +210,13 @@ namespace math
 		assert(Length() > 0 && "Can't Normalize vector with Length 0.");
 		T multiplicationValue = 1 / Length();
 		return vector3<T>(x * multiplicationValue, y * multiplicationValue, z * multiplicationValue);
+	}
+
+	template<class T>
+	float vector3<T>::AngleBetween(const vector3<T>& aOtherVector) const
+	{
+		assert(LengthSqr() > 0 && aOtherVector.LengthSqr() > 0 && "Can't Divide vector with Length 0.");
+		return acos(Dot(aOtherVector) / (Length() * aOtherVector.Length()));
 	}
 #pragma endregion
 }

@@ -4,10 +4,10 @@
 
 using namespace Microsoft::WRL;
 
-enum eBindType
+enum class eBindType
 {
-	VertexShader,
-	PixelShader,
+	vertexShader,
+	pixelShader,
 	VsAndPs
 };
 
@@ -31,7 +31,7 @@ public:
 
 private:
 	ComPtr<ID3D11Buffer> myBuffer;
-	eBindType myBindType = VsAndPs;
+	eBindType myBindType = eBindType::VsAndPs;
 };
 
 template<typename T>
@@ -62,15 +62,15 @@ inline void CBuffer<T>::Bind()
 {
 	switch (myBindType)
 	{
-		case VertexShader:
+		case eBindType::vertexShader:
 			DX11::ourContext->VSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
 			break;
 
-		case PixelShader:
+		case eBindType::pixelShader:
 			DX11::ourContext->PSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
 			break;
 
-		case VsAndPs:
+		case eBindType::VsAndPs:
 			DX11::ourContext->VSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
 			DX11::ourContext->PSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
 			break;

@@ -248,6 +248,7 @@ class Input
 public:
 	Input();
 	~Input();
+	static Input& GetInstance();
 	bool IsKeyDown(const int aKeyCode) const;
 	bool IsKeyPressed(const int aKeyCode) const;
 	bool IsKeyUp(const int aKeyCode) const;
@@ -262,6 +263,9 @@ public:
 	short GetScrollDelta();
 	bool UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam);
 	void Update();
+
+	Input(Input& other) = delete;
+	void operator=(const Input&) = delete;
 
 private:
 	std::bitset<256> myTentativeState;

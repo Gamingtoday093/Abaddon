@@ -29,5 +29,5 @@ ID3D11InputLayout* InputLayout::Get() const
 
 ID3D11InputLayout* const* InputLayout::GetAdressOf() const
 {
-	return  myInputLayout.GetAddressOf();
+	return myInputLayout.GetAddressOf();
 }

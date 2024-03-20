@@ -7,11 +7,16 @@
 
 using namespace DirectX;
 
-class FirstPersonCamera : public virtual Camera
+class FirstPersonCamera : public Camera
 {
 public:
+	FirstPersonCamera() : Camera() { }
+
 	void Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson = false);
 	void Update() override;
+	math::vector3<float> GetPosition() override;
+	math::vector4<float> GetRotation() override;
+	void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) override;
 	XMMATRIX GetMatrix() override;
 
 private:

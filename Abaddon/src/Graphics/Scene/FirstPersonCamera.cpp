@@ -26,6 +26,20 @@ void FirstPersonCamera::Update()
 	CalculateMatrix();
 }
 
+math::vector3<float> FirstPersonCamera::GetPosition()
+{
+	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
+}
+
+math::vector4<float> FirstPersonCamera::GetRotation()
+{
+	return math::vector4<float>::identity();
+}
+
+void FirstPersonCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
+{
+}
+
 XMMATRIX FirstPersonCamera::GetMatrix()
 {
 	return myCameraMatrix;
@@ -78,34 +92,34 @@ void FirstPersonCamera::CalculateMatrix()
 
 void FirstPersonCamera::UpdateInput()
 {
-	if (myInput.IsMouseButtonDown((int)eKeys::MBUTTON))
+	if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
 	{
-		myRot.x += myInput.GetMouseDelta().y * myRotationSpeed;
-		myRot.y += myInput.GetMouseDelta().x * myRotationSpeed;
+		myRot.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
+		myRot.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
 	}
 
 	// Keyboard
-	if (myInput.IsKeyDown((int)eKeys::W))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::W))
 	{
 		myDir.z += 1;
 	}
-	if (myInput.IsKeyDown((int)eKeys::A))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::A))
 	{
 		myDir.x -= 1;
 	}
-	if (myInput.IsKeyDown((int)eKeys::S))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
 	{
 		myDir.z -= 1;
 	}
-	if (myInput.IsKeyDown((int)eKeys::D))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::D))
 	{
 		myDir.x += 1;
 	}
-	if (myInput.IsKeyDown((int)eKeys::Q))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::Q))
 	{
 		myDir.y += 1;
 	}
-	if (myInput.IsKeyDown((int)eKeys::E))
+	if (Input::GetInstance().IsKeyDown((int)eKeys::E))
 	{
 		myDir.y -= 1;
 	}
