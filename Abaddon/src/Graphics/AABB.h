@@ -19,6 +19,16 @@ struct AABB
 		myMax = aMax;
 	}
 
+	math::vector3<float> GetSize() const
+	{
+		return { abs(myMax.x - myMin.x), abs(myMax.y - myMin.y), abs(myMax.z - myMin.z) };
+	}
+
+	math::vector3<float> GetCenter() const
+	{
+		return { (myMax.x + myMin.x) * 0.5f, (myMax.y + myMin.y) * 0.5f, (myMax.z + myMin.z) * 0.5f };
+	}
+
 	bool InsideBounds(const math::vector3<float>& aPosition) const
 	{
 		return aPosition.x >= myMin.x && aPosition.y >= myMin.y && aPosition.z >= myMin.z &&

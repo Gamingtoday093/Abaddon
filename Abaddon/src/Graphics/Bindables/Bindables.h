@@ -8,12 +8,15 @@
 #include "VertexShader.h"
 #include "Rasterizer.h"
 #include "PixelShader.h"
+#include "Graphics/AABB.h"
 
 struct ModelData
 {
 	VertexBuffer myVertexBuffer;
 	IndexBuffer myIndexBuffer;
 	InputLayout myInputLayout;
+
+	AABB myAABB;
 };
 
 struct TextureData

@@ -7,13 +7,14 @@
 #include "Scene/Scene.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderPass.h"
-#include "Graphics/Scene/Scene.h"
-#include "Exo-Star Encounter/Unit.h"
+#include "Scene/Scene.h"
 #include "Graphics/Skybox/CubeTexture.h"
 #include "Graphics/Skybox/Cube.h"
+#include "Scene/ModelAssetHandler.h"
 
 #include "Tools/Input.h"
-#include <Exo-Star Encounter/UnitManager.h>
+#include "Scene/Scripts/Unit.h"
+#include "Scene/Managers/UnitManager.h"
 
 #pragma warning(disable : 28251)
 
@@ -125,7 +126,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	renderer.Init();
 
 	// Create scene
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>(renderer);
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>(renderer, hwnd);
 	scene->Init();
 
 	// Skybox
@@ -136,29 +137,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	SkyboxMesh->Init();
 
 	// Init
-	std::shared_ptr<Unit> ship = UnitManager::CreateUnit();
-	ship->LoadModel("Ship.fbx", "ShipTexture.png", scene.GetCamera());
-	scene.AddModel(ship);
-
-	std::shared_ptr<Unit> ship2 = UnitManager::CreateUnit();
-	ship2->LoadModel("Ship.fbx", "ShipTexture.png", scene.GetCamera());
-	scene.AddModel(ship2);
-
-	ship2->SetPosition({ -30, 0, 10 });
-
-	std::shared_ptr<Unit> ship3 = UnitManager::CreateUnit();
-	ship3->LoadModel("Ship.fbx", "ShipTexture.png", scene.GetCamera());
-	scene.AddModel(ship3);
-
-	ship3->SetPosition({ 3, 0, 20 });
-
-	scene.Awake();
-
-	bool dragging = false;
-	math::vector2<float> dragSelectStart;
-
-	math::vector3<float> movementDirection = { 0, 0, 0 };
-	float movementSpeed = 1.f;
 
 	// Loop
 	bool running = true;
@@ -184,66 +162,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		Input::GetInstance().Update();
 
 		// Game loop --------------
-		if (Input::GetInstance().IsMouseButtonPressed((int)eKeys::MOUSERBUTTON))
-		{
-			math::vector3<float> rayOrigin = scene.GetCamera()->CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(hwnd));
-			math::vector3<float> rayDirection = (rayOrigin - scene.GetCamera()->GetPosition()).GetNormalized();
-
-			math::vector3<float> normal = math::vector3<float>::up();
-
-			float t = -(normal.Dot(rayOrigin)) / normal.Dot(rayDirection);
-			
-			math::vector3<float> hitPosition = rayOrigin + (rayDirection * t);
-
-			for (std::shared_ptr<Unit> unit : UnitManager::GetUnits())
-			{
-				if (unit->GetIsSelected())
-					unit->MoveTo(hitPosition);
-			}
-		}
-
-		if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MOUSELBUTTON) && !dragging)
-		{
-			dragSelectStart = Camera::MousePositionToCameraSpace(hwnd);
-			dragging = true;
-		}
-
-		if (Input::GetInstance().IsMouseButtonUp((int)eKeys::MOUSELBUTTON))
-		{
-			math::vector2<float> dragSelectEnd = Camera::MousePositionToCameraSpace(hwnd);
-			dragging = false;
-
-			if ((dragSelectEnd - dragSelectStart).Length() > 0.1f) // Drag
-			{
-				for (std::shared_ptr<Unit> unit : UnitManager::GetUnits())
-				{
-					math::vector2<float> unitPosition = scene.GetCamera()->WorldSpaceToCameraSpace(unit->GetPosition());
-
-					unit->Select(unitPosition.x > std::min(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y > std::min(dragSelectStart.y, dragSelectEnd.y) &&
-						unitPosition.x < std::max(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y < std::max(dragSelectStart.y, dragSelectEnd.y));
-				}
-			}
-			else // Click
-			{
-				math::vector3<float> rayOrigin = scene.GetCamera()->CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(hwnd));
-				math::vector3<float> rayDirection = (rayOrigin - scene.GetCamera()->GetPosition()).GetNormalized();
-
-				for (std::shared_ptr<Unit> unit : UnitManager::GetUnits())
-				{
-					unit->Select(unit->GetTransformedAABB().RayBounds(rayOrigin, rayDirection) && !unit->GetIsSelected());
-				}
-			}
-		}
-
-		scene.Update();
-		// ------------------------
-
 		SkyboxPass->Bind();
-		SkyboxMesh->UpdateViewProjection(scene.GetCamera());
-		renderer.RenderSkybox(SkyboxMesh, SkyboxTexture);
+		renderer.RenderSkybox(SkyboxMesh, SkyboxTexture, scene->GetCamera());
 
 		DefaultPass->Bind();
-		renderer.Render(scene.GetModels());
+		scene->Update();
+		// ------------------------
+
 		framework.EndFrame();
 	}
 

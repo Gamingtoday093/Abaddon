@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Graphics/Bindables/Bindables.h"
 #include "Graphics/Vertex.h"
-#include "Graphics/Scene/Cameras.h"
+#include "Scene/Cameras.h"
 
 class Cube
 {
@@ -37,18 +37,6 @@ public:
 			}, "Skybox_vs.cso");
 
 		mySampler.Init();
-
-		myViewProjectionBuffer.Init(eBindType::vertexShader);
-	}
-
-	void UpdateViewProjection(const std::shared_ptr<Camera>& aCamera)
-	{
-		myViewProjectionBuffer.myData.myTransformation =
-			XMMatrixTranspose(
-			XMMatrixScaling(10, 10, 10) *
-			aCamera->GetMatrix() *
-			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f));
-		myViewProjectionBuffer.ApplyChanges();
 	}
 
 	void Bind()
@@ -57,12 +45,10 @@ public:
 		myIndexBuffer.Bind();
 		myInputLayout.Bind();
 		mySampler.Bind();
-		myViewProjectionBuffer.Bind();
 	}
 private:
 	VertexBuffer myVertexBuffer;
 	IndexBuffer myIndexBuffer;
 	InputLayout myInputLayout;
 	Sampler mySampler;
-	CBuffer<TransformBuffer> myViewProjectionBuffer;
 };

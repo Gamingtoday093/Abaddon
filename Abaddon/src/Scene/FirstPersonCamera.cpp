@@ -1,15 +1,7 @@
 #include "pch.h"
 #include "FirstPersonCamera.h"
 
-<<<<<<<< HEAD:Abaddon/src/Scene/Camera.cpp
-Camera::Camera()
-{
-}
-
-void Camera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
-========
 void FirstPersonCamera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
->>>>>>>> dev:Abaddon/src/Scene/FirstPersonCamera.cpp
 {
 	myFirstPerson = aFirstPerson;
 
@@ -102,13 +94,8 @@ void FirstPersonCamera::UpdateInput()
 {
 	if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
 	{
-<<<<<<<< HEAD:Abaddon/src/Scene/Camera.cpp
-		myCamPitch += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
-		myCamYaw += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
-========
 		myRot.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
 		myRot.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
->>>>>>>> dev:Abaddon/src/Scene/FirstPersonCamera.cpp
 	}
 
 	// Keyboard
@@ -116,19 +103,11 @@ void FirstPersonCamera::UpdateInput()
 	{
 		myDir.z += 1;
 	}
-<<<<<<<< HEAD:Abaddon/src/Scene/Camera.cpp
-	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
-========
 	if (Input::GetInstance().IsKeyDown((int)eKeys::A))
->>>>>>>> dev:Abaddon/src/Scene/FirstPersonCamera.cpp
 	{
 		myDir.x -= 1;
 	}
-<<<<<<<< HEAD:Abaddon/src/Scene/Camera.cpp
-	if (Input::GetInstance().IsKeyDown((int)eKeys::A))
-========
 	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
->>>>>>>> dev:Abaddon/src/Scene/FirstPersonCamera.cpp
 	{
 		myDir.z -= 1;
 	}

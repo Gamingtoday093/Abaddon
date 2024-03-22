@@ -51,6 +51,8 @@ public:
 		myScene->myRegistry.remove<T>(myEntityHandle);
 	}
 
+	Scene& GetScene();
+
 private:
 	entt::entity myEntityHandle{ 0 };
 	Scene* myScene = nullptr;
