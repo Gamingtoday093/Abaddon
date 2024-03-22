@@ -28,8 +28,8 @@ private:
 	void CreateDepth();
 	void SetViewPort();
 	void SetPrimitiveTopology();
-	void SetVertexShader(std::string aShaderFileName);
-	void SetPixelShader(std::string aShaderFileName);
+	void SetAndCreateVertexShader(std::string aShaderFileName);
+	void SetAndCreatePixelShader(std::string aShaderFileName);
 
 	int GetScreenWidth();
 	int GetScreenHeight();

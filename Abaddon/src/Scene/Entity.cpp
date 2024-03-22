@@ -10,3 +10,8 @@ Entity::~Entity()
 	myScene = nullptr;
 	delete myScene;
 }
+
+Scene& Entity::GetScene()
+{
+	return *myScene;
+}

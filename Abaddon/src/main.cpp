@@ -6,8 +6,15 @@
 #include "Graphics/DX11.h"
 #include "Scene/Scene.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/RenderPass.h"
+#include "Scene/Scene.h"
+#include "Graphics/Skybox/CubeTexture.h"
+#include "Graphics/Skybox/Cube.h"
+#include "Scene/ModelAssetHandler.h"
 
 #include "Tools/Input.h"
+#include "Scene/Scripts/Unit.h"
+#include "Scene/Managers/UnitManager.h"
 
 #include "imgui.h"
 #include "ImGui/ImGuiBuilder.h"
@@ -107,15 +114,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	DX11 framework(hwnd);
 	framework.Initialize(true);
 
-	float clearColor[4] = { 0.3f,0.4f,0.6f,1.0f };
+	//float clearColor[4] = { 0.3f,0.4f,0.6f,1.0f };
+	float clearColor[4] = { 0.16f, 0.16f, 0.16f, 0.16f };
+
+	// Create Render Passes
+	std::shared_ptr<RenderPass> DefaultPass = std::make_shared<RenderPass>();
+	DefaultPass->Init("VertexShader_vs.cso", D3D11_CULL_BACK, "PixelShader_ps.cso");
+
+	std::shared_ptr<RenderPass> SkyboxPass = std::make_shared<RenderPass>();
+	SkyboxPass->Init("Skybox_vs.cso", D3D11_CULL_NONE, "Skybox_ps.cso");
 
 	// Create renderer
 	Renderer renderer;
 	renderer.Init();
 
 	// Create scene
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>(renderer);
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>(renderer, hwnd);
 	scene->Init();
+
+
+	// Skybox
+	std::shared_ptr<CubeTexture> SkyboxTexture = std::make_shared<CubeTexture>();
+	SkyboxTexture->Init("Skybox");
+
+	std::shared_ptr<Cube> SkyboxMesh = std::make_shared<Cube>();
+	SkyboxMesh->Init();
+
+	// Init
 
 	// ImGui
     IMGUI_CHECKVERSION();
@@ -127,6 +152,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(DX11::ourDevice.Get(), DX11::ourContext.Get());
+
 
 	// Loop
 	bool running = true;
@@ -166,6 +192,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		Input::GetInstance().Update();
 
 		// Game loop --------------
+		SkyboxPass->Bind();
+		renderer.RenderSkybox(SkyboxMesh, SkyboxTexture, scene->GetCamera());
+
+		DefaultPass->Bind();
 		scene->Update();
 		// ------------------------
 
