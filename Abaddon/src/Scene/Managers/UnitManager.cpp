@@ -5,6 +5,7 @@
 void UnitManager::Awake()
 {
     ModelAssetHandler::LoadModel("SelectionCircle.fbx");
+	ModelAssetHandler::LoadTexture("SelectionTexture.png");
     myUnits = std::make_shared<std::vector<Unit*>>();
     myInstance = this;
 }
@@ -83,23 +84,40 @@ void UnitManager::InputSelect()
 
 	if ((dragSelectEnd - dragSelectStart).LengthSqr() > 0.01f) // Drag
 	{
+		int selected = 0;
+
 		for (const auto unit : *myUnits)
 		{
 			math::vector2<float> unitPosition = myEntity.GetScene().GetCamera()->WorldSpaceToCameraSpace(unit->GetComponent<TransformComponent>().myTransform.myPosition);
 
 			unit->Select(unitPosition.x > std::min(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y > std::min(dragSelectStart.y, dragSelectEnd.y) &&
 				unitPosition.x < std::max(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y < std::max(dragSelectStart.y, dragSelectEnd.y));
+
+			if (!multipleSelected && unit->GetIsSelected())
+				selected++;
 		}
+
+		multipleSelected = selected > 1;
 	}
 	else // Click
 	{
 		math::vector3<float> rayOrigin = myEntity.GetScene().GetCamera()->CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(myEntity.GetScene().myHWND));
 		math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera()->GetPosition()).GetNormalized();
 
+		int selected = 0;
+
 		for (const auto unit : *myUnits)
 		{
 			AABB transformedAABB = unit->GetComponent<TransformComponent>().TransformAABB(ModelAssetHandler::GetModelData(unit->GetComponent<ModelComponent>().myModelName).myAABB);
-			unit->Select(transformedAABB.RayBounds(rayOrigin, rayDirection) && !unit->GetIsSelected());
+			if (Input::GetInstance().IsKeyDown((int)eKeys::SHIFT))
+				unit->Select(transformedAABB.RayBounds(rayOrigin, rayDirection) != unit->GetIsSelected());
+			else
+				unit->Select(transformedAABB.RayBounds(rayOrigin, rayDirection) && (!unit->GetIsSelected() || multipleSelected));
+
+			if (!multipleSelected && unit->GetIsSelected())
+				selected++;
 		}
+
+		multipleSelected = selected > 1;
 	}
 }

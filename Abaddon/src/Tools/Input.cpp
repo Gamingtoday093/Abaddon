@@ -74,7 +74,6 @@ void Input::MouseInsideWindowUpdate(bool aState)
 
 short Input::GetScrollDelta()
 {
-	//myTentativeScrollDelta = 0;
 	return -myCurrentScrollDelta;
 }
 

@@ -17,6 +17,7 @@ private:
 	void HandleInput();
 	void InputMoveTo();
 	void InputSelect();
+	bool multipleSelected = false;
 	bool dragging = false;
 	math::vector2<float> dragSelectStart;
 

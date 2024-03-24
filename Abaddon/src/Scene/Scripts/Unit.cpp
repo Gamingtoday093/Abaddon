@@ -42,7 +42,7 @@ void Unit::Update()
 	if (GetIsSelected())
 	{
 		mySelectionTransform.myPosition = GetComponent<TransformComponent>().myTransform.myPosition;
-		myRenderer->Render(ModelAssetHandler::GetModelData("SelectionCircle.fbx"), ModelAssetHandler::GetTextureData("sand.jpg"), mySelectionTransform, myEntity.GetScene().GetCamera());
+		myRenderer->Render(ModelAssetHandler::GetModelData("SelectionCircle.fbx"), ModelAssetHandler::GetTextureData("SelectionTexture.png"), mySelectionTransform, myEntity.GetScene().GetCamera());
 	}
 	UpdateMovement();
 }

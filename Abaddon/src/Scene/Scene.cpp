@@ -43,6 +43,12 @@ void Scene::Init()
 	ship.GetComponent<ModelComponent>().SetModelAndTexture("Ship.fbx", "ShipTexture.png");
 	Unit* unit = UnitManager::CreateUnit(ship);
 	unit->Init(myRenderer);
+
+	Entity ship2 = CreateEntity();
+	ship2.GetComponent<ModelComponent>().SetModelAndTexture("Ship.fbx", "ShipTexture.png");
+	ship2.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 20 };
+	Unit* unit2 = UnitManager::CreateUnit(ship2);
+	unit2->Init(myRenderer);
 }
 
 void Scene::Update()
