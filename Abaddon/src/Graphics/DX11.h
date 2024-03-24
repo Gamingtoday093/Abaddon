@@ -7,24 +7,32 @@ using namespace Microsoft::WRL;
 class DX11
 {
 public:
-	DX11(HWND& aWindowHandle);
+	DX11(HWND& aHWND);
 	~DX11() = default;
 
 	void Initialize(bool aDebugMode);
 	void BeginFrame(float aClearColor[4]);
-	void BindRenderTarget();
 	void EndFrame();
 
-	static ComPtr<ID3D11Device> ourDevice;
-	static ComPtr<IDXGISwapChain> ourSwapChain;
-	static ComPtr<ID3D11DeviceContext> ourContext;
-	static ComPtr<ID3D11RenderTargetView> ourBackBuffer;
-	static ComPtr<ID3D11DepthStencilView> ourDepthBuffer;
+	static void BindRenderTarget();
+	static void BindRenderTargetTexture();
 
 	static void HRASSERT(HRESULT aHr, std::string aDescription, bool aPrint = true);
 
+	static ComPtr<ID3D11Device> ourDevice;
+	static ComPtr<ID3D11DeviceContext> ourContext;
+	static ComPtr<IDXGISwapChain> ourSwapChain;
+	static ComPtr<ID3D11RenderTargetView> ourBackBuffer;
+	static ComPtr<ID3D11DepthStencilView> ourDepthBuffer;
+
+	// Render Target View bound to a texture, used by ImGui to render Scene Tab.
+	static ComPtr<ID3D11ShaderResourceView> ourTextureSRV;
+	static ComPtr<ID3D11RenderTargetView> ourTextureBuffer;
+	static ComPtr<ID3D11Texture2D> ourTexture;
+
 private:
 	void CreateRenderTargetView();
+	void CreateSceneTextureResources();
 	void CreateDepth();
 	void SetViewPort();
 	void SetPrimitiveTopology();
@@ -34,6 +42,6 @@ private:
 	int GetScreenWidth();
 	int GetScreenHeight();
 
-	HWND& myWindowHandle;
+	HWND& myHWND;
 };
 

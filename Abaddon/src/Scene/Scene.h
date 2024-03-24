@@ -1,15 +1,16 @@
 #pragma once
 #include "Cameras.h"
 #include "EnTT/entt.hpp"
-#include "Graphics/Renderer.h"
 
+class Renderer;
 class Script;
 class Entity;
+struct ScriptComponent;
 
 class Scene
 {
 public:
-	Scene(Renderer& aRenderer, HWND& aHWND);
+	Scene(std::shared_ptr<Renderer> aRenderer, HWND& aHWND);
 	~Scene();
 
 	void Init();
@@ -26,7 +27,7 @@ public:
 private:
 	friend class Entity;
 
-	Renderer& myRenderer;
+	std::shared_ptr<Renderer> myRenderer;
 	bool myUsingFreeLookCamera = false;
 	std::shared_ptr<FreeLookCamera> myFreeLookCamera;
 	std::shared_ptr<TopDownCamera> myTopDownCamera;

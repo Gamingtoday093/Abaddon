@@ -3,13 +3,15 @@
 #include <d3dcompiler.h>
 
 ComPtr<ID3D11Device> DX11::ourDevice;
-ComPtr<IDXGISwapChain> DX11::ourSwapChain;
 ComPtr<ID3D11DeviceContext> DX11::ourContext;
-
+ComPtr<IDXGISwapChain> DX11::ourSwapChain;
 ComPtr<ID3D11RenderTargetView> DX11::ourBackBuffer;
 ComPtr<ID3D11DepthStencilView> DX11::ourDepthBuffer;
+ComPtr<ID3D11ShaderResourceView> DX11::ourTextureSRV;
+ComPtr<ID3D11RenderTargetView> DX11::ourTextureBuffer;
+ComPtr<ID3D11Texture2D> DX11::ourTexture;
 
-DX11::DX11(HWND& aWindowHandle) : myWindowHandle(aWindowHandle)
+DX11::DX11(HWND& aHWND) : myHWND(aHWND)
 {
 }
 
@@ -27,7 +29,7 @@ void DX11::Initialize(bool aDebugMode)
 	desc.SampleDesc.Quality = 0;
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	desc.BufferCount = 1;
-	desc.OutputWindow = myWindowHandle;
+	desc.OutputWindow = myHWND;
 	desc.Windowed = TRUE;
 	desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	desc.Flags = 0;
@@ -49,6 +51,7 @@ void DX11::Initialize(bool aDebugMode)
 	HRASSERT(hr, "Initializing DX11 Framework");
 
 	CreateRenderTargetView();
+	CreateSceneTextureResources();
 	CreateDepth();
 	BindRenderTarget();
 	SetViewPort();
@@ -63,6 +66,7 @@ void DX11::Initialize(bool aDebugMode)
 void DX11::BeginFrame(float aClearColor[4])
 {
 	ourContext->ClearRenderTargetView(ourBackBuffer.Get(), aClearColor);
+	ourContext->ClearRenderTargetView(ourTextureBuffer.Get(), aClearColor);
 	ourContext->ClearDepthStencilView(ourDepthBuffer.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
@@ -78,11 +82,11 @@ void DX11::HRASSERT(HRESULT aHr, std::string aDescription, bool aPrint)
 		LOG_ERROR(aDescription + " failed.");
 
 		std::string message = "";
-#if defined(DEBUG) || defined(RELEASE)
 		message = std::system_category().message(aHr);
-#endif
 		LOG_ERROR("ERROR: " + message);
+#ifdef enableAssert
 		Assert(false);
+#endif
 	}
 	else
 	{
@@ -148,6 +152,11 @@ void DX11::BindRenderTarget()
 	ourContext->OMSetRenderTargets(1, ourBackBuffer.GetAddressOf(), ourDepthBuffer.Get());
 }
 
+void DX11::BindRenderTargetTexture()
+{
+	ourContext->OMSetRenderTargets(1, ourTextureBuffer.GetAddressOf(), ourDepthBuffer.Get());
+}
+
 void DX11::SetViewPort()
 {
 	D3D11_VIEWPORT vp;
@@ -157,7 +166,7 @@ void DX11::SetViewPort()
 	vp.MaxDepth = 1;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	ourContext->RSSetViewports(1u, &vp);
+	ourContext->RSSetViewports(1, &vp);
 }
 
 void DX11::SetPrimitiveTopology()
@@ -189,10 +198,50 @@ void DX11::SetAndCreatePixelShader(std::string aShaderFileName)
 	ourContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 }
 
+void DX11::CreateSceneTextureResources()
+{
+	HRESULT hr;
+
+	// Texture
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = GetScreenWidth();
+	textureDesc.Height = GetScreenHeight();
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &ourTexture);
+	HRASSERT(hr, "Creating Texture 2D");
+
+	// Render Target View
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	hr = ourDevice->CreateRenderTargetView(ourTexture.Get(), &renderTargetViewDesc, &ourTextureBuffer);
+	HRASSERT(hr, "Creating Render Target View tied to Texture 2D");
+
+	// SRV
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	hr = ourDevice->CreateShaderResourceView(ourTexture.Get(), &shaderResourceViewDesc, &ourTextureSRV);
+	HRASSERT(hr, "Creating SRV for Scene Texture 2D");
+}
+
 int DX11::GetScreenWidth()
 {
 	RECT rect;
-	GetClientRect(myWindowHandle, &rect);
+	GetClientRect(myHWND, &rect);
 
 	return rect.right - rect.left;
 }
@@ -200,7 +249,7 @@ int DX11::GetScreenWidth()
 int DX11::GetScreenHeight()
 {
 	RECT rect;
-	GetClientRect(myWindowHandle, &rect);
+	GetClientRect(myHWND, &rect);
 
 	return rect.bottom - rect.top;
 }

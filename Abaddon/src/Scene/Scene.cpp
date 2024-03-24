@@ -1,14 +1,18 @@
 #include "pch.h"
 #include "Scene.h"
+#include "Graphics/Renderer.h"
 #include "ModelAssetHandler.h"
 
 #include "Entity.h"
 
+#include "ModelAssetHandler.h"
+
+#include "Components/Components.h"
 #include "Scene/Scripts/PlayerMovement.h"
 #include "Scene/Scripts/Unit.h"
 #include "Managers/UnitManager.h"
 
-Scene::Scene(Renderer& aRenderer, HWND& aHWND) : myRenderer(aRenderer), myHWND(aHWND)
+Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND& aHWND) : myRenderer(aRenderer), myHWND(aHWND)
 {
 }
 
@@ -72,7 +76,7 @@ void Scene::Update()
 
 		ModelData& modelData = ModelAssetHandler::GetModelData(std::get<1>(object).myModelName);
 		TextureData& textureData = ModelAssetHandler::GetTextureData(std::get<1>(object).myTextureName);
-		myRenderer.Render(modelData, textureData, std::get<0>(object).myTransform, GetCamera());
+		myRenderer->Render(modelData, textureData, std::get<0>(object).myTransform, GetCamera());
 	}
 
 	myRegistry.view<ScriptComponent>().each([=](entt::entity aEntity, ScriptComponent& aScriptComponent)
