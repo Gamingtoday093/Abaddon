@@ -1,11 +1,7 @@
 #include "pch.h"
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 
-Camera::Camera()
-{
-}
-
-void Camera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
+void FirstPersonCamera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
 {
 	myFirstPerson = aFirstPerson;
 
@@ -24,36 +20,50 @@ void Camera::Init(float aMovementSpeed, float aRotationSpeed, bool aFirstPerson)
 	CalculateMatrix();
 }
 
-void Camera::Update()
+void FirstPersonCamera::Update()
 {
 	UpdateInput();
 	CalculateMatrix();
 }
 
-XMMATRIX Camera::GetMatrix()
+math::vector3<float> FirstPersonCamera::GetPosition()
+{
+	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
+}
+
+math::vector4<float> FirstPersonCamera::GetRotation()
+{
+	return math::vector4<float>::identity();
+}
+
+void FirstPersonCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
+{
+}
+
+XMMATRIX FirstPersonCamera::GetMatrix()
 {
 	return myCameraMatrix;
 }
 
-void Camera::CalculateMatrix()
+void FirstPersonCamera::CalculateMatrix()
 {
 	// Reset values
 	myCamForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	myCamRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	myCamRotationMatrix = XMMatrixIdentity();
-
+	
 	// Calculates new forward direction based on cameras rotation
-	myCamRotationMatrix = XMMatrixRotationRollPitchYaw(myCamPitch, myCamYaw, 0);
+	myCamRotationMatrix = XMMatrixRotationRollPitchYaw(myRot.x, myRot.y, 0);
 	myCamTarget = XMVector3TransformCoord(myDefaultForward, myCamRotationMatrix);
 	myCamTarget = XMVector3Normalize(myCamTarget);
-
+	
 	// Calculate new left, right and up direction based on cameras rotation
 	if (myFirstPerson) 
 	{
 		// First Person camera
 		XMMATRIX RotateYTempMatrix;
-		RotateYTempMatrix = XMMatrixRotationY(myCamYaw);
-
+		RotateYTempMatrix = XMMatrixRotationY(myRot.y);
+	
 		myCamRight = XMVector3TransformCoord(myDefaultRight, RotateYTempMatrix);
 		myCamForward = XMVector3TransformCoord(myDefaultForward, RotateYTempMatrix);
 		myCamUp = XMVector3TransformCoord(myCamUp, RotateYTempMatrix);
@@ -65,54 +75,57 @@ void Camera::CalculateMatrix()
 		myCamForward = XMVector3TransformCoord(myDefaultForward, myCamRotationMatrix);
 		myCamUp = XMVector3Cross(myCamForward, myCamRight);
 	}
-
+	
 	// Update position
-	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamRight, myInputLeftRight));
-	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamForward, myInputBackForward));
-	myCamPosition = XMVectorAdd(myCamPosition, XMVECTOR({ 0.0f, myInputUpDown, 0.0f, 0.0f }));
-
-	myInputLeftRight = 0.0f;
-	myInputBackForward = 0.0f;
-	myInputUpDown = 0.0f;
-
+	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamRight, myDir.x));
+	myCamPosition = XMVectorAdd(myCamPosition, XMVectorScale(myCamForward, myDir.z));
+	myCamPosition = XMVectorAdd(myCamPosition, XMVECTOR({ 0.0f, myDir.y, 0.0f, 0.0f }));
+	
+	myDir = math::vector3<float>::zero();
+	
 	// Calculate final target
 	myCamTarget = XMVectorAdd(myCamPosition, myCamTarget);
-
+	
 	// Set camera matrix
 	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, myCamTarget, myCamUp);
 }
 
-void Camera::UpdateInput()
+void FirstPersonCamera::UpdateInput()
 {
 	if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
 	{
-		myCamPitch += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
-		myCamYaw += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
+		myRot.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
+		myRot.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
 	}
 
 	// Keyboard
 	if (Input::GetInstance().IsKeyDown((int)eKeys::W))
 	{
-		myInputBackForward += myMovementSpeed;
-	}
-	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
-	{
-		myInputBackForward -= myMovementSpeed;
+		myDir.z += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::A))
 	{
-		myInputLeftRight -= myMovementSpeed;
+		myDir.x -= 1;
+	}
+	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
+	{
+		myDir.z -= 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::D))
 	{
-		myInputLeftRight += myMovementSpeed;
+		myDir.x += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::Q))
 	{
-		myInputUpDown -= myMovementSpeed;
+		myDir.y += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::E))
 	{
-		myInputUpDown += myMovementSpeed;
+		myDir.y -= 1;
 	}
+	if (myDir.LengthSqr() > 1)
+	{
+		myDir.Normalize();
+	}
+	myDir *= myMovementSpeed;
 }

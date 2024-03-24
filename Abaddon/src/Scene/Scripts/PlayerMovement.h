@@ -7,10 +7,10 @@ class PlayerMovement : public Script
 public:
 	PlayerMovement() = default;
 
-	void Start();
-	void OnDestroy();
-	void Update();
-	
+	void Start() override;
+	void OnDestroy() override;
+	void Update() override;
+
 private:
 	float mySpeed;
 };

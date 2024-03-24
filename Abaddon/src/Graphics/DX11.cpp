@@ -56,8 +56,11 @@ void DX11::Initialize(bool aDebugMode)
 	BindRenderTarget();
 	SetViewPort();
 	SetPrimitiveTopology();
-	SetVertexShader("VertexShader_vs.cso");
-	SetPixelShader("PixelShader_ps.cso");
+	//SetAndCreateVertexShader("VertexShader_vs.cso");
+	//SetAndCreatePixelShader("PixelShader_ps.cso
+
+	//SetAndCreateVertexShader("Skybox_vs.cso");
+	//SetAndCreatePixelShader("Skybox_ps.cso");
 }
 
 void DX11::BeginFrame(float aClearColor[4])
@@ -109,7 +112,8 @@ void DX11::CreateDepth()
 	D3D11_DEPTH_STENCIL_DESC depthDesc = {};
 	depthDesc.DepthEnable = true;
 	depthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	//depthDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	HRESULT hr = ourDevice->CreateDepthStencilState(&depthDesc, &depthStencilState);
 	HRASSERT(hr, "Creation of Depth Stencil State");
@@ -170,7 +174,7 @@ void DX11::SetPrimitiveTopology()
 	ourContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void DX11::SetVertexShader(std::string aShaderFileName)
+void DX11::SetAndCreateVertexShader(std::string aShaderFileName)
 {
 	ComPtr<ID3DBlob> blob;
 	ComPtr<ID3D11VertexShader> vertexShader;
@@ -182,7 +186,7 @@ void DX11::SetVertexShader(std::string aShaderFileName)
 	ourContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 }
 
-void DX11::SetPixelShader(std::string aShaderFileName)
+void DX11::SetAndCreatePixelShader(std::string aShaderFileName)
 {
 	ComPtr<ID3DBlob> blob;
 	ComPtr<ID3D11PixelShader> pixelShader;

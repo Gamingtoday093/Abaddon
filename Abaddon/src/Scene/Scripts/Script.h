@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene/Entity.h"
+#include <typeinfo>
 
 class Script
 {
@@ -14,12 +15,15 @@ public:
 	}
 
 protected:
+	virtual void Awake() {};
 	virtual void Start() {};
 	virtual void OnDestroy() {};
 	virtual void Update() {};
 
-private:
 	Entity myEntity;
+
+private:
 	friend class Scene;
+	friend class ScriptComponent;
 };
 
