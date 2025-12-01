@@ -16,9 +16,9 @@ void Sampler::Init()
 	DX11::HRASSERT(hr, "Creating Sampler");
 }
 
-void Sampler::Bind()
+void Sampler::Bind(UINT slot)
 {
-	DX11::ourContext->PSSetSamplers(0, 1, mySamplerState.GetAddressOf());
+	DX11::ourContext->PSSetSamplers(slot, 1, mySamplerState.GetAddressOf());
 }
 
 ID3D11SamplerState* Sampler::Get() const

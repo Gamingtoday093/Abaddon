@@ -1,5 +1,7 @@
 #pragma once
 #include "Graphics/Bindables/Bindables.h"
+#include "Bindables/VertexShader.h"
+#include "Bindables/PixelShader.h"
 
 class RenderPass
 {

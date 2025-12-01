@@ -1,41 +1,66 @@
 #include "pch.h"
 #include "Renderer.h"
-#include "Graphics/Bindables/Bindables.h"
+#include "Bindables/Bindables.h"
 #include "Scene/Transform.h"
 #include "Scene/Camera.h"
-
-#define DegToRadFactor 0.01745329251f
+#include "Bindables/Materials/Material.hpp"
+#include <Scene/ModelAssetHandler.h>
 
 void Renderer::Init()
 {
 	myCBufferTransform.Init(eBindType::vertexShader);
+	myCBufferCamera.Init(eBindType::pixelShader);
+
+	for (size_t i = 0; i < myBlendStates.size(); i++)
+	{
+		BlendState blendState;
+		blendState.Init(static_cast<eBlendState>(i));
+		myBlendStates.at(i) = blendState;
+	}
 }
 
-void Renderer::Render(ModelData& aModelData, TextureData& aTextureData, Transform& aTransform, std::shared_ptr<Camera> aCamera)
+inline constexpr BlendState& Renderer::GetBlendState(eBlendState aBlendState)
+{
+	return myBlendStates.at(static_cast<size_t>(aBlendState));
+}
+
+void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTransform, std::shared_ptr<Camera> aCamera)
 {
 	// Bind model
 	aModelData.myVertexBuffer.Bind();
 	aModelData.myIndexBuffer.Bind();
 	aModelData.myInputLayout.Bind();
 
-	// Bind texture
-	aTextureData.mySRV.Bind();
-	aTextureData.mySampler.Bind();
+	// Bind material
+	aMaterial.Bind();
+
+	// TODO: Should sort Renders into RenderCommands so BlendState only has to be set when Switching Material BlendState Context
+	GetBlendState(aMaterial.GetBlendState()).Bind();
 
 	// Set transform
-	aTransform.myRotation *= DegToRadFactor;
+	DirectX::XMMATRIX modelMatrix = aTransform.GetModelMatrix();
 
-	myCBufferTransform.myData.myTransformation =
+	myCBufferTransform.myData.myProjectionModelMatrix =
 		DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixScaling(aTransform.myScale.x, aTransform.myScale.y, aTransform.myScale.z) *
-			DirectX::XMMatrixRotationRollPitchYaw(aTransform.myRotation.x, aTransform.myRotation.y, aTransform.myRotation.z) *
-			DirectX::XMMatrixTranslation(aTransform.myPosition.x, aTransform.myPosition.y, aTransform.myPosition.z) *
+			modelMatrix *
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
 		);
+
+	myCBufferTransform.myData.myModelMatrix = 
+		DirectX::XMMatrixTranspose(
+			modelMatrix
+		);
+
 	myCBufferTransform.ApplyChanges();
 	myCBufferTransform.Bind();
 
+	// Set camera
+	math::vector3<float> cameraPosition = aCamera.get()->GetPosition();
+	myCBufferCamera.myData.CameraPosition = DirectX::XMVectorSet(cameraPosition.x, cameraPosition.y, cameraPosition.z, 0);
+	myCBufferCamera.ApplyChanges();
+	myCBufferCamera.Bind();
+	
 	// Draw textured model
 	DX11::ourContext->DrawIndexed(aModelData.myIndexBuffer.GetIndexAmount(), 0, 0);
 }
@@ -49,7 +74,7 @@ void Renderer::RenderSkybox(std::shared_ptr<Cube> aCube, std::shared_ptr<CubeTex
 	aCubeTexture->Bind();
 
 	// Set View Projection Matrix
-	myCBufferTransform.myData.myTransformation =
+	myCBufferTransform.myData.myProjectionModelMatrix =
 		DirectX::XMMatrixTranspose(
 			aCamera->GetMatrix() *
 			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)

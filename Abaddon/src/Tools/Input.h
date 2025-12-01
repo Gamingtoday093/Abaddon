@@ -55,6 +55,16 @@ enum class eKeys : int
 	INSERT = 0x2D,
 	DELETE_BUTTON = 0x2E,
 	HELP = 0x2F,
+	Alpha0 = 0x30,
+	Alpha1 = 0x31,
+	Alpha2 = 0x32,
+	Alpha3 = 0x33,
+	Alpha4 = 0x34,
+	Alpha5 = 0x35,
+	Alpha6 = 0x36,
+	Alpha7 = 0x37,
+	Alpha8 = 0x38,
+	Alpha9 = 0x39,
 	A = 0x41,
 	B = 0x42,
 	C = 0x43,
@@ -261,7 +271,7 @@ public:
 	void ResetMouseDelta();
 	const bool GetMouseInsideWindow();
 	void MouseInsideWindowUpdate(bool aState);
-	short GetScrollDelta();
+	short GetScrollDelta() const;
 	bool UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam);
 	void Update();
 

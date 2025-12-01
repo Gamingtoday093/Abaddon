@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Window.h"
 #include "Engine.h"
+#include <format>
 
 #include "ImGui/ImGui.h"
 
@@ -8,6 +9,11 @@ int main()
 {
 	Window* window = new Window();
 	Engine* engine = new Engine(window->GetHWND());
+
+	window->OnResize = [engine](int width, int height)
+	{
+		engine->Resize(width, height);
+	};
 
 	engine->Init();
 

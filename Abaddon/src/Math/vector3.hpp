@@ -216,7 +216,10 @@ namespace math
 	float vector3<T>::AngleBetween(const vector3<T>& aOtherVector) const
 	{
 		assert(LengthSqr() > 0 && aOtherVector.LengthSqr() > 0 && "Can't Divide vector with Length 0.");
-		return acos(Dot(aOtherVector) / (Length() * aOtherVector.Length()));
+		float dot = Dot(aOtherVector) / (Length() * aOtherVector.Length()); // There is a chance that this might be outside of the 0 to 1 range due to floating point innaccuracies
+		if (dot < 0) dot = 0;
+		else if (dot > 1) dot = 1;
+		return acos(dot);
 	}
 #pragma endregion
 }

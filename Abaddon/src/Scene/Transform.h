@@ -11,6 +11,16 @@ struct Transform
 	}
 
 	math::vector3<float> myPosition;
+	/// <summary>
+	/// Rotation in Radians.
+	/// </summary>
 	math::vector3<float> myRotation;
 	math::vector3<float> myScale;
+
+	DirectX::XMMATRIX GetModelMatrix() const
+	{
+		return DirectX::XMMatrixScaling(myScale.x, myScale.y, myScale.z) *
+			   DirectX::XMMatrixRotationRollPitchYaw(myRotation.x, myRotation.y, myRotation.z) *
+			   DirectX::XMMatrixTranslation(myPosition.x, myPosition.y, myPosition.z);
+	}
 };

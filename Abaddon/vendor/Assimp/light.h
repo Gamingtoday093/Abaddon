@@ -194,7 +194,7 @@ struct aiLight {
      */
     C_STRUCT aiColor3D mColorDiffuse;
 
-    /** Specular color of the light source
+    /** Roughness color of the light source
      *
      *  The specular light color is multiplied with the specular
      *  material color to obtain the final color that contributes

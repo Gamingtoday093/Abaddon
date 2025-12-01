@@ -13,6 +13,7 @@ public:
 	void Initialize(bool aDebugMode);
 	void BeginFrame(float aClearColor[4]);
 	void EndFrame();
+	void Resize();
 
 	static void BindRenderTarget();
 	static void BindRenderTargetTexture();
@@ -32,8 +33,10 @@ public:
 
 private:
 	void CreateRenderTargetView();
+	// Used by ImGui to render Scene Tab.
 	void CreateSceneTextureResources();
 	void CreateDepth();
+	void CreateDepthTexture();
 	void SetViewPort();
 	void SetPrimitiveTopology();
 	void SetAndCreateVertexShader(std::string aShaderFileName);

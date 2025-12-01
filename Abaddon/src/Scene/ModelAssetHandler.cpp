@@ -7,6 +7,9 @@
 std::unordered_map<ePrimitive, ModelData> ModelAssetHandler::myPrimitiveModels;
 std::unordered_map<std::string, ModelData> ModelAssetHandler::myLoadedModels;
 std::unordered_map<std::string, TextureData> ModelAssetHandler::myLoadedTextures;
+std::unordered_map<std::string, Material*> ModelAssetHandler::myCreatedMaterials;
+
+class StandardMaterial;
 
 void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVertexShaderFileName)
 {
@@ -20,7 +23,7 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 
 	// Load file
 	Assimp::Importer importer;
-	auto data = importer.ReadFile("Models/" + aModelFileName, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenBoundingBoxes);
+	auto data = importer.ReadFile("Models/" + aModelFileName, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenBoundingBoxes | aiProcess_GenSmoothNormals);
 	if (!data)
 	{
 		LOG_ERROR("Failed to load model '" + aModelFileName + "'");
@@ -35,20 +38,26 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 	{
 		auto mesh = data->mMeshes[mIndex];
 		int indexOffset = vertexList.size();
-		
+
 		for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
 		{
 			auto vertex = mesh->mVertices[vIndex];
+			aiVector3t<ai_real> normal;
+			if (mesh->HasNormals())
+			{
+				normal = mesh->mNormals[vIndex];
+			}
 
 			aiVector3D* textureCoords = mesh->mTextureCoords[0];
+			float vertexU = 0;
+			float vertexV = 0;
 			if (textureCoords)
 			{
-				vertexList.push_back({ vertex.x, vertex.y, vertex.z, mesh->mTextureCoords[0][vIndex].x, 1.0f - mesh->mTextureCoords[0][vIndex].y });
+				vertexU = mesh->mTextureCoords[0][vIndex].x;
+				vertexV = 1.0f - mesh->mTextureCoords[0][vIndex].y;
 			}
-			else
-			{
-				vertexList.push_back({ vertex.x, vertex.y, vertex.z, 0, 0 });
-			}
+
+			vertexList.push_back({ vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV });
 		}
 
 		for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
@@ -60,14 +69,15 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 			indexList.push_back(face.mIndices[2] + indexOffset);
 		}
 		
-		boundingBox.ExpandTo({ mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z });
-		boundingBox.ExpandTo({ mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z });
+		boundingBox.ExpandTo(reinterpret_cast<math::vector3<float>&>(mesh->mAABB.mMin));
+		boundingBox.ExpandTo(reinterpret_cast<math::vector3<float>&>(mesh->mAABB.mMax));
 	}
 
 	// Create Input Layout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout = {
-		{ "POSITION", 0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
-		{ "TEXCOORD", 0,DXGI_FORMAT_R32G32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 	// Init
@@ -114,15 +124,16 @@ void ModelAssetHandler::LoadPrimitiveModels()
 #pragma region Plane
 	// Vertex Buffer list
 	std::vector<Vertex> vertexList;
-	vertexList.push_back({ -side, 0, side, 0, 0 });
-	vertexList.push_back({ side, 0, side, 1, 0 });
-	vertexList.push_back({ -side, 0, -side, 0, 1 });
-	vertexList.push_back({ side, 0, -side, 1, 1 });
+	vertexList.push_back({ -side, 0, side, 0, 1, 0, 0, 0 });
+	vertexList.push_back({ side, 0, side, 0, 1, 0, 1, 0 });
+	vertexList.push_back({ -side, 0, -side, 0, 1, 0, 0, 1 });
+	vertexList.push_back({ side, 0, -side, 0, 1, 0, 1, 1 });
 
 	// Create Input Layout
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout = {
-		{ "POSITION", 0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
-		{ "TEXCOORD", 0,DXGI_FORMAT_R32G32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	// Init
@@ -138,14 +149,14 @@ void ModelAssetHandler::LoadPrimitiveModels()
 #pragma region Cube
 	// Vertex Buffer list
 	vertexList.clear();
-	vertexList.push_back({ -side, -side, -side, 0.375f, 0.25f });
-	vertexList.push_back({ side, -side, -side, 0.375f, 0.50f });
-	vertexList.push_back({ -side, side, -side, 0.625f, 0.25f });
-	vertexList.push_back({ side, side, -side, 0.625f, 0.50f });
-	vertexList.push_back({ -side, -side, side, 0.375f, 1 });
-	vertexList.push_back({ side, -side, side, 0.375f, 0.75f });
-	vertexList.push_back({ -side, side, side, 0.625f, 0 });
-	vertexList.push_back({ side, side, side, 0.625f, 0.75f });
+	vertexList.push_back({ -side, -side, -side, 0, 1, 0, 0.375f, 0.25f });
+	vertexList.push_back({ side, -side, -side, 0, 1, 0, 0.375f, 0.50f });
+	vertexList.push_back({ -side, side, -side, 0, 1, 0, 0.625f, 0.25f });
+	vertexList.push_back({ side, side, -side, 0, 1, 0, 0.625f, 0.50f });
+	vertexList.push_back({ -side, -side, side, 0, 1, 0, 0.375f, 1 });
+	vertexList.push_back({ side, -side, side, 0, 1, 0, 0.375f, 0.75f });
+	vertexList.push_back({ -side, side, side, 0, 1, 0, 0.625f, 0 });
+	vertexList.push_back({ side, side, side, 0, 1, 0, 0.625f, 0.75f });
 
 	ModelData cubeMeshData;
 	cubeMeshData.myVertexBuffer.Init(vertexList);
@@ -182,4 +193,15 @@ TextureData& ModelAssetHandler::GetTextureData(std::string aTextureFileName)
 	}
 
 	return myLoadedTextures.at(aTextureFileName);
+}
+
+Material& ModelAssetHandler::GetMaterial(std::string aMaterialName)
+{
+	if (myCreatedMaterials.find(aMaterialName) == myCreatedMaterials.end())
+	{
+		LOG_ERROR("Material not found.");
+		Assert(false);
+	}
+
+	return *myCreatedMaterials.at(aMaterialName);
 }

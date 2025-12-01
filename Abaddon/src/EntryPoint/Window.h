@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <functional>
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -17,6 +18,7 @@ public:
 
 	HWND& GetHWND();
 
+	std::function<void(int, int)> OnResize;
 private:
 	HINSTANCE myHInstance;
 	HWND myHWND;

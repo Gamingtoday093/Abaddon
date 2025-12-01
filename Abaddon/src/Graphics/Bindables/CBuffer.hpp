@@ -19,7 +19,7 @@ public:
 	~CBuffer() = default;
 
 	void Init(eBindType aBindType);
-	void Bind();
+	void Bind(UINT slot = 0);
 	ID3D11Buffer* Get() const;
 	ID3D11Buffer* const* GetAdressOf() const;
 
@@ -58,21 +58,21 @@ inline void CBuffer<T>::Init(eBindType aBindType)
 }
 
 template<typename T>
-inline void CBuffer<T>::Bind()
+inline void CBuffer<T>::Bind(UINT slot)
 {
 	switch (myBindType)
 	{
 		case eBindType::vertexShader:
-			DX11::ourContext->VSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
+			DX11::ourContext->VSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
 		case eBindType::pixelShader:
-			DX11::ourContext->PSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
+			DX11::ourContext->PSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
 		case eBindType::VsAndPs:
-			DX11::ourContext->VSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
-			DX11::ourContext->PSSetConstantBuffers(0, 1, myBuffer.GetAddressOf());
+			DX11::ourContext->VSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
+			DX11::ourContext->PSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
 		default:

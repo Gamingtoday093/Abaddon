@@ -3,6 +3,9 @@
 class DX11;
 class Renderer;
 class Scene;
+class RenderPass;
+class CubeTexture;
+class Cube;
 
 #ifdef enableImGui
 class ImGuiManager;
@@ -18,7 +21,7 @@ public:
 	void Update();
 	void BeginFrame();
 	void EndFrame();
-
+	void Resize(int width, int height);
 
 private:
 	HWND& myHWND;
@@ -26,10 +29,17 @@ private:
 	std::shared_ptr<Renderer> myRenderer;
 	std::shared_ptr<Scene> myScene;
 
+	std::unique_ptr<RenderPass> myDefaultPass;
+	std::unique_ptr<RenderPass> mySkyboxPass;
+
+	std::shared_ptr<CubeTexture> mySkyboxTexture;
+	std::shared_ptr<Cube> mySkyboxMesh;
+
 #ifdef enableImGui
 	std::shared_ptr<ImGuiManager> myImGui;
 #endif
 
-	float myClearColor[4] = { 0.3f,0.4f,0.6f,1.0f };
+	bool myIsMinimized = false;
+	float myClearColor[4] = { 0.16f, 0.16f, 0.16f, 0.16f };
 };
 

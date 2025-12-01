@@ -60,6 +60,7 @@ Window::Window() : myHInstance(GetModuleHandle(nullptr))
 	int width = 1500;
 	int height = 902;
 
+	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	SetWindowPos(hwnd, nullptr, 190, 80, width, height, 0);
 	ShowWindow(hwnd, SW_SHOW);
 }
@@ -88,6 +89,7 @@ bool Window::ProcessMessages()
 
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
+		// Window has fully Closed
 		if (msg.message == WM_QUIT)
 		{
 			return false;
@@ -115,11 +117,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #endif
 	
 	Input::GetInstance().UpdateEvents(uMsg, wParam, lParam);
+	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 	switch (uMsg)
 	{
+		// Window is being Closed
 		case WM_DESTROY:
 			PostQuitMessage(0);
+			return 0;
+
+		// Window has Resized
+		case WM_SIZE:
+			if (window && window->OnResize)
+				window->OnResize(LOWORD(lParam), HIWORD(lParam));
 			return 0;
 
 		case WM_PAINT:

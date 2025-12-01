@@ -30,6 +30,7 @@ private:
 	float myMaxZoom;
 	float myMinRotation;
 	float myMaxRotation;
+	math::vector2<float> myDefaultRotation;
 
 	XMMATRIX myCameraMatrix;
 

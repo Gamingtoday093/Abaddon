@@ -203,14 +203,14 @@ enum aiTextureType {
     /** The texture is combined with the result of the diffuse
      *  lighting equation.
      *  OR
-     *  PBR Specular/Glossiness
+     *  PBR Roughness/Glossiness
      */
     aiTextureType_DIFFUSE = 1,
 
     /** The texture is combined with the result of the specular
      *  lighting equation.
      *  OR
-     *  PBR Specular/Glossiness
+     *  PBR Roughness/Glossiness
      */
     aiTextureType_SPECULAR = 2,
 
@@ -414,7 +414,7 @@ enum aiShadingMode {
     * of their preferred PBR rendering methods are likely to be available
     * eg:
     * - If AI_MATKEY_METALLIC_FACTOR is set, then a Metallic/Roughness is available
-    * - If AI_MATKEY_GLOSSINESS_FACTOR is set, then a Specular/Glossiness is available
+    * - If AI_MATKEY_GLOSSINESS_FACTOR is set, then a Roughness/Glossiness is available
     * Note that some PBR methods allow layering of techniques
     */
     aiShadingMode_PBR_BRDF = 0xb,
@@ -993,12 +993,12 @@ extern "C" {
 // -1.0 = anisotropy along bitangent direction
 #define AI_MATKEY_ANISOTROPY_FACTOR "$mat.anisotropyFactor", 0, 0
 
-// Specular/Glossiness Workflow
+// Roughness/Glossiness Workflow
 // ---------------------------
 // Diffuse/Albedo Color. Note: Pure Metals have a diffuse of {0,0,0}
 // AI_MATKEY_COLOR_DIFFUSE
-// Specular Color.
-// Note: Metallic/Roughness may also have a Specular Color
+// Roughness Color.
+// Note: Metallic/Roughness may also have a Roughness Color
 // AI_MATKEY_COLOR_SPECULAR
 #define AI_MATKEY_SPECULAR_FACTOR "$mat.specularFactor", 0, 0
 // Glossiness factor. 0.0 = Completely Rough, 1.0 = Perfectly Smooth

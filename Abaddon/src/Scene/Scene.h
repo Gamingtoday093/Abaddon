@@ -18,10 +18,11 @@ public:
 
 	Entity CreateEmptyEntity(std::string aName = "New Entity");
 	Entity CreateEntity(std::string aName = "Unnamed");
+	std::vector<Entity> GetAllEntities();
 
-	entt::registry* FuckENTT();
+	std::shared_ptr<Renderer> GetRenderer();
 	HWND& myHWND;
-
+	
 	std::shared_ptr<Camera> GetCamera();
 
 private:

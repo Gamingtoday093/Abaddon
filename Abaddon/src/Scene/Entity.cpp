@@ -15,3 +15,13 @@ Scene& Entity::GetScene()
 {
 	return *myScene;
 }
+
+bool Entity::operator==(entt::entity aEntity)
+{
+	return myEntityHandle == aEntity;
+}
+
+bool Entity::operator==(Entity aEntity)
+{
+	return myEntityHandle == aEntity.myEntityHandle;
+}

@@ -24,21 +24,22 @@ namespace math
 		vector4<T> GetNormalized() const;
 		vector3<T> Rotate(const vector3<T>& aOtherVector) const;
 		vector3<T> ToEuler() const;
+		static vector4<T> RotateAngleAxis(const float aAngle, const vector3<T>& aAxis);
 		static vector4<T> FromToRotation(const vector3<T>& aFromDir, const vector3<T>& aToDir);
 		static vector4<T> LookRotation(const vector3<T>& aForward, const vector3<T>& aUp);
 
 #pragma region StaticMethods
-		static const vector4<T> zero()
+		static constexpr vector4<T> zero()
 		{
 			return { 0, 0, 0, 0 };
 		}
 
-		static const vector4<T> one()
+		static constexpr vector4<T> one()
 		{
 			return { 1, 1, 1, 1 };
 		}
 
-		static const vector4<T> identity()
+		static constexpr vector4<T> identity()
 		{
 			return { 0, 0, 0, 1 };
 		}
@@ -187,8 +188,8 @@ namespace math
 	inline vector3<T> vector4<T>::Rotate(const vector3<T>& aOtherVector) const
 	{
 		const vector3<T> u = { x, y, z };
-		//return (u * (2 * u.Dot(aOtherVector))) + (aOtherVector * (w * w - u.Dot(u))) + (u.Cross(aOtherVector) * (2 * w));
-		return aOtherVector + (u.Cross(aOtherVector) * w) + u.Cross(u.Cross(aOtherVector)) * 2.0f;
+		return (u * (2 * u.Dot(aOtherVector))) + (aOtherVector * (w * w - u.Dot(u))) + (u.Cross(aOtherVector) * (2 * w));
+		//return aOtherVector + (u.Cross(aOtherVector) * w) + u.Cross(u.Cross(aOtherVector)) * 2.0f; // Doesnt work
 	}
 
 	template<class T>
@@ -226,6 +227,15 @@ namespace math
 	}
 
 	template<class T>
+	inline vector4<T> vector4<T>::RotateAngleAxis(const float aAngle, const vector3<T>& aAxis)
+	{
+		const float sn = sin(aAngle * 0.5f);
+		const float cs = cos(aAngle * 0.5f);
+		const math::vector3<T> asn = aAxis * sn;
+		return { asn.x, asn.y, asn.z, cs };
+	}
+
+	template<class T>
 	vector4<T> vector4<T>::FromToRotation(const vector3<T>& aFromDir, const vector3<T>& aToDir)
 	{
 		const vector3<T> normalizedFromDir = aFromDir.GetNormalized();
@@ -245,8 +255,9 @@ namespace math
 				axis = normalizedFromDir.Cross(vector3<T>::up());
 			}
 
-			const DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(axis.x, axis.y, axis.z, 0), DirectX::XM_PI);
-			return vector4<T>(DirectX::XMVectorGetX(quat), DirectX::XMVectorGetY(quat), DirectX::XMVectorGetZ(quat), DirectX::XMVectorGetW(quat));
+			return vector4<T>::RotateAngleAxis(DirectX::XM_PI, axis);
+			//const DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(axis.x, axis.y, axis.z, 0), DirectX::XM_PI);
+			//return vector4<T>(DirectX::XMVectorGetX(quat), DirectX::XMVectorGetY(quat), DirectX::XMVectorGetZ(quat), DirectX::XMVectorGetW(quat));
 		}
 		else
 		{

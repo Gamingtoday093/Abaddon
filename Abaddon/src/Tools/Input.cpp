@@ -72,7 +72,7 @@ void Input::MouseInsideWindowUpdate(bool aState)
 	myMouseInsideWindow = aState;
 }
 
-short Input::GetScrollDelta()
+short Input::GetScrollDelta() const
 {
 	return -myCurrentScrollDelta;
 }

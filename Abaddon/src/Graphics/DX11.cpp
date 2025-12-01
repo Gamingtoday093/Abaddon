@@ -75,6 +75,26 @@ void DX11::EndFrame()
 	ourSwapChain->Present(1, 0);
 }
 
+void DX11::Resize()
+{
+	ourContext->OMSetRenderTargets(0, 0, 0);
+	// ComPtr Calls Release() when set to nullptr
+	ourBackBuffer = nullptr;
+	ourDepthBuffer = nullptr;
+	ourTextureSRV = nullptr;
+	ourTextureBuffer = nullptr;
+	ourTexture = nullptr;
+
+	HRESULT hr = ourSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+
+	HRASSERT(hr, "Resizing Buffers");
+
+	CreateRenderTargetView();
+	CreateDepthTexture();
+	CreateSceneTextureResources();
+	SetViewPort();
+}
+
 void DX11::HRASSERT(HRESULT aHr, std::string aDescription, bool aPrint)
 {
 	if (FAILED(aHr))
@@ -112,7 +132,6 @@ void DX11::CreateDepth()
 	D3D11_DEPTH_STENCIL_DESC depthDesc = {};
 	depthDesc.DepthEnable = true;
 	depthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	//depthDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	depthDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	HRESULT hr = ourDevice->CreateDepthStencilState(&depthDesc, &depthStencilState);
@@ -121,6 +140,11 @@ void DX11::CreateDepth()
 	ourContext->OMSetDepthStencilState(depthStencilState.Get(), 1);
 
 	// Depth Stencil Texture
+	CreateDepthTexture();
+}
+
+void DX11::CreateDepthTexture()
+{
 	ComPtr<ID3D11Texture2D> depthStencilTexture;
 
 	D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -134,7 +158,7 @@ void DX11::CreateDepth()
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-	hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &depthStencilTexture);
+	HRESULT hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &depthStencilTexture);
 	HRASSERT(hr, "Creation of Depth Stencil Texture 2D");
 
 	// Depth Stencil View

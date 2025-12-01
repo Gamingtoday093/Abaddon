@@ -10,6 +10,7 @@ void TopDownCamera::Init(float aMovementSpeed, float aRotationSpeed, float aZoom
 	myMaxZoom = aMaxZoom;
 	myMinRotation = aMinRotation;
 	myMaxRotation = aMaxRotation;
+	myDefaultRotation = aStartRotation;
 
 	myCamOrbitTarget = XMVectorSet(aStartOrbit.x, aStartOrbit.y, aStartOrbit.z, 0.0f);
 	myCamPosition = XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f);
@@ -73,13 +74,19 @@ void TopDownCamera::CalculateMatrix()
 
 void TopDownCamera::UpdateInput()
 {
-	// Mouse
+	// Rotation
 	if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MBUTTON))
 	{
-		myRot.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
+		myRot.x -= Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
 		if (myRot.x > myMinRotation) myRot.x = myMinRotation;
 		else if (myRot.x < myMaxRotation) myRot.x = myMaxRotation;
-		myRot.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
+		myRot.y -= Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
+	}
+
+	// Reset Rotation
+	if (Input::GetInstance().IsKeyPressed((int)eKeys::HOME))
+	{
+		myRot = myDefaultRotation;
 	}
 
 	// Zoom

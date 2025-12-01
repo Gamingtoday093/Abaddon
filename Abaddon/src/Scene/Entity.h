@@ -22,7 +22,7 @@ public:
 	}
 
 	template<typename T>
-	T& GetComponent()
+	T& GetComponent() const
 	{
 		if (!HasComponent<T>())
 		{
@@ -34,7 +34,7 @@ public:
 	}
 
 	template <typename T>
-	bool HasComponent()
+	bool HasComponent() const
 	{
 		return myScene->myRegistry.any_of<T>(myEntityHandle);
 	}
@@ -52,6 +52,9 @@ public:
 	}
 
 	Scene& GetScene();
+
+	bool operator==(entt::entity aEntity);
+	bool operator==(Entity aEntity);
 
 private:
 	entt::entity myEntityHandle{ 0 };

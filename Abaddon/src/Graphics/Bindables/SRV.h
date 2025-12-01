@@ -12,7 +12,7 @@ public:
 	~SRV() = default;
 
 	void Init(std::string aTextureFileName);
-	void Bind();
+	void Bind(UINT slot = 0);
 	ID3D11ShaderResourceView* Get() const;
 	ID3D11ShaderResourceView* const* GetAdressOf() const;
 
