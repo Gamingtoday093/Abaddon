@@ -41,6 +41,7 @@ void ImGuiManager::BeginFrame()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 	Update();
 	ImGui::Render();
 }
@@ -77,6 +78,40 @@ void ImGuiManager::SceneTab()
 
 	ImGui::SetCursorPos({ (ImGui::GetWindowSize().x - textureSizeCorrected.x) * 0.5f, (ImGui::GetWindowSize().y - textureSizeCorrected.y) * 0.5f + 10 });
 	ImGui::Image((void*)DX11::ourTextureSRV.Get(), textureSizeCorrected);
+
+	if (mySelectedEntity && mySelectedEntity->HasComponent<TransformComponent>())
+	{
+		ImVec2 viewportMin = ImGui::GetItemRectMin();
+		ImVec2 viewportMax = ImGui::GetItemRectMax();
+
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(viewportMin.x, viewportMin.y, viewportMax.x - viewportMin.x, viewportMax.y - viewportMin.y);
+
+		DirectX::XMFLOAT4X4 storedViewMatrix;
+		DirectX::XMStoreFloat4x4(&storedViewMatrix, myScene->GetCamera()->GetMatrix());
+		float* viewMatrix = &storedViewMatrix.m[0][0];
+
+		DirectX::XMFLOAT4X4 storedProjectionMatrix;
+		DirectX::XMStoreFloat4x4(&storedProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f));
+		float* projectionMatrix = &storedProjectionMatrix.m[0][0];
+
+		TransformComponent& transform = mySelectedEntity->GetComponent<TransformComponent>();
+
+		DirectX::XMFLOAT4X4 storedModelMatrix;
+		DirectX::XMStoreFloat4x4(&storedModelMatrix, transform.myTransform.GetModelMatrix());
+		float* modelMatrix = &storedModelMatrix.m[0][0];
+
+		ImGuizmo::Manipulate(viewMatrix, projectionMatrix, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, modelMatrix);
+
+		DirectX::XMVECTOR position;
+		DirectX::XMVECTOR rotation;
+		DirectX::XMVECTOR scale;
+		DirectX::XMMatrixDecompose(&scale, &rotation, &position, DirectX::XMMATRIX(modelMatrix));
+
+		transform.myTransform.myPosition = { DirectX::XMVectorGetX(position), DirectX::XMVectorGetY(position), DirectX::XMVectorGetZ(position) };
+		transform.myTransform.myRotation = (math::vector4<float> { DirectX::XMVectorGetX(rotation), DirectX::XMVectorGetY(rotation), DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) }).ToEuler();
+		transform.myTransform.myScale = { DirectX::XMVectorGetX(scale), DirectX::XMVectorGetY(scale), DirectX::XMVectorGetZ(scale) };
+	}
 
 	ImGui::End();
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "ImGui/ImGui.h"
+#include "external/ImGuizmo/ImGuizmo.h"
 #include "ImGuiLogger.h"
 #include "Scene/Entity.h"
 

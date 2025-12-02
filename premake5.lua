@@ -13,6 +13,7 @@ workspace "Abaddon"
     
 group "Dependencies" 
     include "vendor/external/ImGui"
+    include "vendor/external/ImGuizmo"
 group ""
     
 project "Abaddon"
@@ -41,7 +42,8 @@ project "Abaddon"
         "D3DCompiler.lib",
         "lib/DirectXTex.lib",
         "lib/assimp-vc143-mt.lib",
-        "ImGui"
+        "ImGui",
+        "ImGuizmo"
     }
     
     files {
