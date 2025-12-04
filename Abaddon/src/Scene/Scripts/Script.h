@@ -24,6 +24,6 @@ protected:
 
 private:
 	friend class Scene;
-	friend class ScriptComponent;
+	friend struct ScriptComponent;
 };
 

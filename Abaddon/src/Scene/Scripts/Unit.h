@@ -7,8 +7,8 @@
 
 using namespace DirectX;
 
-class ModelData;
-class TextureData;
+struct ModelData;
+struct TextureData;
 
 class Unit : public Script
 {

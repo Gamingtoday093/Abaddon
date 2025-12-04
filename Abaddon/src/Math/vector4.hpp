@@ -219,11 +219,6 @@ namespace math
 
 			return { cx, 0.f, atan2f(-m21, m11) };
 		}
-
-		//return { (w * aOtherVector.x) + (x * aOtherVector.w) + (y * aOtherVector.z) - (y * aOtherVector.y),
-		//		 (w * aOtherVector.y) - (x * aOtherVector.z) + (y * aOtherVector.w) + (z * aOtherVector.x),
-		//		 (w * aOtherVector.z) + (x * aOtherVector.y) - (y * aOtherVector.x) + (z * aOtherVector.w),
-		//		 (w * aOtherVector.w) - (x * aOtherVector.x) - (y * aOtherVector.y) - (z * aOtherVector.z) };
 	}
 
 	template<class T>
@@ -282,10 +277,6 @@ namespace math
 		const DirectX::XMVECTOR U = DirectX::XMQuaternionMultiply(DirectX::XMVectorSet(quat.x, quat.y, quat.z, quat.w), DirectX::XMVectorSet(0, 1, 0, 0));
 		
 		vector4<T> quat2 = FromToRotation({ DirectX::XMVectorGetX(U), DirectX::XMVectorGetY(U), DirectX::XMVectorGetZ(U) }, aUp);
-
-		//auto U = quat.Multiply({ 0, 1, 0, 0 });
-
-		//vector4<T> quat2 = FromToRotation({ U.x, U.y, U.z }, aUp);
 
 		const DirectX::XMVECTOR result = DirectX::XMQuaternionMultiply(DirectX::XMVectorSet(quat2.x, quat2.y, quat2.z, quat2.w), DirectX::XMVectorSet(quat.x, quat.y, quat.z, quat.w));
 		return vector4<T>(DirectX::XMVectorGetX(result), DirectX::XMVectorGetY(result), DirectX::XMVectorGetZ(result), DirectX::XMVectorGetW(result));

@@ -19,6 +19,9 @@ void ImGuiManager::Init()
 	ImGui_ImplWin32_Init(myHWND);
 	ImGui_ImplDX11_Init(DX11::ourDevice.Get(), DX11::ourContext.Get());
 
+	myGizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+	myGizmoSpace = ImGuizmo::MODE::WORLD;
+
 	// Override Output Buffer with a Mirrored Buffer (Writes to Both)
 	myLogger = std::make_unique<ImGuiLogger>();
 	myLogger->Bind();
@@ -59,25 +62,44 @@ void ImGuiManager::EndFrame()
 
 void ImGuiManager::SceneTab()
 {
-	ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("Scene", nullptr, 
+		ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoNav // Disable all forms of Scrolling
+	);
 
 	RECT rect;
 	GetClientRect(myHWND, &rect);
 
+	ImVec2 windowSize = ImGui::GetWindowSize();
+
 	ImVec2 textureSizeCorrected;
 	float aspectRatio = (float)(rect.bottom - rect.top) / (float)(rect.right - rect.left);
-	if (ImGui::GetWindowHeight() / ImGui::GetWindowWidth() > aspectRatio)
+	if (windowSize.y / windowSize.x > aspectRatio)
 	{
-		textureSizeCorrected = ImVec2{ ImGui::GetWindowSize().x, ImGui::GetWindowSize().x * aspectRatio };
+		textureSizeCorrected = ImVec2{ windowSize.x - 8, windowSize.x * aspectRatio - ImGui::GetFrameHeight() };
 	}
 	else
 	{
 		aspectRatio = (float)(rect.right - rect.left) / (float)(rect.bottom - rect.top);
-		textureSizeCorrected = ImVec2{ ImGui::GetWindowSize().y * aspectRatio, ImGui::GetWindowSize().y };
+		textureSizeCorrected = ImVec2{ windowSize.y * aspectRatio - 8, windowSize.y - ImGui::GetFrameHeight() };
 	}
 
-	ImGui::SetCursorPos({ (ImGui::GetWindowSize().x - textureSizeCorrected.x) * 0.5f, (ImGui::GetWindowSize().y - textureSizeCorrected.y) * 0.5f + 10 });
+	ImGui::SetCursorPos({ (windowSize.x - textureSizeCorrected.x) * 0.5f, (windowSize.y - textureSizeCorrected.y + ImGui::GetFrameHeight()) * 0.5f });
 	ImGui::Image((void*)DX11::ourTextureSRV.Get(), textureSizeCorrected);
+	
+	if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_Q))
+		myGizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+	else if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_W))
+		myGizmoOperation = ImGuizmo::OPERATION::ROTATE;
+	else if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_R))
+		myGizmoOperation = ImGuizmo::OPERATION::SCALE;
+
+	if (ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_T, false))
+	{
+		if (myGizmoSpace == ImGuizmo::MODE::WORLD)
+			myGizmoSpace = ImGuizmo::MODE::LOCAL;
+		else
+			myGizmoSpace = ImGuizmo::MODE::WORLD;
+	}
 
 	if (mySelectedEntity && mySelectedEntity->HasComponent<TransformComponent>())
 	{
@@ -101,7 +123,7 @@ void ImGuiManager::SceneTab()
 		DirectX::XMStoreFloat4x4(&storedModelMatrix, transform.myTransform.GetModelMatrix());
 		float* modelMatrix = &storedModelMatrix.m[0][0];
 
-		ImGuizmo::Manipulate(viewMatrix, projectionMatrix, ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, modelMatrix);
+		ImGuizmo::Manipulate(viewMatrix, projectionMatrix, myGizmoOperation, myGizmoSpace, modelMatrix);
 
 		DirectX::XMVECTOR position;
 		DirectX::XMVECTOR rotation;
@@ -111,6 +133,45 @@ void ImGuiManager::SceneTab()
 		transform.myTransform.myPosition = { DirectX::XMVectorGetX(position), DirectX::XMVectorGetY(position), DirectX::XMVectorGetZ(position) };
 		transform.myTransform.myRotation = (math::vector4<float> { DirectX::XMVectorGetX(rotation), DirectX::XMVectorGetY(rotation), DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) }).ToEuler();
 		transform.myTransform.myScale = { DirectX::XMVectorGetX(scale), DirectX::XMVectorGetY(scale), DirectX::XMVectorGetZ(scale) };
+	}
+
+	if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_MouseLeft, false))
+	{
+		ImVec2 mousePos = ImGui::GetMousePos();
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		math::vector2<float> insideViewportPos =
+		{
+			mousePos.x - windowPos.x - ((windowSize.x - textureSizeCorrected.x) * 0.5f),
+			mousePos.y - windowPos.y - ImGui::GetFrameHeight() - ((windowSize.y - ImGui::GetFrameHeight() - textureSizeCorrected.y) * 0.5f)
+		}; // Mouse Position where (0, 0) is Top left of the Scene Viewport
+
+		// * To CameraSpace *
+		insideViewportPos.x /= textureSizeCorrected.x;
+		insideViewportPos.y /= textureSizeCorrected.y;
+
+		insideViewportPos.x -= 0.5f;
+		insideViewportPos.y -= 0.5f;
+
+		insideViewportPos.x *= 2;
+		insideViewportPos.y *= -2;
+
+		math::vector3<float> rayOrigin = myScene->GetCamera()->CameraSpaceToWorldSpace(insideViewportPos);
+		math::vector3<float> rayDirection = (rayOrigin - myScene->GetCamera()->GetPosition()).GetNormalized();
+
+		for (const auto& entity : myScene->GetAllEntities())
+		{
+			if (!entity.HasComponent<TransformComponent>() || !entity.HasComponent<ModelComponent>()) continue;
+
+			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+			ModelComponent& model = entity.GetComponent<ModelComponent>();
+
+			AABB transformedAABB = transform.TransformAABB(ModelAssetHandler::GetModelData(model.myModelName).myAABB);			
+			if (transformedAABB.RayBounds(rayOrigin, rayDirection))
+			{
+				mySelectedEntity = std::make_unique<Entity>(entity);
+				break;
+			}
+		}
 	}
 
 	ImGui::End();
@@ -129,10 +190,9 @@ void ImGuiManager::HierarchyTab()
 	for (const auto& entity : myScene->GetAllEntities())
 	{
 		bool selected = mySelectedEntity && entity == *mySelectedEntity;
-		if (entity.HasComponent<TagComponent>() && ImGui::Selectable(entity.GetComponent<TagComponent>().myTag.c_str(), selected))
-		{
+		const char* tag = entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().myTag.c_str() : "[Missing Tag]";
+		if (ImGui::Selectable(tag, selected))
 			mySelectedEntity = std::make_unique<Entity>(entity);
-		}
 	}
 
 	ImGui::End();

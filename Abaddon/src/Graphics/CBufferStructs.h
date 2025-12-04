@@ -2,7 +2,9 @@
 #include "Bindables/CBuffer.hpp"
 #include <DirectXMath.h>
 
-__declspec(align(64))
+// These should all be 16 Byte Aligned to take advantage of SIMD instructions
+
+__declspec(align(16))
 struct TransformBuffer
 {
 	DirectX::XMMATRIX myProjectionModelMatrix;

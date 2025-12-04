@@ -6,7 +6,7 @@
 
 using namespace DirectX;
 
-class Camera
+class Camera abstract
 {
 public:
 	explicit Camera() = default;
@@ -25,7 +25,7 @@ public:
 			GetMatrix() * // View Matrix
 			XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f); // Projection Matrix
 
-		XMVECTOR newVector = XMVector3TransformCoord(XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0), matrix);
+		XMVECTOR newVector = XMVector3TransformCoord(XMLoadFloat3(reinterpret_cast<XMFLOAT3*>(&aPosition)), matrix);
 
 		return { XMVectorGetX(newVector), XMVectorGetY(newVector) };
 	}
@@ -38,15 +38,23 @@ public:
 
 		matrix = XMMatrixInverse(NULL, matrix); // Inverse Matrix
 
-		XMVECTOR newVector = XMVector3TransformCoord(XMVectorSet(aPosition.x, aPosition.y, 0, 0), matrix);
+		XMVECTOR newVector = XMVector3TransformCoord(XMLoadFloat2(reinterpret_cast<XMFLOAT2*>(&aPosition)), matrix);
 
 		return { XMVectorGetX(newVector), XMVectorGetY(newVector), XMVectorGetZ(newVector) };
 	}
 
+	/// <summary>
+	/// Center of the Screen is (0, 0).
+	/// Left is -1 and Right is 1.
+	/// Bottom is -1 and Top is 1.
+	/// Top Right is (1, 1).
+	/// Bottom Left is (-1, -1).
+	/// </summary>
+	/// <param name="hwnd"></param>
+	/// <returns></returns>
 	static math::vector2<float> MousePositionToCameraSpace(HWND& hwnd)
 	{
 		POINT mPos = Input::GetInstance().GetMousePosition();
-
 		math::vector2<float> mousePos = math::vector2<float>(mPos.x, mPos.y);
 
 		RECT rect;

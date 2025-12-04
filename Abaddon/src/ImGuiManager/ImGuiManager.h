@@ -27,6 +27,8 @@ private:
 
 	HWND& myHWND;
 	std::shared_ptr<Scene> myScene;
+	ImGuizmo::OPERATION myGizmoOperation;
+	ImGuizmo::MODE myGizmoSpace;
 	std::unique_ptr<Entity> mySelectedEntity = nullptr;
 	std::unique_ptr<ImGuiLogger> myLogger;
 };

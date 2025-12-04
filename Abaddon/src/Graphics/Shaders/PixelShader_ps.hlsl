@@ -31,7 +31,7 @@ cbuffer LightingBufffer : register(b2)
 
 float cal_specular(float4 position, float4 normal, float shininess)
 {
-    const float4 halfWayVector = normalize(-lightDirection + (cameraPosition - normal));
+    const float4 halfWayVector = normalize(-lightDirection + (cameraPosition - position));
     return saturate(pow(dot(normal, halfWayVector), shininess));
 }
 
@@ -46,5 +46,5 @@ float4 main(PS_INPUT input) : SV_TARGET
     light += 0.5f;
     light *= 0.75f;
     
-    return ((baseColor + (cal_specular(input.position, input.normal, 4) * roughness) + (lightColor * saturate(NdotL) * lightStrength)) * light) + emission;
+    return ((baseColor + (cal_specular(input.worldPosition, input.normal, 4) * roughness) + (lightColor * saturate(NdotL) * lightStrength)) * light) + emission;
 }
