@@ -3,7 +3,7 @@
 #include "Graphics/DX11.h"
 #include <d3dcompiler.h>
 
-void InputLayout::Init(std::vector<D3D11_INPUT_ELEMENT_DESC> aDescriptionList, std::string aVertexShaderFileName)
+void InputLayout::Init(const std::vector<D3D11_INPUT_ELEMENT_DESC>& aDescriptionList, std::string aVertexShaderFileName)
 {
 	// Get Vertex Shader info
 	ComPtr<ID3DBlob> blob;
@@ -15,6 +15,8 @@ void InputLayout::Init(std::vector<D3D11_INPUT_ELEMENT_DESC> aDescriptionList, s
 		blob->GetBufferSize(),
 		&myInputLayout);
 	DX11::HRASSERT(hr, "Creating Input Layout");
+
+	blob = nullptr; // Releasing Shader Blob, it's only used for Description matches Shader Validation
 }
 
 void InputLayout::Bind()

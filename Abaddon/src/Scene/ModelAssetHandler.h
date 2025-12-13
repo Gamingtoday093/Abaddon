@@ -1,8 +1,10 @@
 #pragma once
 #include "Graphics/Bindables/Bindables.h"
+#include "Graphics/Bindables/Animation/Animation.h"
 #include "Graphics/Bindables/Materials/Material.hpp"
-#include <unordered_map>
 #include <concepts>
+
+struct aiNode;
 
 enum class ePrimitive : int
 {
@@ -16,13 +18,15 @@ concept DerivedFromMaterial = std::derived_from<T, Material>;
 class ModelAssetHandler
 {
 public:
-	static void LoadModel(std::string aModelFileName, std::string aVertexShaderFileName = "VertexShader_vs.cso");
+	static void LoadModel(std::string aModelFileName);
+	static void LoadAnimations(std::string aAnimationFileName);
 	static void LoadTexture(std::string aTextureFileName);
 	template<DerivedFromMaterial T>
 	static T& CreateMaterial(std::string aMaterialName);
 
 	static ModelData& GetPrimitiveModelData(ePrimitive aPrimitive);
 	static ModelData& GetModelData(std::string aModelFileName);
+	static Animation& GetAnimation(std::string aAnimationName);
 	static TextureData& GetTextureData(std::string aTextureFileName);
 	static Material& GetMaterial(std::string aMaterialName);
 	template<DerivedFromMaterial T>
@@ -32,8 +36,10 @@ private:
 	friend class ImGuiManager;
 
 	static void LoadPrimitiveModels();
+	static void LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode/*, const DirectX::XMMATRIX& aParentTransform*/);
 	static std::unordered_map<ePrimitive, ModelData> myPrimitiveModels;
 	static std::unordered_map<std::string, ModelData> myLoadedModels;
+	static std::unordered_map<std::string, Animation> myLoadedAnimations;
 	static std::unordered_map<std::string, TextureData> myLoadedTextures;
 	static std::unordered_map<std::string, Material*> myCreatedMaterials; // Raw Pointer because idgaf
 };

@@ -306,6 +306,13 @@ void ImGuiManager::InspectorTab()
 			ImGui::Text(model.myModelName.c_str());
 			ImGui::Text(model.myMaterialName.c_str());
 		}
+		if (entity.HasComponent<AnimatorComponent>())
+		{
+			ImGui::SeparatorText("Animator");
+			AnimatorComponent& animator = entity.GetComponent<AnimatorComponent>();
+			ImGui::Text(animator.myAnimationName.c_str());
+			ImGui::Text(std::to_string(animator.myTimeSeconds).c_str());
+		}
 		if (entity.HasComponent<ScriptComponent>())
 		{
 			ImGui::SeparatorText("Script");
@@ -322,6 +329,13 @@ void ImGuiManager::AssetsTab()
 	for (auto& model : ModelAssetHandler::myLoadedModels)
 	{
 		ImGui::Text(model.first.c_str());
+	}
+
+	ImGui::Separator();
+
+	for (auto& animation : ModelAssetHandler::myLoadedAnimations)
+	{
+		ImGui::Text(animation.first.c_str());
 	}
 
 	ImGui::Separator();

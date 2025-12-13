@@ -5,14 +5,14 @@
 
 #include "Entity.h"
 
-#include "ModelAssetHandler.h"
-
 #include "Components/Components.h"
 #include "Scene/Scripts/PlayerMovement.h"
 #include "Scene/Scripts/Unit.h"
 #include "Scene/Scripts/LightingVisualizer.h"
-#include "Managers/UnitManager.h"
+#include "Scene/Scripts/Managers/UnitManager.h"
 #include "Graphics/Bindables/Materials/Materials.h"
+
+struct TextureData;
 
 Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND& aHWND) : myRenderer(aRenderer), myHWND(aHWND)
 {
@@ -40,6 +40,8 @@ void Scene::Init()
 	ModelAssetHandler::LoadModel("Ship.fbx");
 	ModelAssetHandler::LoadModel("ShipSmooth.fbx");
 	ModelAssetHandler::LoadModel("Sphere2.fbx");
+	ModelAssetHandler::LoadModel("AnimationTest2.fbx");
+	ModelAssetHandler::LoadAnimations("AnimationTest2.fbx");
 	ModelAssetHandler::LoadTexture("ShipTexture.png");
 	ModelAssetHandler::LoadTexture("ShipEmission.png");
 	ModelAssetHandler::LoadModel("gremlin.fbx");
@@ -67,6 +69,21 @@ void Scene::Init()
 	sphere.GetComponent<TransformComponent>().myTransform.myPosition = { 0, 10, 0 };
 	LightingVisualizer* lightingVisualizer = sphere.AddComponent<ScriptComponent>().Bind<LightingVisualizer>(sphere);
 	lightingVisualizer->Init("ShipMaterial");
+
+	Entity animated = CreateEntity("Animated");
+	animated.AddComponent<ModelComponent>("AnimationTest2.fbx", "ShipMaterial");
+	animated.GetComponent<TransformComponent>().myTransform.myPosition = { 10, 10, 0 };
+	animated.AddComponent<AnimatorComponent>("Armature|Move2", ModelAssetHandler::GetAnimation("Armature|Move2").myDurationSeconds);
+
+	constexpr double time = 0;
+	for (auto& channel : ModelAssetHandler::GetAnimation("Armature|Move2").myChannels)
+	{
+		LOG(channel.myName);
+		auto keyframe = channel.GetInterpolated(time);
+		auto rot = keyframe.myRotationKey.ToEuler();
+		std::cout << "Time: " << std::to_string(time) << " Position: (" << std::to_string(keyframe.myPositionKey.x) << ", " << std::to_string(keyframe.myPositionKey.y) << ", " << std::to_string(keyframe.myPositionKey.z) << ") Rotation: (" << std::to_string(rot.x) << ", " << std::to_string(rot.y) << ", " << std::to_string(rot.z) << ") Scale: (" << std::to_string(keyframe.myScaleKey.x) << ", " << std::to_string(keyframe.myScaleKey.y) << ", " << std::to_string(keyframe.myScaleKey.z) << ")" << std::endl;
+		//, keyframe.myPositionKey, keyframe.myRotationKey.ToEuler(), keyframe.myScaleKey));
+	}
 }
 
 void Scene::Update()
@@ -105,15 +122,30 @@ void Scene::Update()
 		material.UpdateLightingDirection(lightDirection);
 	}
 
-	auto group = myRegistry.group<TransformComponent>(entt::get<ModelComponent>);
+	auto group = myRegistry.group<TransformComponent>(entt::get<ModelComponent>, entt::exclude<AnimatorComponent>);
 	for (auto entity : group)
 	{
 		std::tuple<TransformComponent, ModelComponent> object = group.get<TransformComponent, ModelComponent>(entity);
-
 		ModelData& modelData = ModelAssetHandler::GetModelData(std::get<1>(object).myModelName);
 		Material& material = ModelAssetHandler::GetMaterial(std::get<1>(object).myMaterialName);
 		myRenderer->Render(modelData, material, std::get<0>(object).myTransform, GetCamera());
 	}
+
+	auto skinned = myRegistry.view<AnimatorComponent, TransformComponent, ModelComponent>();
+	for (auto skinnedEntity : skinned)
+	{
+		std::tuple<AnimatorComponent, TransformComponent, ModelComponent> object = skinned.get<AnimatorComponent, TransformComponent, ModelComponent>(skinnedEntity);
+	
+		ModelData& modelData = ModelAssetHandler::GetModelData(std::get<2>(object).myModelName);
+		Material& material = ModelAssetHandler::GetMaterial(std::get<2>(object).myMaterialName);
+		Animation& animation = ModelAssetHandler::GetAnimation(std::get<0>(object).myAnimationName);
+		myRenderer->Render(modelData, material, std::get<1>(object).myTransform, animation, std::get<0>(object).myTimeSeconds, GetCamera());
+	}
+
+	myRegistry.view<AnimatorComponent>().each([=](AnimatorComponent& aAnimatorComponent)
+		{
+			aAnimatorComponent.Update();
+		});
 
 	myRegistry.view<ScriptComponent>().each([=](entt::entity aEntity, ScriptComponent& aScriptComponent)
 		{

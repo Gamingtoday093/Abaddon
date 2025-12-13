@@ -1,6 +1,8 @@
 #pragma once
-#include "Scene/Scripts/Unit.h"
+#include "Scene/Scripts/Script.h"
 #include <unordered_map>
+
+class Unit;
 
 class UnitManager : public Script
 {

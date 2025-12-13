@@ -2,6 +2,7 @@
 #include "UnitManager.h"
 #include "Scene/ModelAssetHandler.h"
 #include "Scene/Components/Components.h"
+#include "Scene/Scripts/Unit.h"
 
 #include "Graphics/Renderer.h"
 #include "Graphics/Bindables/Materials/Materials.h"

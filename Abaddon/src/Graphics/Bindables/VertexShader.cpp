@@ -8,7 +8,7 @@ void VertexShader::Init(std::string aShaderFileName)
 	ComPtr<ID3DBlob> blob;
 	HRESULT hr = D3DReadFileToBlob(AddStringsReturnWStr("Shaders/", aShaderFileName).c_str(), &blob);
 	DX11::HRASSERT(hr, "Creating Vertex Shader Blob");
-
+	
 	hr = DX11::ourDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &myVertexShader);
 	DX11::HRASSERT(hr, "Creating Vertex Shader");
 }

@@ -17,7 +17,7 @@ public:
 			LOG_ERROR("Entity already has component");
 			Assert(false);
 		}
-
+		
 		return myScene->myRegistry.emplace<T>(myEntityHandle, std::forward<Args>(aArgs)...);
 	}
 

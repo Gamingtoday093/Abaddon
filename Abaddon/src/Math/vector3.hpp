@@ -25,45 +25,55 @@ namespace math
 		float AngleBetween(const vector3<T>& aOtherVector) const;
 
 #pragma region StaticMethods
-		static const vector3<T> zero()
+		static constexpr vector3<T> zero()
 		{
 			return { 0, 0, 0 };
 		}
 
-		static const vector3<T> one()
+		static constexpr vector3<T> one()
 		{
 			return { 1, 1, 1 };
 		}
 
-		static const vector3<T> forward()
+		static constexpr vector3<T> forward()
 		{
 			return { 0, 0, 1 };
 		}
 
-		static const vector3<T> back()
+		static constexpr vector3<T> back()
 		{
 			return { 0, 0, -1 };
 		}
 
-		static const vector3<T> right()
+		static constexpr vector3<T> right()
 		{
 			return { 1, 0, 0 };
 		}
 
-		static const vector3<T> left()
+		static constexpr vector3<T> left()
 		{
 			return { -1, 0, 0 };
 		}
 
-		static const vector3<T> up()
+		static constexpr vector3<T> up()
 		{
 			return { 0, 1, 0 };
 		}
 
-		static const vector3<T> down()
+		static constexpr vector3<T> down()
 		{
 			return { 0, -1, 0 };
 		}
+
+		static const vector3<T> lerp(const vector3<T>& lhs, const vector3<T>& rhs, float t)
+		{
+			return lhs + ((rhs - lhs) * t);
+		}
+
+		//static const vector3<T> slerp(const vector3<T>& lhs, const vector3<T>& rhs, float t)
+		//{
+		//	return lerp(lhs, rhs, easeInOutCubic(t));
+		//}
 #pragma endregion
 
 		vector3<T>& operator=(const vector3<T>& aOtherVector) = default;

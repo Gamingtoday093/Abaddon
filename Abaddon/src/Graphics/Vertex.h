@@ -1,12 +1,12 @@
 #pragma once
-#include "Math/vectors.h"
+#include "Bindables/Animation/AnimationDefines.h"
 
 struct Vertex
 {
 	Vertex() 
 	{
-		myPosition = { 0,0,0,1 };
-		myNormal = { 0,0,0,1 };
+		myPosition = { 0,0,0 };
+		myNormal = { 0,0,0 };
 		myTexcoord = { 0.0f,0.0f };
 	}
 
@@ -15,12 +15,10 @@ struct Vertex
 		myPosition.x = aX;
 		myPosition.y = aY;
 		myPosition.z = aZ;
-		myPosition.w = 1;
 
 		myNormal.x = aNX;
 		myNormal.y = aNY;
 		myNormal.z = aNZ;
-		myNormal.w = 0;
 
 		myTexcoord.x = aU;
 		myTexcoord.y = aV;
@@ -31,18 +29,59 @@ struct Vertex
 		myPosition.x = aPosition.x;
 		myPosition.y = aPosition.y;
 		myPosition.z = aPosition.z;
-		myPosition.w = 1;
 
 		myNormal.x = aNormal.x;
 		myNormal.y = aNormal.y;
 		myNormal.z = aNormal.z;
-		myNormal.w = 0;
 
 		myTexcoord.x = aTexcoord.x;
 		myTexcoord.y = aTexcoord.y;
 	}
 
-	math::vector4<float> myPosition;
-	math::vector4<float> myNormal;
+	math::vector3<float> myPosition;
+	math::vector3<float> myNormal;
 	math::vector2<float> myTexcoord;
+};
+
+struct SkinnedVertex
+{
+	SkinnedVertex()
+	{
+		myPosition = { 0,0,0 };
+		myNormal = { 0,0,0 };
+		myTexcoord = { 0.0f,0.0f };
+
+		for (size_t i = 0; i < Animations::MAX_WEIGHTS; i++)
+		{
+			myBoneIDs[i] = 0;
+			myBoneWeights[i] = 0;
+		}
+	}
+
+	SkinnedVertex(float aX, float aY, float aZ, float aNX, float aNY, float aNZ, float aU, float aV)
+	{
+		myPosition.x = aX;
+		myPosition.y = aY;
+		myPosition.z = aZ;
+
+		myNormal.x = aNX;
+		myNormal.y = aNY;
+		myNormal.z = aNZ;
+
+		myTexcoord.x = aU;
+		myTexcoord.y = aV;
+
+		for (size_t i = 0; i < Animations::MAX_WEIGHTS; i++)
+		{
+			myBoneIDs[i] = 0;
+			myBoneWeights[i] = 0;
+		}
+	}
+
+	math::vector3<float> myPosition;
+	math::vector3<float> myNormal;
+	math::vector2<float> myTexcoord;
+
+	unsigned int myBoneIDs[Animations::MAX_WEIGHTS];
+	float myBoneWeights[Animations::MAX_WEIGHTS];
 };

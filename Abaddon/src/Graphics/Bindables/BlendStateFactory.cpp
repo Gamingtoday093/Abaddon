@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "BlendStateFactory.h"
+#include <d3d11.h>
 
 namespace BlendStateFactory
 {

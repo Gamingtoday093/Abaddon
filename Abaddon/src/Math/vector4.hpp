@@ -27,6 +27,7 @@ namespace math
 		static vector4<T> RotateAngleAxis(const float aAngle, const vector3<T>& aAxis);
 		static vector4<T> FromToRotation(const vector3<T>& aFromDir, const vector3<T>& aToDir);
 		static vector4<T> LookRotation(const vector3<T>& aForward, const vector3<T>& aUp);
+		static const vector4<T> slerp(const vector4<T>& lhs, const vector4<T>& rhs, float t);
 
 #pragma region StaticMethods
 		static constexpr vector4<T> zero()
@@ -280,6 +281,29 @@ namespace math
 
 		const DirectX::XMVECTOR result = DirectX::XMQuaternionMultiply(DirectX::XMVectorSet(quat2.x, quat2.y, quat2.z, quat2.w), DirectX::XMVectorSet(quat.x, quat.y, quat.z, quat.w));
 		return vector4<T>(DirectX::XMVectorGetX(result), DirectX::XMVectorGetY(result), DirectX::XMVectorGetZ(result), DirectX::XMVectorGetW(result));
+	}
+
+	template<class T>
+	inline const vector4<T> vector4<T>::slerp(const vector4<T>& lhs, const vector4<T>& rhs, float t)
+	{
+		T dot = lhs.Dot(rhs);
+
+		vector4<T> rhs2 = rhs;
+		if (dot < 0)
+		{
+			dot = -dot;
+			rhs2 = rhs * static_cast<T>(-1);
+		}
+
+		float theta = acos(dot);
+		float sinTheta = sin(theta);
+
+		if (sinTheta == 0) return rhs;
+
+		float w1 = sin((1.0f - t) * theta) / sinTheta;
+		float w2 = sin(t * theta) / sinTheta;
+
+		return lhs * w1 + rhs2 * w2;
 	}
 #pragma endregion
 }

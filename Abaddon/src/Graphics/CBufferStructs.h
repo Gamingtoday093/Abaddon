@@ -1,14 +1,21 @@
 #pragma once
 #include "Bindables/CBuffer.hpp"
+#include "Bindables/Animation/AnimationDefines.h"
 #include <DirectXMath.h>
 
-// These should all be 16 Byte Aligned to take advantage of SIMD instructions
+// These should all be 16 Byte Aligned to take advantage of SIMD instructions + Constant Buffers Require 16 byte Alignments
 
 __declspec(align(16))
 struct TransformBuffer
 {
-	DirectX::XMMATRIX myProjectionModelMatrix;
+	DirectX::XMMATRIX myProjectionViewMatrix;
 	DirectX::XMMATRIX myModelMatrix;
+};
+
+__declspec(align(16))
+struct AnimationBuffer
+{
+	DirectX::XMMATRIX myBones[Animations::MAX_BONES];
 };
 
 __declspec(align(16))

@@ -3,15 +3,15 @@
 #include "Assimp/Importer.hpp"
 #include "Assimp/scene.h"
 #include "Assimp/postprocess.h"
+#include "Graphics/Bindables/InputLayoutFactory.h"
 
 std::unordered_map<ePrimitive, ModelData> ModelAssetHandler::myPrimitiveModels;
 std::unordered_map<std::string, ModelData> ModelAssetHandler::myLoadedModels;
+std::unordered_map<std::string, Animation> ModelAssetHandler::myLoadedAnimations;
 std::unordered_map<std::string, TextureData> ModelAssetHandler::myLoadedTextures;
 std::unordered_map<std::string, Material*> ModelAssetHandler::myCreatedMaterials;
 
-class StandardMaterial;
-
-void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVertexShaderFileName)
+void ModelAssetHandler::LoadModel(std::string aModelFileName)
 {
 	// Check if it's already loaded
 	if (myLoadedModels.find(aModelFileName) != myLoadedModels.end())
@@ -20,18 +20,26 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 		Assert(false);
 		return;
 	}
-
+	
 	// Load file
 	Assimp::Importer importer;
-	auto data = importer.ReadFile("Models/" + aModelFileName, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenBoundingBoxes | aiProcess_GenSmoothNormals);
+	auto data = importer.ReadFile("Models/" + aModelFileName,
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_GenBoundingBoxes |
+		aiProcess_GenSmoothNormals |
+		aiProcess_PopulateArmatureData |
+		aiProcess_LimitBoneWeights);
 	if (!data)
 	{
 		LOG_ERROR("Failed to load model '" + aModelFileName + "'");
 		Assert(false);
 	}
-	
+
 	// Vertex Buffer & Index Buffer list & Bounding Box
+	ModelData meshData;
 	std::vector<Vertex> vertexList;
+	std::vector<SkinnedVertex> vertexSkinnedList;
 	std::vector<unsigned short> indexList;
 	AABB boundingBox;
 	for (int mIndex = 0; mIndex < data->mNumMeshes; mIndex++)
@@ -42,22 +50,22 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 		for (int vIndex = 0; vIndex < mesh->mNumVertices; vIndex++)
 		{
 			auto vertex = mesh->mVertices[vIndex];
-			aiVector3t<ai_real> normal;
+			aiVector3D normal;
 			if (mesh->HasNormals())
-			{
 				normal = mesh->mNormals[vIndex];
-			}
 
-			aiVector3D* textureCoords = mesh->mTextureCoords[0];
 			float vertexU = 0;
 			float vertexV = 0;
-			if (textureCoords)
+			if (mesh->mTextureCoords[0])
 			{
 				vertexU = mesh->mTextureCoords[0][vIndex].x;
 				vertexV = 1.0f - mesh->mTextureCoords[0][vIndex].y;
 			}
 
-			vertexList.push_back({ vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV });
+			if (mesh->HasBones())
+				vertexSkinnedList.emplace_back(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV);
+			else
+				vertexList.emplace_back(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV);
 		}
 
 		for (int fIndex = 0; fIndex < mesh->mNumFaces; fIndex++)
@@ -71,24 +79,139 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName, std::string aVerte
 		
 		boundingBox.ExpandTo(reinterpret_cast<math::vector3<float>&>(mesh->mAABB.mMin));
 		boundingBox.ExpandTo(reinterpret_cast<math::vector3<float>&>(mesh->mAABB.mMax));
+
+		// Skeleton
+		if (mesh->HasBones())
+		{
+			meshData.mySkeleton.myBones.reserve(mesh->mNumBones);
+			meshData.mySkeleton.myBoneNameToIndex.reserve(mesh->mNumBones);
+
+			for (int b = 0; b < mesh->mNumBones; b++)
+			{
+				auto bone = mesh->mBones[b];
+				auto& om = bone->mOffsetMatrix;
+				meshData.mySkeleton.myBones.emplace_back(b,
+					DirectX::XMMatrixSet(
+					om.a1, om.a2, om.a3, om.a4,
+					om.b1, om.b2, om.b3, om.b4,
+					om.c1, om.c2, om.c3, om.c4,
+					om.d1, om.d2, om.d3, om.d4)
+				);
+
+				// THIS HAS BEEN VERIFIED TO BE CORRECT!
+				meshData.mySkeleton.myBoneNameToIndex.insert({ bone->mName.C_Str(), b });
+
+				// Assign Weights to Vertices
+				// THIS HAS BEEN VERIFIED TO BE CORRECT!
+				for (int w = 0; w < bone->mNumWeights; w++)
+				{
+					auto weight = bone->mWeights[w];
+
+					SkinnedVertex& vertex = vertexSkinnedList[weight.mVertexId];
+					for (int i = 0; i < Animations::MAX_WEIGHTS; i++)
+					{
+						if (vertex.myBoneWeights[i] != 0) continue;
+
+						vertex.myBoneIDs[i] = b;
+						vertex.myBoneWeights[i] = weight.mWeight;
+						break;
+					}
+				}
+			}
+
+			LoadBoneHierarchyRecursive(meshData.mySkeleton.myBoneNameToIndex, meshData.mySkeleton, data->mRootNode/*, DirectX::XMMatrixIdentity()*/);
+		}
 	}
 
-	// Create Input Layout
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-
 	// Init
-	ModelData meshData;
-	meshData.myVertexBuffer.Init(vertexList);
+	if (meshData.HasSkeleton()) 
+		meshData.myVertexBuffer.Init(vertexSkinnedList);
+	else meshData.myVertexBuffer.Init(vertexList);
 	meshData.myIndexBuffer.Init(indexList);
-	meshData.myInputLayout.Init(inputLayout, aVertexShaderFileName);
 	meshData.myAABB = boundingBox;
 
 	// Add to loaded model list
 	myLoadedModels.insert({ aModelFileName, meshData });
+}
+
+void ModelAssetHandler::LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode/*, const DirectX::XMMATRIX& aParentTransform*/)
+{
+	//auto& t = aNode->mTransformation;
+	//const DirectX::XMMATRIX nodeTransform = aParentTransform * DirectX::XMMatrixSet(
+	//	t.a1, t.a2, t.a3, t.a4,
+	//	t.b1, t.b2, t.b3, t.b4,
+	//	t.c1, t.c2, t.c3, t.c4,
+	//	t.d1, t.d2, t.d3, t.d4);
+
+	auto pair = aBoneNameToIndex.find(aNode->mName.C_Str());
+	if (pair != aBoneNameToIndex.end())
+	{
+		//auto& bone = aSkeleton.myBones.at(pair->second);
+		//bone.myFinalMatrix = nodeTransform * bone.myRestMatrix;
+
+		if (aNode->mParent)
+		{
+			auto parent = aBoneNameToIndex.find(aNode->mParent->mName.C_Str());
+			if (parent != aBoneNameToIndex.end())
+				aSkeleton.myBones.at(pair->second).myBoneParentIndex = parent->second;
+		}
+	}
+
+	for (int c = 0; c < aNode->mNumChildren; c++)
+		LoadBoneHierarchyRecursive(aBoneNameToIndex, aSkeleton, aNode->mChildren[c]/*, nodeTransform*/);
+}
+
+void ModelAssetHandler::LoadAnimations(std::string aAnimationFileName)
+{
+	Assimp::Importer importer;
+	auto data = importer.ReadFile("Models/" + aAnimationFileName, 0);
+
+	for (int a = 0; a < data->mNumAnimations; a++)
+	{
+		auto animationData = data->mAnimations[a];
+
+		if (animationData->mNumChannels == 0) continue;
+
+		if (myLoadedAnimations.find(animationData->mName.C_Str()) != myLoadedAnimations.end())
+		{
+			LOG_WARNING("Duplicate Animation Name.");
+			Assert(false);
+		}
+
+		Animation animation;
+		animation.myFramerate = animationData->mTicksPerSecond == 0 ? 30. : animationData->mTicksPerSecond;
+		animation.myDurationSeconds = animationData->mDuration / animation.myFramerate;
+
+		for (int c = 0; c < animationData->mNumChannels; c++)
+		{
+			auto channelData = animationData->mChannels[c];
+
+			Animation::Channel& channel = animation.myChannels.emplace_back(channelData->mNodeName.C_Str());
+
+			for (int i = 0; i < channelData->mNumPositionKeys; i++)
+			{
+				auto& positionKey = channelData->mPositionKeys[i];
+
+				channel.myPositionKeyframes.emplace_back(positionKey.mTime, positionKey.mValue.x, positionKey.mValue.y, positionKey.mValue.z);
+			}
+
+			for (int i = 0; i < channelData->mNumRotationKeys; i++)
+			{
+				auto& rotationKey = channelData->mRotationKeys[i];
+
+				channel.myRotationKeyframes.emplace_back(rotationKey.mTime, rotationKey.mValue.x, rotationKey.mValue.y, rotationKey.mValue.z, rotationKey.mValue.w);
+			}
+
+			for (int i = 0; i < channelData->mNumScalingKeys; i++)
+			{
+				auto& scaleKey = channelData->mScalingKeys[i];
+
+				channel.myScaleKeyframes.emplace_back(scaleKey.mTime, scaleKey.mValue.x, scaleKey.mValue.y, scaleKey.mValue.z);
+			}
+		}
+
+		myLoadedAnimations.insert({ animationData->mName.C_Str(), animation });
+	}
 }
 
 void ModelAssetHandler::LoadTexture(std::string aTextureFileName)
@@ -129,18 +252,13 @@ void ModelAssetHandler::LoadPrimitiveModels()
 	vertexList.push_back({ -side, 0, -side, 0, 1, 0, 0, 1 });
 	vertexList.push_back({ side, 0, -side, 0, 1, 0, 1, 1 });
 
-	// Create Input Layout
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayout = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
 	// Init
 	ModelData planeMeshData;
 	planeMeshData.myVertexBuffer.Init(vertexList);
 	planeMeshData.myIndexBuffer.Init({ 1,2,0, 1,3,2 });
-	planeMeshData.myInputLayout.Init(inputLayout, "VertexShader_vs.cso");
+
+	for (auto& vertex : vertexList)
+		planeMeshData.myAABB.ExpandTo(vertex.myPosition);
 
 	// Add to primitive model list
 	myPrimitiveModels.insert({ ePrimitive::Plane, planeMeshData});
@@ -166,7 +284,9 @@ void ModelAssetHandler::LoadPrimitiveModels()
 									  4,5,7, 4,7,6,
 									  0,4,2, 2,4,6,
 									  0,1,4, 1,5,4 });
-	cubeMeshData.myInputLayout.Init(inputLayout, "VertexShader_vs.cso");
+
+	for (auto& vertex : vertexList)
+		cubeMeshData.myAABB.ExpandTo(vertex.myPosition);
 
 	// Add to primitive model list
 	myPrimitiveModels.insert({ ePrimitive::Cube, cubeMeshData });
@@ -182,6 +302,17 @@ ModelData& ModelAssetHandler::GetModelData(std::string aModelFileName)
 	}
 	
 	return myLoadedModels.at(aModelFileName);
+}
+
+Animation& ModelAssetHandler::GetAnimation(std::string aAnimationName)
+{
+	if (myLoadedAnimations.find(aAnimationName) == myLoadedAnimations.end())
+	{
+		LOG_ERROR("Animation not found.");
+		Assert(false);
+	}
+
+	return myLoadedAnimations.at(aAnimationName);
 }
 
 TextureData& ModelAssetHandler::GetTextureData(std::string aTextureFileName)

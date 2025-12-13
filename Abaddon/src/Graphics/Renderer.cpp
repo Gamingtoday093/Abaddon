@@ -1,15 +1,24 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "Bindables/Bindables.h"
+#include "Bindables/Animation/Animation.h"
 #include "Scene/Transform.h"
 #include "Scene/Camera.h"
 #include "Bindables/Materials/Material.hpp"
 #include <Scene/ModelAssetHandler.h>
+#include "Bindables/InputLayoutFactory.h"
 
 void Renderer::Init()
 {
 	myCBufferTransform.Init(eBindType::vertexShader);
+	myCBufferAnimation.Init(eBindType::vertexShader);
 	myCBufferCamera.Init(eBindType::pixelShader);
+
+	myInputLayout.Init(InputLayoutFactory::GetDescription<Vertex>(), "VertexShader_vs.cso");
+	mySkinnedInputLayout.Init(InputLayoutFactory::GetDescription<SkinnedVertex>(), "SkinnedShader_vs.cso");
+
+	myVertexShader.Init("VertexShader_vs.cso");
+	mySkinnedShader.Init("SkinnedShader_vs.cso");
 
 	for (size_t i = 0; i < myBlendStates.size(); i++)
 	{
@@ -24,33 +33,48 @@ inline constexpr BlendState& Renderer::GetBlendState(eBlendState aBlendState)
 	return myBlendStates.at(static_cast<size_t>(aBlendState));
 }
 
+void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTransform, Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera)
+{
+	Assert(aModelData.HasSkeleton());
+
+	constexpr rsize_t bonesArraySize = sizeof(DirectX::XMMATRIX) * Animations::MAX_BONES;
+	memcpy_s(myCBufferAnimation.myData.myBones, bonesArraySize, aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds), bonesArraySize);
+	myCBufferAnimation.ApplyChanges();
+	myCBufferAnimation.Bind(1);
+
+	Render(aModelData, aMaterial, aTransform, aCamera);
+}
+
 void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTransform, std::shared_ptr<Camera> aCamera)
 {
 	// Bind model
 	aModelData.myVertexBuffer.Bind();
 	aModelData.myIndexBuffer.Bind();
-	aModelData.myInputLayout.Bind();
 
 	// Bind material
 	aMaterial.Bind();
 
-	// TODO: Should sort Renders into RenderCommands so BlendState only has to be set when Switching Material BlendState Context
+	// TODO: Should sort Renders into RenderCommands so BlendState and Others only has to be set when Switching Material BlendState Context
+	if (aModelData.HasSkeleton())
+	{
+		mySkinnedInputLayout.Bind();
+		mySkinnedShader.Bind();
+	}
+	else
+	{
+		myInputLayout.Bind();
+		myVertexShader.Bind();
+	}
+
 	GetBlendState(aMaterial.GetBlendState()).Bind();
 
-	// Set transform
-	DirectX::XMMATRIX modelMatrix = aTransform.GetModelMatrix();
-
-	myCBufferTransform.myData.myProjectionModelMatrix =
-		DirectX::XMMatrixTranspose(
-			modelMatrix *
-			aCamera->GetMatrix() *
-			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
-		);
+	// Set Vertex Constant Buffer
+	myCBufferTransform.myData.myProjectionViewMatrix =
+		aCamera->GetMatrix() *
+		DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 	myCBufferTransform.myData.myModelMatrix = 
-		DirectX::XMMatrixTranspose(
-			modelMatrix
-		);
+		aTransform.GetModelMatrix();
 
 	myCBufferTransform.ApplyChanges();
 	myCBufferTransform.Bind();
@@ -74,11 +98,9 @@ void Renderer::RenderSkybox(std::shared_ptr<Cube> aCube, std::shared_ptr<CubeTex
 	aCubeTexture->Bind();
 
 	// Set View Projection Matrix
-	myCBufferTransform.myData.myProjectionModelMatrix =
-		DirectX::XMMatrixTranspose(
-			aCamera->GetMatrix() *
-			DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f)
-		);
+	myCBufferTransform.myData.myProjectionViewMatrix =
+		aCamera->GetMatrix() *
+		DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 	myCBufferTransform.ApplyChanges();
 	myCBufferTransform.Bind();
 

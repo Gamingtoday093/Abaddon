@@ -1,6 +1,7 @@
 #pragma once
-#include <d3d11.h>
 #include "RenderStates.hpp"
+
+struct D3D11_BLEND_DESC;
 
 namespace BlendStateFactory
 {
@@ -12,4 +13,3 @@ namespace BlendStateFactory
 	D3D11_BLEND_DESC MultiplyBlendDesc();
 	D3D11_BLEND_DESC PremultipliedBlendDesc();
 }
-

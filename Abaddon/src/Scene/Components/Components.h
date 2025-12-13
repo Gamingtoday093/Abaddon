@@ -20,16 +20,14 @@ struct TransformComponent
 		cornerPos[5] = XMVectorSet(aAABB.myMax.x, aAABB.myMin.y, aAABB.myMax.z, 0);
 		cornerPos[6] = XMVectorSet(aAABB.myMax.x, aAABB.myMax.y, aAABB.myMin.z, 0);
 		cornerPos[7] = XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0);
-	
-		XMMATRIX matrix = DirectX::XMMatrixRotationRollPitchYaw(myTransform.myRotation.x, myTransform.myRotation.y, myTransform.myRotation.z) *	// ***
-						  DirectX::XMMatrixTranslation(myTransform.myPosition.x, myTransform.myPosition.y, myTransform.myPosition.z) *			// World Matrix
-						  DirectX::XMMatrixScaling(myTransform.myScale.x, myTransform.myScale.y, myTransform.myScale.z);						// ***
-		
+			
 		AABB newAABB(myTransform.myPosition, myTransform.myPosition);
+
+		DirectX::XMMATRIX modelMatrix = myTransform.GetModelMatrix();
 
 		for (int i = 0; i < 8; i++)
 		{
-			cornerPos[i] = XMVector3TransformCoord(cornerPos[i], matrix);
+			cornerPos[i] = XMVector3TransformCoord(cornerPos[i], modelMatrix);
 			math::vector3<float> transformedPos = { XMVectorGetX(cornerPos[i]), XMVectorGetY(cornerPos[i]), XMVectorGetZ(cornerPos[i]) };
 			newAABB.ExpandTo(transformedPos);
 		}
@@ -88,5 +86,33 @@ struct ModelComponent
 	{
 		myModelName = aModelName;
 		myMaterialName = aTextureName;
+	}
+};
+
+struct AnimatorComponent
+{
+	AnimatorComponent(std::string aAnimationName, double aAnimationDurationSeconds)
+	{
+		SetAnimation(aAnimationName, aAnimationDurationSeconds);
+	}
+
+	std::string myAnimationName;
+	double myAnimationDurationSeconds;
+	double myTimeSeconds;
+
+	void SetAnimation(std::string aAnimationName, double aAnimationDurationSeconds)
+	{
+		myAnimationName = aAnimationName;
+		myAnimationDurationSeconds = aAnimationDurationSeconds;
+		myTimeSeconds = 0;
+	}
+
+	void Update()
+	{
+		myTimeSeconds += 0.02;
+		if (myTimeSeconds > myAnimationDurationSeconds)
+		{
+			myTimeSeconds = 0;
+		}
 	}
 };

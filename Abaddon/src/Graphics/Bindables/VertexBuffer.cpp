@@ -4,16 +4,28 @@
 
 void VertexBuffer::Init(std::vector<Vertex> aVertexList)
 {
+	Init(std::data(aVertexList), aVertexList.size(), sizeof(Vertex));
+}
+
+void VertexBuffer::Init(std::vector<SkinnedVertex> aVertexList)
+{
+	Init(std::data(aVertexList), aVertexList.size(), sizeof(SkinnedVertex));
+}
+
+void VertexBuffer::Init(void* aData, UINT aNumData, UINT aDataSize)
+{
+	myDataSize = aDataSize;
+
 	D3D11_BUFFER_DESC bufferDesc = {};
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.CPUAccessFlags = 0u;
 	bufferDesc.MiscFlags = 0u;
-	bufferDesc.ByteWidth = UINT(sizeof(Vertex) * aVertexList.size());
-	bufferDesc.StructureByteStride = sizeof(Vertex);
+	bufferDesc.ByteWidth = aDataSize * aNumData;
+	bufferDesc.StructureByteStride = aDataSize;
 
 	D3D11_SUBRESOURCE_DATA subResData = {};
-	subResData.pSysMem = std::data(aVertexList);
+	subResData.pSysMem = aData;
 
 	// Create
 	HRESULT hr = DX11::ourDevice->CreateBuffer(&bufferDesc, &subResData, &myBuffer);
@@ -22,9 +34,8 @@ void VertexBuffer::Init(std::vector<Vertex> aVertexList)
 
 void VertexBuffer::Bind()
 {
-	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
-	DX11::ourContext->IASetVertexBuffers(0u, 1u, myBuffer.GetAddressOf(), &stride, &offset);
+	DX11::ourContext->IASetVertexBuffers(0u, 1u, myBuffer.GetAddressOf(), &myDataSize, &offset);
 }
 
 ID3D11Buffer* VertexBuffer::Get() const
