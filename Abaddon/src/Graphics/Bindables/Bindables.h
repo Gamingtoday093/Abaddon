@@ -19,21 +19,6 @@ struct Skeleton
 		{
 			myBoneParentIndex = aBoneIndex;
 			myRestMatrix = aRestMatrix;
-
-			DirectX::XMVECTOR position;
-			DirectX::XMVECTOR rotation;
-			DirectX::XMVECTOR scale;
-			DirectX::XMMatrixDecompose(&scale, &rotation, &position, myRestMatrix);
-
-			LOG("REST MATRIX BEGIN");
-
-			LOG("Position: (" + std::to_string(DirectX::XMVectorGetX(position)) + ", " + std::to_string(DirectX::XMVectorGetY(position)) + ", " + std::to_string(DirectX::XMVectorGetZ(position)) + ")");
-			math::vector4<float> rot = { DirectX::XMVectorGetX(rotation), DirectX::XMVectorGetY(rotation), DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) };
-			math::vector3<float> rotEuler = rot.ToEuler();
-			LOG("Rotation: (" + std::to_string(rotEuler.x) + ", " + std::to_string(rotEuler.y) + ", " + std::to_string(rotEuler.z) + ")");
-			LOG("Scale: (" + std::to_string(DirectX::XMVectorGetX(scale)) + ", " + std::to_string(DirectX::XMVectorGetY(scale)) + ", " + std::to_string(DirectX::XMVectorGetZ(scale)) + ")");
-
-			LOG("REST MATRIX END");
 		}
 
 		// This Bone has no Parent if the Parent Index is the same as it's Index
@@ -57,12 +42,14 @@ struct Skeleton
 			if (pair == myBoneNameToIndex.end()) continue;
 			if (pair->second < 0 && pair->second >= Animations::MAX_BONES) continue;
 			
+			// This is based on the assumption that Animation::myChannels is ordered from RootBone and Down
 			DirectX::XMMATRIX local = aAnimation.myChannels[i].GetInterpolated(aTime).GetMatrix();
 			BoneIndex parentIndex = myBones.at(pair->second).myBoneParentIndex;
 			if (parentIndex == pair->second) bones[pair->second] = local; // No Parent
 			else bones[pair->second] = bones[parentIndex] * local;
 		}
 
+		// TODO: This doesnt check the bounds compared to bones!!
 		for (int i = 0; i < myBones.size(); i++)
 			bones[i] = DirectX::XMMatrixTranspose(bones[i] * myBones[i].myRestMatrix);
 

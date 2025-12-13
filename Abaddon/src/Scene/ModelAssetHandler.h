@@ -36,7 +36,7 @@ private:
 	friend class ImGuiManager;
 
 	static void LoadPrimitiveModels();
-	static void LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode/*, const DirectX::XMMATRIX& aParentTransform*/);
+	static void LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode);
 	static std::unordered_map<ePrimitive, ModelData> myPrimitiveModels;
 	static std::unordered_map<std::string, ModelData> myLoadedModels;
 	static std::unordered_map<std::string, Animation> myLoadedAnimations;

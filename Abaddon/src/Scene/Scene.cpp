@@ -74,16 +74,6 @@ void Scene::Init()
 	animated.AddComponent<ModelComponent>("AnimationTest2.fbx", "ShipMaterial");
 	animated.GetComponent<TransformComponent>().myTransform.myPosition = { 10, 10, 0 };
 	animated.AddComponent<AnimatorComponent>("Armature|Move2", ModelAssetHandler::GetAnimation("Armature|Move2").myDurationSeconds);
-
-	constexpr double time = 0;
-	for (auto& channel : ModelAssetHandler::GetAnimation("Armature|Move2").myChannels)
-	{
-		LOG(channel.myName);
-		auto keyframe = channel.GetInterpolated(time);
-		auto rot = keyframe.myRotationKey.ToEuler();
-		std::cout << "Time: " << std::to_string(time) << " Position: (" << std::to_string(keyframe.myPositionKey.x) << ", " << std::to_string(keyframe.myPositionKey.y) << ", " << std::to_string(keyframe.myPositionKey.z) << ") Rotation: (" << std::to_string(rot.x) << ", " << std::to_string(rot.y) << ", " << std::to_string(rot.z) << ") Scale: (" << std::to_string(keyframe.myScaleKey.x) << ", " << std::to_string(keyframe.myScaleKey.y) << ", " << std::to_string(keyframe.myScaleKey.z) << ")" << std::endl;
-		//, keyframe.myPositionKey, keyframe.myRotationKey.ToEuler(), keyframe.myScaleKey));
-	}
 }
 
 void Scene::Update()
@@ -126,6 +116,7 @@ void Scene::Update()
 	for (auto entity : group)
 	{
 		std::tuple<TransformComponent, ModelComponent> object = group.get<TransformComponent, ModelComponent>(entity);
+		auto x = std::get<1>(object).myModelName;
 		ModelData& modelData = ModelAssetHandler::GetModelData(std::get<1>(object).myModelName);
 		Material& material = ModelAssetHandler::GetMaterial(std::get<1>(object).myMaterialName);
 		myRenderer->Render(modelData, material, std::get<0>(object).myTransform, GetCamera());

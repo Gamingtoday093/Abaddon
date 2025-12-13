@@ -98,11 +98,9 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 					om.d1, om.d2, om.d3, om.d4)
 				);
 
-				// THIS HAS BEEN VERIFIED TO BE CORRECT!
 				meshData.mySkeleton.myBoneNameToIndex.insert({ bone->mName.C_Str(), b });
 
 				// Assign Weights to Vertices
-				// THIS HAS BEEN VERIFIED TO BE CORRECT!
 				for (int w = 0; w < bone->mNumWeights; w++)
 				{
 					auto weight = bone->mWeights[w];
@@ -119,7 +117,7 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 				}
 			}
 
-			LoadBoneHierarchyRecursive(meshData.mySkeleton.myBoneNameToIndex, meshData.mySkeleton, data->mRootNode/*, DirectX::XMMatrixIdentity()*/);
+			LoadBoneHierarchyRecursive(meshData.mySkeleton.myBoneNameToIndex, meshData.mySkeleton, data->mRootNode);
 		}
 	}
 
@@ -134,22 +132,12 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 	myLoadedModels.insert({ aModelFileName, meshData });
 }
 
-void ModelAssetHandler::LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode/*, const DirectX::XMMATRIX& aParentTransform*/)
+void ModelAssetHandler::LoadBoneHierarchyRecursive(const std::unordered_map<std::string, unsigned int>& aBoneNameToIndex, Skeleton& aSkeleton, const aiNode* aNode)
 {
-	//auto& t = aNode->mTransformation;
-	//const DirectX::XMMATRIX nodeTransform = aParentTransform * DirectX::XMMatrixSet(
-	//	t.a1, t.a2, t.a3, t.a4,
-	//	t.b1, t.b2, t.b3, t.b4,
-	//	t.c1, t.c2, t.c3, t.c4,
-	//	t.d1, t.d2, t.d3, t.d4);
-
-	auto pair = aBoneNameToIndex.find(aNode->mName.C_Str());
-	if (pair != aBoneNameToIndex.end())
+	if (aNode->mParent)
 	{
-		//auto& bone = aSkeleton.myBones.at(pair->second);
-		//bone.myFinalMatrix = nodeTransform * bone.myRestMatrix;
-
-		if (aNode->mParent)
+		auto pair = aBoneNameToIndex.find(aNode->mName.C_Str());
+		if (pair != aBoneNameToIndex.end())
 		{
 			auto parent = aBoneNameToIndex.find(aNode->mParent->mName.C_Str());
 			if (parent != aBoneNameToIndex.end())
@@ -158,7 +146,7 @@ void ModelAssetHandler::LoadBoneHierarchyRecursive(const std::unordered_map<std:
 	}
 
 	for (int c = 0; c < aNode->mNumChildren; c++)
-		LoadBoneHierarchyRecursive(aBoneNameToIndex, aSkeleton, aNode->mChildren[c]/*, nodeTransform*/);
+		LoadBoneHierarchyRecursive(aBoneNameToIndex, aSkeleton, aNode->mChildren[c]);
 }
 
 void ModelAssetHandler::LoadAnimations(std::string aAnimationFileName)
