@@ -62,7 +62,7 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 				vertexV = 1.0f - mesh->mTextureCoords[0][vIndex].y;
 			}
 
-			if (mesh->HasBones())
+			if (mesh->HasBones() && mesh->mNumBones <= Animations::MAX_BONES)
 				vertexSkinnedList.emplace_back(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV);
 			else
 				vertexList.emplace_back(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, vertexU, vertexV);
@@ -81,7 +81,7 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 		boundingBox.ExpandTo(reinterpret_cast<math::vector3<float>&>(mesh->mAABB.mMax));
 
 		// Skeleton
-		if (mesh->HasBones())
+		if (mesh->HasBones() && mesh->mNumBones <= Animations::MAX_BONES)
 		{
 			meshData.mySkeleton.myBones.reserve(mesh->mNumBones);
 			meshData.mySkeleton.myBoneNameToIndex.reserve(mesh->mNumBones);

@@ -58,7 +58,7 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTr
 	if (aModelData.HasSkeleton())
 	{
 		mySkinnedInputLayout.Bind();
-		mySkinnedShader.Bind(); // TODO: This should only Bind if bones are actually set!
+		mySkinnedShader.Bind(); // TODO: This should only Bind if bones are actually set! Otherwise bind regular VertexShader
 	}
 	else
 	{

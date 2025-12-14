@@ -187,7 +187,7 @@ struct Animation
 		}
 	};
 
-	double myFramerate;
-	double myDurationSeconds;
+	double myFramerate{};
+	double myDurationSeconds{};
 	std::vector<Channel> myChannels{};
 };

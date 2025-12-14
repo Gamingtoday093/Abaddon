@@ -49,9 +49,14 @@ struct Skeleton
 			else bones[pair->second] = bones[parentIndex] * local;
 		}
 
-		// TODO: This doesnt check the bounds compared to bones!!
-		for (int i = 0; i < myBones.size(); i++)
-			bones[i] = DirectX::XMMatrixTranspose(bones[i] * myBones[i].myRestMatrix);
+		for (int i = 0; i < aAnimation.myChannels.size(); i++)
+		{
+			auto pair = myBoneNameToIndex.find(aAnimation.myChannels[i].myName);
+			if (pair == myBoneNameToIndex.end()) continue;
+			if (pair->second < 0 && pair->second >= Animations::MAX_BONES) continue;
+
+			bones[pair->second] = DirectX::XMMatrixTranspose(bones[pair->second] * myBones[pair->second].myRestMatrix);
+		}
 
 		return bones;
 	}
