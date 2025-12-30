@@ -34,7 +34,7 @@ void StandardMaterial::UpdateLighting(math::vector4<float> aColor, float aStreng
 	myLighting.ApplyChanges();
 }
 
-math::vector3<float> StandardMaterial::GetLightingDirection()
+math::vector3<float> StandardMaterial::GetLightingDirection() const
 {
 	return { DirectX::XMVectorGetX(myLighting.myData.LightDirection), DirectX::XMVectorGetY(myLighting.myData.LightDirection), DirectX::XMVectorGetZ(myLighting.myData.LightDirection) };
 }

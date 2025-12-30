@@ -18,7 +18,7 @@ public:
 
 	Entity CreateEmptyEntity(const std::string& aName = "New Entity");
 	Entity CreateEntity(const std::string& aName = "Unnamed");
-	std::vector<Entity> GetAllEntities() const;
+	std::vector<Entity> GetAllEntities();
 
 	std::shared_ptr<Renderer> GetRenderer();
 	HWND myHWND;

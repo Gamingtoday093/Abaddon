@@ -83,7 +83,7 @@ inline void CBuffer<T>::ApplyChanges()
 	ZeroMemory(&bufferData, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
 	HRESULT hr = DX11::ourContext->Map(myBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-	DX11::HRASSERT(hr, "Applying changes to CBuffer", false);
+	DX11::HRASSERT(hr, "Locking CBuffer for Write", false);
 
 	memcpy(bufferData.pData, &myData, sizeof(myData));
 

@@ -174,7 +174,7 @@ Entity Scene::CreateEntity(const std::string& aName)
 	return entity;
 }
 
-std::vector<Entity> Scene::GetAllEntities() const
+std::vector<Entity> Scene::GetAllEntities()
 {
 	auto view = myRegistry.view<entt::entity>();
 	std::vector<Entity> entities;

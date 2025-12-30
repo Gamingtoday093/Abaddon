@@ -1,5 +1,5 @@
 #pragma once
-#include "Script.h"
+#include "Script.hpp"
 #include "Graphics/Bindables/Materials/StandardMaterial.h"
 
 class LightingVisualizer : public Script

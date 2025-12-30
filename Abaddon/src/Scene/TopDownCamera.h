@@ -43,6 +43,6 @@ private:
 	math::vector3<float> myDir;
 	math::vector2<float> myRot;
 
-	float myZoom;
+	float myZoom = 0;
 };
 

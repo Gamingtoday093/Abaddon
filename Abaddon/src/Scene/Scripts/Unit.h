@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Scene/Scripts/Script.h"
+#include "Scene/Scripts/Script.hpp"
 #include "Scene/Components/Components.h"
 #include "Scene/Transform.h"
 #include <chrono>

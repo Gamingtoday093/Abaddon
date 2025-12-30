@@ -31,7 +31,7 @@ private:
 	ComPtr<ID3D11Buffer> myBuffer;
 	ComPtr<ID3D11ShaderResourceView> mySRV;
 	eBindType myBindType = eBindType::VertexAndPixelShader;
-	uint32_t myBufferLength;
+	uint32_t myBufferLength = 0;
 };
 
 template<typename T>

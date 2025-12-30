@@ -16,7 +16,7 @@ public:
 	void Bind() override;
 
 	void UpdateLighting(math::vector4<float> aColor, float aStrength, math::vector3<float> aDirection);
-	math::vector3<float> GetLightingDirection();
+	math::vector3<float> GetLightingDirection() const;
 	void UpdateLightingDirection(math::vector3<float> aNewDirection);
 
 private:

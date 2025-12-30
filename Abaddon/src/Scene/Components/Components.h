@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/Transform.h"
-#include "Scene/Scripts/Script.h"
+#include "Scene/Scripts/Script.hpp"
 #include "Graphics/AABB.h"
 #include <functional>
 #include <string>
