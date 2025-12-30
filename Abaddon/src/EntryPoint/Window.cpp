@@ -85,7 +85,7 @@ void Window::CreateAndRegisterWindowClass(HINSTANCE& hInstance, LPCWSTR classNam
 
 bool Window::ProcessMessages()
 {
-	MSG msg = { };
+	MSG msg = {};
 
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
@@ -102,7 +102,7 @@ bool Window::ProcessMessages()
 	return true;
 }
 
-HWND& Window::GetHWND()
+HWND Window::GetHWND() const
 {
 	return myHWND;
 }

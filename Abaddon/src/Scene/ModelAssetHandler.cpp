@@ -11,7 +11,7 @@ std::unordered_map<std::string, Animation> ModelAssetHandler::myLoadedAnimations
 std::unordered_map<std::string, TextureData> ModelAssetHandler::myLoadedTextures;
 std::unordered_map<std::string, Material*> ModelAssetHandler::myCreatedMaterials;
 
-void ModelAssetHandler::LoadModel(std::string aModelFileName)
+void ModelAssetHandler::LoadModel(const std::string& aModelFileName)
 {
 	// Check if it's already loaded
 	if (myLoadedModels.find(aModelFileName) != myLoadedModels.end())
@@ -91,7 +91,7 @@ void ModelAssetHandler::LoadModel(std::string aModelFileName)
 				auto bone = mesh->mBones[b];
 				auto& om = bone->mOffsetMatrix;
 				meshData.mySkeleton.myBones.emplace_back(b,
-					DirectX::XMMatrixSet(
+					DirectX::XMFLOAT4X4(
 					om.a1, om.a2, om.a3, om.a4,
 					om.b1, om.b2, om.b3, om.b4,
 					om.c1, om.c2, om.c3, om.c4,
@@ -149,7 +149,7 @@ void ModelAssetHandler::LoadBoneHierarchyRecursive(const std::unordered_map<std:
 		LoadBoneHierarchyRecursive(aBoneNameToIndex, aSkeleton, aNode->mChildren[c]);
 }
 
-void ModelAssetHandler::LoadAnimations(std::string aAnimationFileName)
+void ModelAssetHandler::LoadAnimations(const std::string& aAnimationFileName)
 {
 	Assimp::Importer importer;
 	auto data = importer.ReadFile("Models/" + aAnimationFileName, 0);
@@ -202,7 +202,7 @@ void ModelAssetHandler::LoadAnimations(std::string aAnimationFileName)
 	}
 }
 
-void ModelAssetHandler::LoadTexture(std::string aTextureFileName)
+void ModelAssetHandler::LoadTexture(const std::string& aTextureFileName)
 {
 	if (myLoadedTextures.find(aTextureFileName) != myLoadedTextures.end())
 	{
@@ -281,7 +281,7 @@ void ModelAssetHandler::LoadPrimitiveModels()
 #pragma endregion
 }
 
-ModelData& ModelAssetHandler::GetModelData(std::string aModelFileName)
+ModelData& ModelAssetHandler::GetModelData(const std::string& aModelFileName)
 {
 	if (myLoadedModels.find(aModelFileName) == myLoadedModels.end())
 	{
@@ -292,7 +292,7 @@ ModelData& ModelAssetHandler::GetModelData(std::string aModelFileName)
 	return myLoadedModels.at(aModelFileName);
 }
 
-Animation& ModelAssetHandler::GetAnimation(std::string aAnimationName)
+Animation& ModelAssetHandler::GetAnimation(const std::string& aAnimationName)
 {
 	if (myLoadedAnimations.find(aAnimationName) == myLoadedAnimations.end())
 	{
@@ -303,7 +303,7 @@ Animation& ModelAssetHandler::GetAnimation(std::string aAnimationName)
 	return myLoadedAnimations.at(aAnimationName);
 }
 
-TextureData& ModelAssetHandler::GetTextureData(std::string aTextureFileName)
+TextureData& ModelAssetHandler::GetTextureData(const std::string& aTextureFileName)
 {
 	if (myLoadedTextures.find(aTextureFileName) == myLoadedTextures.end())
 	{
@@ -314,7 +314,7 @@ TextureData& ModelAssetHandler::GetTextureData(std::string aTextureFileName)
 	return myLoadedTextures.at(aTextureFileName);
 }
 
-Material& ModelAssetHandler::GetMaterial(std::string aMaterialName)
+Material& ModelAssetHandler::GetMaterial(const std::string& aMaterialName)
 {
 	if (myCreatedMaterials.find(aMaterialName) == myCreatedMaterials.end())
 	{

@@ -14,17 +14,17 @@ class ImGuiManager;
 class Engine
 {
 public:
-	Engine(HWND& aHWND);
+	Engine(HWND aHWND);
 	~Engine();
 
 	void Init();
 	void Update();
 	void BeginFrame();
 	void EndFrame();
-	void Resize(int width, int height);
+	void Resize(int aWidth, int aHeight);
 
 private:
-	HWND& myHWND;
+	HWND myHWND;
 	std::shared_ptr<DX11> myFramework;
 	std::shared_ptr<Renderer> myRenderer;
 	std::shared_ptr<Scene> myScene;

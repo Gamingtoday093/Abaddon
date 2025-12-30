@@ -10,7 +10,7 @@ struct ScriptComponent;
 class Scene
 {
 public:
-	Scene(std::shared_ptr<Renderer> aRenderer, HWND& aHWND);
+	Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND);
 	~Scene();
 
 	void Init();
@@ -21,7 +21,7 @@ public:
 	std::vector<Entity> GetAllEntities();
 
 	std::shared_ptr<Renderer> GetRenderer();
-	HWND& myHWND;
+	HWND myHWND;
 	
 	std::shared_ptr<Camera> GetCamera();
 

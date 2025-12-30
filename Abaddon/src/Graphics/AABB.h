@@ -29,13 +29,13 @@ struct AABB
 		return { (myMax.x + myMin.x) * 0.5f, (myMax.y + myMin.y) * 0.5f, (myMax.z + myMin.z) * 0.5f };
 	}
 
-	bool InsideBounds(const math::vector3<float>& aPosition) const
+	bool InsideBounds(math::vector3<float> aPosition) const
 	{
 		return aPosition.x >= myMin.x && aPosition.y >= myMin.y && aPosition.z >= myMin.z &&
 			   aPosition.x <= myMax.x && aPosition.y <= myMax.y && aPosition.z <= myMax.z;
 	}
 
-	bool RayBounds(const math::vector3<float>& aOrigin, const math::vector3<float>& aDirection) const
+	bool RayBounds(math::vector3<float> aOrigin, math::vector3<float> aDirection) const
 	{
 		const math::vector3<float> invDir = { 1.0f / aDirection.x, 1.0f / aDirection.y, 1.0f / aDirection.z };
 		const math::vector3<float> tMin = { (myMin.x - aOrigin.x) * invDir.x, (myMin.y - aOrigin.y) * invDir.y, (myMin.z - aOrigin.z) * invDir.z };
@@ -47,7 +47,7 @@ struct AABB
 		return tNear <= tFar;
 	}
 
-	void ExpandTo(const math::vector3<float>& aPosition)
+	void ExpandTo(math::vector3<float> aPosition)
 	{
 		if (aPosition.x < myMin.x)
 			myMin.x = aPosition.x;

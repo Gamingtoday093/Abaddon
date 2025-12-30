@@ -23,11 +23,13 @@ private:
 	void CalculateMatrix() override;
 	void UpdateInput() override;
 
-	bool myFirstPerson;
-	float myMovementSpeed;
-	float myRotationSpeed;
+	bool myFirstPerson = false;
+	float myMovementSpeed = 1;
+	float myRotationSpeed = 1;
 
 private:
+	XMMATRIX myCameraMatrix;
+
 	// Variables used to calculate Camera Matrix
 	XMVECTOR myDefaultForward;
 	XMVECTOR myDefaultRight;

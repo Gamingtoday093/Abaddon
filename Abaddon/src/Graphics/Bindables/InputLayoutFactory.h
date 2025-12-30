@@ -18,7 +18,11 @@ namespace InputLayoutFactory
 	template<>
 	const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetDescription<SkinnedVertex>();
 
+	template<>
+	const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetDescription<SkyboxVertex>();
+
 	const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetVertexDescription();
 	const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetSkinnedVertexDescription();
+	const std::vector<D3D11_INPUT_ELEMENT_DESC>& GetSkyboxVertexDescription();
 };
 

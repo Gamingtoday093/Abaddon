@@ -3,14 +3,14 @@
 #include "Scene/Components/Components.h"
 #include "Scene/ModelAssetHandler.h"
 
-void LightingVisualizer::Init(std::string aStandardMaterial)
+void LightingVisualizer::Init(const std::string& aStandardMaterial)
 {
 	myStandardMaterial = aStandardMaterial;
 }
 
 void LightingVisualizer::Start()
 {
-	GetComponent<TransformComponent>().myTransform.myScale = { 0.4, 2, 0.4 };
+	GetComponent<TransformComponent>().myTransform.myScale = { 0.4f, 2, 0.4f };
 }
 
 void LightingVisualizer::Update()

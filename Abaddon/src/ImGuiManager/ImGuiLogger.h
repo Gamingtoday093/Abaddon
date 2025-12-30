@@ -18,16 +18,16 @@ public:
 		{
 			switch (aColor)
 			{
-				case RED:
+				case Log::COLOR_RED:
 					myColor = { 255, 0, 0, 255 };
 					break;
-				case GREEN:
+				case Log::COLOR_GREEN:
 					myColor = { 0, 255, 0, 255 };
 					break;
-				case YELLOW:
+				case Log::COLOR_YELLOW:
 					myColor = { 255, 255, 0, 255 };
 					break;
-				case WHITE:
+				case Log::COLOR_WHITE:
 				default:
 					myColor = { 255, 255, 255, 255 };
 					break;

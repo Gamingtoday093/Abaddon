@@ -82,6 +82,27 @@ struct SkinnedVertex
 	math::vector3<float> myNormal;
 	math::vector2<float> myTexcoord;
 
-	unsigned int myBoneIDs[Animations::MAX_WEIGHTS];
+	uint32_t myBoneIDs[Animations::MAX_WEIGHTS];
 	float myBoneWeights[Animations::MAX_WEIGHTS];
 };
+
+struct SkyboxVertex
+{
+	SkyboxVertex()
+	{
+		myPosition = {};
+	}
+
+	SkyboxVertex(float aX, float aY, float aZ)
+	{
+		myPosition = { aX, aY, aZ };
+	}
+
+	math::vector3<float> myPosition;
+};
+
+template<typename TVertex>
+concept VertexType =
+std::same_as<std::remove_cvref_t<TVertex>, Vertex> ||
+std::same_as<std::remove_cvref_t<TVertex>, SkinnedVertex> ||
+std::same_as<std::remove_cvref_t<TVertex>, SkyboxVertex>;

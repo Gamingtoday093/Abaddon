@@ -78,7 +78,7 @@ public:
 	void Update() override;
 
 protected:
-	bool isSelected;
+	bool isSelected = false;
 
 	int myHealth = 500;
 
@@ -103,8 +103,8 @@ private:
 
 	std::shared_ptr<Renderer> myRenderer;
 
-	ModelData* mySelectionMesh;
-	TextureData* mySelectionTexture;
+	ModelData* mySelectionMesh = nullptr;
+	TextureData* mySelectionTexture = nullptr;
 	Transform mySelectionTransform;
 	math::vector3<float> mySelectionPositionOffset;
 

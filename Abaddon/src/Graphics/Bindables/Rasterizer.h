@@ -13,7 +13,7 @@ public:
 	void Init(D3D11_CULL_MODE aCullMode);
 	void Bind();
 	ID3D11RasterizerState* Get() const;
-	ID3D11RasterizerState* const* GetAdressOf() const;
+	ID3D11RasterizerState* const* GetAddressOf() const;
 private:
 	ComPtr<ID3D11RasterizerState> myRasterizerState;
 };

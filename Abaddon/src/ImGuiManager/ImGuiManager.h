@@ -9,7 +9,7 @@ class Scene;
 class ImGuiManager
 {
 public:
-	ImGuiManager(HWND& aHWND, std::shared_ptr<Scene> aScene);
+	ImGuiManager(HWND aHWND, std::shared_ptr<Scene> aScene);
 	~ImGuiManager() = default;
 
 	void Init();
@@ -25,7 +25,7 @@ private:
 	void AssetsTab();
 	void ConsoleTab();
 
-	HWND& myHWND;
+	HWND myHWND;
 	std::shared_ptr<Scene> myScene;
 	ImGuizmo::OPERATION myGizmoOperation;
 	ImGuizmo::MODE myGizmoSpace;

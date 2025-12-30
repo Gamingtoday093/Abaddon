@@ -6,43 +6,43 @@
 #include <cassert>
 #endif
 
-enum LogType
+enum class eLogType : uint8_t
 {
-	eStandard,
-	eSuccess,
-	eWarning,
-	eError
+	Standard,
+	Success,
+	Warning,
+	Error
 };
 
 namespace Log
 {
-	static void Print(std::string aString, LogType aLogType = LogType::eStandard)
-	{
-#define RED 12
-#define GREEN 10
-#define YELLOW 14
-#define WHITE 15
+	constexpr WORD COLOR_WHITE = 15;
+	constexpr WORD COLOR_GREEN = 10;
+	constexpr WORD COLOR_YELLOW = 14;
+	constexpr WORD COLOR_RED = 12;
 
+	static void Print(const std::string& aString, eLogType aLogType = eLogType::Standard)
+	{
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		switch (aLogType)
 		{
-			case eStandard:
+			case eLogType::Standard:
 				std::cout << aString << std::endl;
 				break;
 
-			case eSuccess:
-				SetConsoleTextAttribute(hConsole, GREEN);
+			case eLogType::Success:
+				SetConsoleTextAttribute(hConsole, COLOR_GREEN);
 				std::cout << aString << std::endl;
 				break;
 
-			case eWarning:
-				SetConsoleTextAttribute(hConsole, YELLOW);
+			case eLogType::Warning:
+				SetConsoleTextAttribute(hConsole, COLOR_YELLOW);
 				std::cout << aString << std::endl;
 				break;
 
-			case eError:
-				SetConsoleTextAttribute(hConsole, RED);
+			case eLogType::Error:
+				SetConsoleTextAttribute(hConsole, COLOR_RED);
 				std::cout << aString << std::endl;
 				break;
 
@@ -51,15 +51,15 @@ namespace Log
 
 		}
 
-		SetConsoleTextAttribute(hConsole, WHITE);
+		SetConsoleTextAttribute(hConsole, COLOR_WHITE);
 	}
 }
 
 #if defined(DEBUG) || defined(RELEASE)
-#define LOG(string) Log::Print(string, LogType::eStandard)
-#define LOG_SUCCESS(string) Log::Print(string, LogType::eSuccess)
-#define LOG_WARNING(string) Log::Print(string, LogType::eWarning)
-#define LOG_ERROR(string) Log::Print(string, LogType::eError)
+#define LOG(string) Log::Print(string, eLogType::Standard)
+#define LOG_SUCCESS(string) Log::Print(string, eLogType::Success)
+#define LOG_WARNING(string) Log::Print(string, eLogType::Warning)
+#define LOG_ERROR(string) Log::Print(string, eLogType::Error)
 #define Assert(bool) assert(bool)
 
 #else

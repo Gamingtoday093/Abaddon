@@ -52,10 +52,10 @@ public:
 	/// </summary>
 	/// <param name="hwnd"></param>
 	/// <returns></returns>
-	static math::vector2<float> MousePositionToCameraSpace(HWND& hwnd)
+	static math::vector2<float> MousePositionToCameraSpace(HWND hwnd)
 	{
 		POINT mPos = Input::GetInstance().GetMousePosition();
-		math::vector2<float> mousePos = math::vector2<float>(mPos.x, mPos.y);
+		math::vector2<float> mousePos = math::vector2<float>(float(mPos.x), float(mPos.y));
 
 		RECT rect;
 		GetWindowRect(hwnd, &rect);
@@ -78,6 +78,4 @@ public:
 protected:
 	virtual void CalculateMatrix() = 0;
 	virtual void UpdateInput() { }
-
-	XMMATRIX myCameraMatrix;
 };

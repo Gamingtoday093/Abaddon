@@ -23,13 +23,13 @@ private:
 	void CalculateMatrix() override;
 	void UpdateInput() override;
 
-	float myMovementSpeed;
-	float myRotationSpeed;
-	float myZoomSpeed;
-	float myMinZoom;
-	float myMaxZoom;
-	float myMinRotation;
-	float myMaxRotation;
+	float myMovementSpeed = 1;
+	float myRotationSpeed = 1;
+	float myZoomSpeed = 1;
+	float myMinZoom = 0;
+	float myMaxZoom = 1;
+	float myMinRotation = 0;
+	float myMaxRotation = 0;
 	math::vector2<float> myDefaultRotation;
 
 	XMMATRIX myCameraMatrix;

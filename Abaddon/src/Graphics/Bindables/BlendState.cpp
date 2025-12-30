@@ -22,7 +22,7 @@ ID3D11BlendState* BlendState::Get() const
 	return myBlendState.Get();
 }
 
-ID3D11BlendState* const* BlendState::GetAdressOf() const
+ID3D11BlendState* const* BlendState::GetAddressOf() const
 {
 	return myBlendState.GetAddressOf();
 }

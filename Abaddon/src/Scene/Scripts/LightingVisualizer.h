@@ -5,7 +5,7 @@
 class LightingVisualizer : public Script
 {
 public:
-	void Init(std::string aStandardMaterial);
+	void Init(const std::string& aStandardMaterial);
 
 	void Start() override;
 	void Update() override;

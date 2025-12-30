@@ -7,7 +7,7 @@ class Material abstract
 {
 public:
 	Material() = delete;
-	Material(const std::string aPixelShader, eBlendState aBlendState = eBlendState::Opaque);
+	Material(const std::string& aPixelShader, eBlendState aBlendState = eBlendState::Opaque);
 	~Material() = default;
 
 	eBlendState GetBlendState() const;
@@ -18,7 +18,7 @@ private:
 	PixelShader myPixelShader;
 };
 
-inline Material::Material(const std::string aPixelShader, eBlendState aBlendState)
+inline Material::Material(const std::string& aPixelShader, eBlendState aBlendState)
 {
 	myBlendState = aBlendState;
 	myPixelShader.Init(aPixelShader);

@@ -11,8 +11,13 @@ ComPtr<ID3D11ShaderResourceView> DX11::ourTextureSRV;
 ComPtr<ID3D11RenderTargetView> DX11::ourTextureBuffer;
 ComPtr<ID3D11Texture2D> DX11::ourTexture;
 
-DX11::DX11(HWND& aHWND) : myHWND(aHWND)
+DX11::DX11(HWND aHWND) : myHWND(aHWND)
 {
+	RECT rect;
+	GetClientRect(myHWND, &rect);
+
+	myWidth = rect.right - rect.left;
+	myHeight = rect.bottom - rect.top;
 }
 
 void DX11::Initialize(bool aDebugMode)
@@ -75,8 +80,12 @@ void DX11::EndFrame()
 	ourSwapChain->Present(1, 0);
 }
 
-void DX11::Resize()
+void DX11::Resize(int aNewWidth, int aNewHeight)
 {
+	myWidth = aNewWidth;
+	myHeight = aNewHeight;
+
+	// Clear Render Targets
 	ourContext->OMSetRenderTargets(0, 0, 0);
 	// ComPtr Calls Release() when set to nullptr
 	ourBackBuffer = nullptr;
@@ -85,9 +94,11 @@ void DX11::Resize()
 	ourTextureBuffer = nullptr;
 	ourTexture = nullptr;
 
-	HRESULT hr = ourSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+	HRESULT hr = ourSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0); // Keep Previous Settings
 
 	HRASSERT(hr, "Resizing Buffers");
+
+	if (myWidth == 0 || myHeight == 0) return;
 
 	CreateRenderTargetView();
 	CreateDepthTexture();
@@ -95,7 +106,7 @@ void DX11::Resize()
 	SetViewPort();
 }
 
-void DX11::HRASSERT(HRESULT aHr, std::string aDescription, bool aPrint)
+void DX11::HRASSERT(HRESULT aHr, const std::string& aDescription, bool aPrint)
 {
 	if (FAILED(aHr))
 	{
@@ -148,8 +159,8 @@ void DX11::CreateDepthTexture()
 	ComPtr<ID3D11Texture2D> depthStencilTexture;
 
 	D3D11_TEXTURE2D_DESC textureDesc = {};
-	textureDesc.Width = GetScreenWidth();
-	textureDesc.Height = GetScreenHeight();
+	textureDesc.Width = myWidth;
+	textureDesc.Height = myHeight;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -184,8 +195,8 @@ void DX11::BindRenderTargetTexture()
 void DX11::SetViewPort()
 {
 	D3D11_VIEWPORT vp;
-	vp.Width = (float)GetScreenWidth();
-	vp.Height = (float)GetScreenHeight();
+	vp.Width = float(myWidth);
+	vp.Height = float(myHeight);
 	vp.MinDepth = 0;
 	vp.MaxDepth = 1;
 	vp.TopLeftX = 0;
@@ -228,8 +239,8 @@ void DX11::CreateSceneTextureResources()
 
 	// Texture
 	D3D11_TEXTURE2D_DESC textureDesc = {};
-	textureDesc.Width = GetScreenWidth();
-	textureDesc.Height = GetScreenHeight();
+	textureDesc.Width = myWidth;
+	textureDesc.Height = myHeight;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -260,20 +271,4 @@ void DX11::CreateSceneTextureResources()
 
 	hr = ourDevice->CreateShaderResourceView(ourTexture.Get(), &shaderResourceViewDesc, &ourTextureSRV);
 	HRASSERT(hr, "Creating SRV for Scene Texture 2D");
-}
-
-int DX11::GetScreenWidth()
-{
-	RECT rect;
-	GetClientRect(myHWND, &rect);
-
-	return rect.right - rect.left;
-}
-
-int DX11::GetScreenHeight()
-{
-	RECT rect;
-	GetClientRect(myHWND, &rect);
-
-	return rect.bottom - rect.top;
 }

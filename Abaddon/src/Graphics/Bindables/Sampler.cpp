@@ -26,7 +26,7 @@ ID3D11SamplerState* Sampler::Get() const
 	return mySamplerState.Get();
 }
 
-ID3D11SamplerState* const* Sampler::GetAdressOf() const
+ID3D11SamplerState* const* Sampler::GetAddressOf() const
 {
 	return mySamplerState.GetAddressOf();
 }

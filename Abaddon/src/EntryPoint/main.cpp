@@ -7,37 +7,29 @@
 
 int main()
 {
-	Window* window = new Window();
+	std::unique_ptr<Window> window = std::make_unique<Window>();
 	Engine* engine = new Engine(window->GetHWND());
-
+	
 	window->OnResize = [engine](int width, int height)
 	{
 		engine->Resize(width, height);
+		engine->Update();
 	};
 
 	engine->Init();
 
-	bool running = true;
-	while (running)
+	while (window->ProcessMessages())
 	{
-		if (!window->ProcessMessages())
-		{
-#ifdef enableImGui
-			ImGui_ImplDX11_Shutdown();
-			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
-#endif 
-			running = false;
-			break;
-		}
-
 		engine->Update();
 	}
 
-	delete engine;
-	engine = nullptr;
+#ifdef enableImGui
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+#endif 
 
-	delete window;
+	delete engine;
 	engine = nullptr;
 
 	return 0;

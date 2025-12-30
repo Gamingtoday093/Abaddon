@@ -23,7 +23,7 @@ ID3D11PixelShader* PixelShader::Get() const
 	return myPixelShader.Get();
 }
 
-ID3D11PixelShader* const* PixelShader::GetAdressOf() const
+ID3D11PixelShader* const* PixelShader::GetAddressOf() const
 {
 	return myPixelShader.GetAddressOf();
 }

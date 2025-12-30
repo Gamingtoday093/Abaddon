@@ -11,15 +11,17 @@ struct TransformComponent
 
 	AABB TransformAABB(AABB aAABB)
 	{
-		XMVECTOR cornerPos[8];
-		cornerPos[0] = XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0);
-		cornerPos[1] = XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMax.z, 0);
-		cornerPos[2] = XMVectorSet(aAABB.myMin.x, aAABB.myMax.y, aAABB.myMin.z, 0);
-		cornerPos[3] = XMVectorSet(aAABB.myMax.x, aAABB.myMin.y, aAABB.myMin.z, 0);
-		cornerPos[4] = XMVectorSet(aAABB.myMin.x, aAABB.myMax.y, aAABB.myMax.z, 0);
-		cornerPos[5] = XMVectorSet(aAABB.myMax.x, aAABB.myMin.y, aAABB.myMax.z, 0);
-		cornerPos[6] = XMVectorSet(aAABB.myMax.x, aAABB.myMax.y, aAABB.myMin.z, 0);
-		cornerPos[7] = XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0);
+		XMVECTOR cornerPos[8]
+		{
+			XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0),
+			XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMax.z, 0),
+			XMVectorSet(aAABB.myMin.x, aAABB.myMax.y, aAABB.myMin.z, 0),
+			XMVectorSet(aAABB.myMax.x, aAABB.myMin.y, aAABB.myMin.z, 0),
+			XMVectorSet(aAABB.myMin.x, aAABB.myMax.y, aAABB.myMax.z, 0),
+			XMVectorSet(aAABB.myMax.x, aAABB.myMin.y, aAABB.myMax.z, 0),
+			XMVectorSet(aAABB.myMax.x, aAABB.myMax.y, aAABB.myMin.z, 0),
+			XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0)
+		};
 			
 		AABB newAABB(myTransform.myPosition, myTransform.myPosition);
 
@@ -38,7 +40,7 @@ struct TransformComponent
 
 struct TagComponent
 {
-	TagComponent(std::string aTag)
+	TagComponent(const std::string& aTag)
 	{
 		myTag = aTag;
 	}
@@ -51,8 +53,8 @@ struct ScriptComponent
 	Script* myInstance = nullptr;
 	bool myHasStarted = false;
 
-	Script*(*InitFunction)();
-	void(*DestroyFunction)(ScriptComponent*);
+	Script*(*InitFunction)() = nullptr;
+	void(*DestroyFunction)(ScriptComponent*) = nullptr;
 
 	template<typename T>
 	T* Bind(Entity& aEntity)
@@ -69,11 +71,9 @@ struct ScriptComponent
 	}
 };
 
-class Material;
-
 struct ModelComponent
 {
-	ModelComponent(std::string aModelName, std::string aMaterialName)
+	ModelComponent(const std::string& aModelName, const std::string& aMaterialName)
 	{
 		myModelName = aModelName;
 		myMaterialName = aMaterialName;
@@ -82,7 +82,7 @@ struct ModelComponent
 	std::string myModelName;
 	std::string myMaterialName;
 
-	void SetModelAndTexture(std::string aModelName, std::string aTextureName)
+	void SetModelAndTexture(const std::string& aModelName, const std::string& aTextureName)
 	{
 		myModelName = aModelName;
 		myMaterialName = aTextureName;
@@ -91,7 +91,7 @@ struct ModelComponent
 
 struct AnimatorComponent
 {
-	AnimatorComponent(std::string aAnimationName, double aAnimationDurationSeconds)
+	AnimatorComponent(const std::string& aAnimationName, double aAnimationDurationSeconds)
 	{
 		SetAnimation(aAnimationName, aAnimationDurationSeconds);
 	}
@@ -100,7 +100,7 @@ struct AnimatorComponent
 	double myAnimationDurationSeconds;
 	double myTimeSeconds;
 
-	void SetAnimation(std::string aAnimationName, double aAnimationDurationSeconds)
+	void SetAnimation(const std::string& aAnimationName, double aAnimationDurationSeconds)
 	{
 		myAnimationName = aAnimationName;
 		myAnimationDurationSeconds = aAnimationDurationSeconds;
@@ -109,7 +109,7 @@ struct AnimatorComponent
 
 	void Update()
 	{
-		myTimeSeconds += 0.02;
+		myTimeSeconds += 0.02; // TODO: Delta Time ig? Change this to some proper solution
 		if (myTimeSeconds > myAnimationDurationSeconds)
 		{
 			myTimeSeconds = 0;

@@ -12,16 +12,16 @@ public:
 	{
 		constexpr float side = 1.0f / 2.0f;
 
-		std::vector<Vertex> vertices;
+		std::vector<SkyboxVertex> vertices;
 
-		vertices.push_back({ -side, -side, -side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ side, -side, -side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ -side, side, -side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ side, side, -side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ -side, -side, side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ side, -side, side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ -side, side, side, 0, 0, 0, 0, 0 });
-		vertices.push_back({ side, side, side, 0, 0, 0, 0, 0 });
+		vertices.push_back({ -side, -side, -side });
+		vertices.push_back({ side, -side, -side });
+		vertices.push_back({ -side, side, -side });
+		vertices.push_back({ side, side, -side });
+		vertices.push_back({ -side, -side, side });
+		vertices.push_back({ side, -side, side });
+		vertices.push_back({ -side, side, side });
+		vertices.push_back({ side, side, side });
 
 		myVertexBuffer.Init(vertices);
 
@@ -32,7 +32,7 @@ public:
 						   0,4,2, 2,4,6,
 						   0,1,4, 1,5,4 });
 
-		myInputLayout.Init(InputLayoutFactory::GetVertexDescription(), "Skybox_vs.cso");
+		myInputLayout.Init(InputLayoutFactory::GetDescription<SkyboxVertex>(), "Skybox_vs.cso");
 
 		mySampler.Init();
 	}

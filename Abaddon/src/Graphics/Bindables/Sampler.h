@@ -14,7 +14,7 @@ public:
 	void Init();
 	void Bind(UINT slot = 0);
 	ID3D11SamplerState* Get() const;
-	ID3D11SamplerState* const* GetAdressOf() const;
+	ID3D11SamplerState* const* GetAddressOf() const;
 
 private:
 	ComPtr<ID3D11SamplerState> mySamplerState;

@@ -11,15 +11,15 @@ public:
 	IndexBuffer() = default;
 	~IndexBuffer() = default;
 
-	void Init(std::vector<unsigned short> aIndexList);
+	void Init(const std::vector<unsigned short>& aIndexList);
 	void Bind();
 	ID3D11Buffer* Get() const;
-	ID3D11Buffer* const* GetAdressOf() const;
+	ID3D11Buffer* const* GetAddressOf() const;
 
 	unsigned int GetIndexAmount() const;
 
 private:
 	ComPtr<ID3D11Buffer> myBuffer;
-	unsigned int myIndexAmount;
+	unsigned int myIndexAmount = 0;
 };
 

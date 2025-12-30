@@ -284,11 +284,11 @@ private:
 	std::bitset<256> myTentativeState;
 	std::bitset<256> myCurrentState;
 	std::bitset<256> myPreviousState;
-	POINT myTentativeMousePos;
-	POINT myCurrentMousePos;
-	POINT myPreviousMousePos;
-	short myTentativeScrollDelta;
-	short myCurrentScrollDelta;
-	short myPreviousScrollDelta;
+	POINT myTentativeMousePos{};
+	POINT myCurrentMousePos{};
+	POINT myPreviousMousePos{};
+	short myTentativeScrollDelta = 0;
+	short myCurrentScrollDelta = 0;
+	short myPreviousScrollDelta = 0;
 	bool myMouseInsideWindow = true;
 };

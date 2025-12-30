@@ -8,7 +8,7 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	std::vector<DirectX::ScratchImage> images;
 	for (int i = 0; i < 6; i++)
 	{
-		images.push_back(DirectX::ScratchImage{});
+		images.emplace_back();
 		HRESULT hr = DirectX::LoadFromWICFile(AddStringsReturnWStr("Textures/" + aFolderPath + "/" + std::to_string(i), ".png").c_str(), DirectX::WIC_FLAGS_NONE, nullptr, images[i]);
 		DX11::HRASSERT(hr, "Loading Texture Image");
 	}
@@ -27,11 +27,11 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
 	// subresource data
-	D3D11_SUBRESOURCE_DATA data[6];
+	D3D11_SUBRESOURCE_DATA data[6] = {};
 	for (int i = 0; i < 6; i++)
 	{
 		data[i].pSysMem = images[i].GetPixels();
-		data[i].SysMemPitch = (unsigned int)images[i].GetImage(0, 0, 0)->rowPitch;
+		data[i].SysMemPitch = UINT(images[i].GetImage(0, 0, 0)->rowPitch);
 		data[i].SysMemSlicePitch = 0;
 	}
 

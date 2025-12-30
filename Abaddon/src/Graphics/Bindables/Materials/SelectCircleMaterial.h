@@ -9,7 +9,7 @@ public:
 	SelectCircleMaterial() : Material("SelectCircleShader_ps.cso", eBlendState::Alpha)
 	{
 		myNextCirclePositionIndex = 0;
-		myMaterialSettings.Init(eBindType::pixelShader);
+		myMaterialSettings.Init(eBindType::PixelShader);
 	}
 
 	void SetColor(math::vector3<float> aColor);

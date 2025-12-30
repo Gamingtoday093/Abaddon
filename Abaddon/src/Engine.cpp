@@ -14,7 +14,7 @@
 #include "ImGuiManager/ImGuiManager.h"
 #endif
 
-Engine::Engine(HWND& aHWND) : myHWND(aHWND)
+Engine::Engine(HWND aHWND) : myHWND(aHWND)
 {}
 
 Engine::~Engine()
@@ -101,9 +101,8 @@ void Engine::EndFrame()
 	}
 }
 
-void Engine::Resize(int width, int height)
+void Engine::Resize(int aWidth, int aHeight)
 {
-	myIsMinimized = width == 0 || height == 0;
-	if (myIsMinimized) return;
-	myFramework->Resize();
+	myIsMinimized = aWidth == 0 || aHeight == 0;
+	myFramework->Resize(aWidth, aHeight);
 }

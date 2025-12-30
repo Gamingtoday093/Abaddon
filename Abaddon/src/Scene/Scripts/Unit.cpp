@@ -229,6 +229,6 @@ void Unit::UpdateMovement()
 	else
 	{
 		myTransform.myRotation.y += angleBetween;
-		myTransform.myRotation.z = std::lerp(myTransform.myRotation.z, 0, myRotationBankAngleAccelaration);
+		myTransform.myRotation.z = float(std::lerp(myTransform.myRotation.z, 0, myRotationBankAngleAccelaration));
 	}
 }

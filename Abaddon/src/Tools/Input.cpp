@@ -116,6 +116,8 @@ bool Input::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)
 			myTentativeScrollDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 			return true;
 	}
+
+	return false;
 }
 
 void Input::Update()

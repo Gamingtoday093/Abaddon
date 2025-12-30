@@ -7,18 +7,18 @@ using namespace Microsoft::WRL;
 class DX11
 {
 public:
-	DX11(HWND& aHWND);
+	DX11(HWND aHWND);
 	~DX11() = default;
 
 	void Initialize(bool aDebugMode);
 	void BeginFrame(float aClearColor[4]);
 	void EndFrame();
-	void Resize();
+	void Resize(int aNewWidth, int aNewHeight);
 
 	static void BindRenderTarget();
 	static void BindRenderTargetTexture();
 
-	static void HRASSERT(HRESULT aHr, std::string aDescription, bool aPrint = true);
+	static void HRASSERT(HRESULT aHr, const std::string& aDescription, bool aPrint = true);
 
 	static ComPtr<ID3D11Device> ourDevice;
 	static ComPtr<ID3D11DeviceContext> ourContext;
@@ -42,9 +42,9 @@ private:
 	void SetAndCreateVertexShader(std::string aShaderFileName);
 	void SetAndCreatePixelShader(std::string aShaderFileName);
 
-	int GetScreenWidth();
-	int GetScreenHeight();
+	HWND myHWND;
 
-	HWND& myHWND;
+	int myWidth;
+	int myHeight;
 };
 

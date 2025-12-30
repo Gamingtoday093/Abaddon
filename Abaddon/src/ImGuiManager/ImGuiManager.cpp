@@ -5,7 +5,7 @@
 #include "Scene/Components/Components.h"
 #include "Scene/ModelAssetHandler.h"
 
-ImGuiManager::ImGuiManager(HWND& aHWND, std::shared_ptr<Scene> aScene) : myHWND(aHWND), myScene(aScene) {}
+ImGuiManager::ImGuiManager(HWND aHWND, std::shared_ptr<Scene> aScene) : myHWND(aHWND), myScene(aScene), myGizmoOperation(ImGuizmo::OPERATION::TRANSLATE), myGizmoSpace(ImGuizmo::MODE::WORLD) {}
 
 void ImGuiManager::Init()
 {
@@ -18,9 +18,6 @@ void ImGuiManager::Init()
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	ImGui_ImplWin32_Init(myHWND);
 	ImGui_ImplDX11_Init(DX11::ourDevice.Get(), DX11::ourContext.Get());
-
-	myGizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
-	myGizmoSpace = ImGuizmo::MODE::WORLD;
 
 	// Override Output Buffer with a Mirrored Buffer (Writes to Both)
 	myLogger = std::make_unique<ImGuiLogger>();
@@ -215,7 +212,7 @@ void ImGuiManager::InspectorTab()
 			ImGui::SameLine();
 
 			char tagBuffer[128];
-			std::strncpy(tagBuffer, tag.myTag.c_str(), sizeof(tagBuffer));
+			strncpy_s(tagBuffer, sizeof(tagBuffer), tag.myTag.c_str(), tag.myTag.length());
 			tagBuffer[sizeof(tagBuffer) - 1] = '\0';
 
 			ImGui::PushItemWidth(-1);

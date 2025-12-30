@@ -13,7 +13,7 @@ public:
 	void Init(std::string aShaderFileName);
 	void Bind();
 	ID3D11PixelShader* Get() const;
-	ID3D11PixelShader* const* GetAdressOf() const;
+	ID3D11PixelShader* const* GetAddressOf() const;
 private:
 	ComPtr<ID3D11PixelShader> myPixelShader;
 };

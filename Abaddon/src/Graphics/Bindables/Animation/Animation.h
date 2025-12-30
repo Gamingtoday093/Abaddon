@@ -64,7 +64,7 @@ struct Animation
 
 	struct Channel
 	{
-		Channel(std::string aName)
+		Channel(const std::string& aName)
 		{
 			myName = aName;
 		}
@@ -140,7 +140,7 @@ struct Animation
 			}
 
 			const PositionKeyframe& nextPositionKeyframe = myPositionKeyframes.at(positionIndex + 1);
-			float t = (aTime - positionKeyframe.myTime) / (nextPositionKeyframe.myTime - positionKeyframe.myTime);
+			float t = float((aTime - positionKeyframe.myTime) / (nextPositionKeyframe.myTime - positionKeyframe.myTime));
 			aKeyframe.myPositionKey = math::vector3<float>::lerp(positionKeyframe.myPositionKey, nextPositionKeyframe.myPositionKey, t);
 		}
 
@@ -161,7 +161,7 @@ struct Animation
 			}
 
 			const RotationKeyframe& nextRotationKeyframe = myRotationKeyframes.at(rotationIndex + 1);
-			float t = (aTime - rotationKeyframe.myTime) / (nextRotationKeyframe.myTime - rotationKeyframe.myTime);
+			float t = float((aTime - rotationKeyframe.myTime) / (nextRotationKeyframe.myTime - rotationKeyframe.myTime));
 			aKeyframe.myRotationKey = math::vector4<float>::slerp(rotationKeyframe.myRotationKey, nextRotationKeyframe.myRotationKey, t);
 		}
 
@@ -182,7 +182,7 @@ struct Animation
 			}
 
 			const ScaleKeyframe& nextScaleKeyframe = myScaleKeyframes.at(scaleIndex + 1);
-			float t = (aTime - scaleKeyframe.myTime) / (nextScaleKeyframe.myTime - scaleKeyframe.myTime);
+			float t = float((aTime - scaleKeyframe.myTime) / (nextScaleKeyframe.myTime - scaleKeyframe.myTime));
 			aKeyframe.myScaleKey = math::vector3<float>::lerp(scaleKeyframe.myScaleKey, nextScaleKeyframe.myScaleKey, t);
 		}
 	};

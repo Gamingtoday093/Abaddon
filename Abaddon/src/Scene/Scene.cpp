@@ -14,7 +14,7 @@
 
 struct TextureData;
 
-Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND& aHWND) : myRenderer(aRenderer), myHWND(aHWND)
+Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND) : myRenderer(aRenderer), myHWND(aHWND)
 {
 }
 
@@ -35,7 +35,7 @@ void Scene::Init()
 	myFreeLookCamera->Init(0.125f, 0.5f, 0.1f, 3, 0.005f);
 
 	myTopDownCamera = std::make_shared<TopDownCamera>();
-	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 120, { 0, 0, 0 }, { -0.9f, 0 }, -0.1, -1.3);
+	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 120, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
 
 	ModelAssetHandler::LoadModel("Ship.fbx");
 	ModelAssetHandler::LoadModel("ShipSmooth.fbx");

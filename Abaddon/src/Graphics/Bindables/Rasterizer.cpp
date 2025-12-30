@@ -25,7 +25,7 @@ ID3D11RasterizerState* Rasterizer::Get() const
 	return myRasterizerState.Get();
 }
 
-ID3D11RasterizerState* const* Rasterizer::GetAdressOf() const
+ID3D11RasterizerState* const* Rasterizer::GetAddressOf() const
 {
 	return myRasterizerState.GetAddressOf();
 }

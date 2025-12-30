@@ -10,9 +10,9 @@
 
 void Renderer::Init()
 {
-	myCBufferTransform.Init(eBindType::vertexShader);
-	myCBufferAnimation.Init(eBindType::vertexShader);
-	myCBufferCamera.Init(eBindType::pixelShader);
+	myCBufferTransform.Init(eBindType::VertexShader);
+	myCBufferAnimation.Init(eBindType::VertexShader);
+	myCBufferCamera.Init(eBindType::PixelShader);
 
 	myInputLayout.Init(InputLayoutFactory::GetDescription<Vertex>(), "VertexShader_vs.cso");
 	mySkinnedInputLayout.Init(InputLayoutFactory::GetDescription<SkinnedVertex>(), "SkinnedShader_vs.cso");
@@ -37,8 +37,7 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTr
 {
 	Assert(aModelData.HasSkeleton());
 
-	constexpr rsize_t bonesArraySize = sizeof(DirectX::XMMATRIX) * Animations::MAX_BONES;
-	memcpy_s(myCBufferAnimation.myData.myBones, bonesArraySize, aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds), bonesArraySize);
+	aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds, myCBufferAnimation.myData.myBones);
 	myCBufferAnimation.ApplyChanges();
 	myCBufferAnimation.Bind(1);
 

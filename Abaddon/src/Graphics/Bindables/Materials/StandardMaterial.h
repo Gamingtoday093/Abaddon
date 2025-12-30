@@ -8,8 +8,8 @@ class StandardMaterial : public Material
 public:
 	StandardMaterial() : Material("PixelShader_ps.cso")
 	{
-		myMaterialSettings.Init(eBindType::pixelShader);
-		myLighting.Init(eBindType::pixelShader);
+		myMaterialSettings.Init(eBindType::PixelShader);
+		myLighting.Init(eBindType::PixelShader);
 	}
 
 	void Init(math::vector4<float> aColor, float aRoughness, TextureData aMainTexture, TextureData aEmissionTexture);

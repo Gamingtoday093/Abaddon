@@ -3,7 +3,7 @@
 #include "Graphics/DX11.h"
 #include <d3dcompiler.h>
 
-void VertexShader::Init(std::string aShaderFileName)
+void VertexShader::Init(const std::string& aShaderFileName)
 {
 	ComPtr<ID3DBlob> blob;
 	HRESULT hr = D3DReadFileToBlob(AddStringsReturnWStr("Shaders/", aShaderFileName).c_str(), &blob);
@@ -23,7 +23,7 @@ ID3D11VertexShader* VertexShader::Get() const
 	return myVertexShader.Get();
 }
 
-ID3D11VertexShader* const* VertexShader::GetAdressOf() const
+ID3D11VertexShader* const* VertexShader::GetAddressOf() const
 {
 	return myVertexShader.GetAddressOf();
 }

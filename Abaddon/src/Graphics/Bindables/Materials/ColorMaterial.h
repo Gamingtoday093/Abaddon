@@ -8,7 +8,7 @@ class ColorMaterial : public Material
 public:
 	ColorMaterial() : Material("ColorShader_ps.cso")
 	{
-		myMaterialSettings.Init(eBindType::pixelShader);
+		myMaterialSettings.Init(eBindType::PixelShader);
 	}
 
 	void Init(math::vector3<float> aColor);

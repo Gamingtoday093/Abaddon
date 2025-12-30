@@ -2,17 +2,7 @@
 #include "VertexBuffer.h"
 #include "Graphics/DX11.h"
 
-void VertexBuffer::Init(std::vector<Vertex> aVertexList)
-{
-	Init(std::data(aVertexList), aVertexList.size(), sizeof(Vertex));
-}
-
-void VertexBuffer::Init(std::vector<SkinnedVertex> aVertexList)
-{
-	Init(std::data(aVertexList), aVertexList.size(), sizeof(SkinnedVertex));
-}
-
-void VertexBuffer::Init(void* aData, UINT aNumData, UINT aDataSize)
+void VertexBuffer::Init(const void* aData, UINT aNumData, UINT aDataSize)
 {
 	myDataSize = aDataSize;
 

@@ -6,9 +6,9 @@ using namespace Microsoft::WRL;
 
 enum class eBindType
 {
-	vertexShader,
-	pixelShader,
-	VsAndPs
+	VertexShader,
+	PixelShader,
+	VertexAndPixelShader
 };
 
 template<typename T>
@@ -27,11 +27,11 @@ public:
 	void SetBindType(eBindType aBindType);
 	eBindType GetBindType();
 
-	T myData;
+	T myData{};
 
 private:
 	ComPtr<ID3D11Buffer> myBuffer;
-	eBindType myBindType = eBindType::VsAndPs;
+	eBindType myBindType = eBindType::VertexAndPixelShader;
 };
 
 template<typename T>
@@ -62,22 +62,22 @@ inline void CBuffer<T>::Bind(UINT slot)
 {
 	switch (myBindType)
 	{
-		case eBindType::vertexShader:
+		case eBindType::VertexShader:
 			DX11::ourContext->VSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
-		case eBindType::pixelShader:
+		case eBindType::PixelShader:
 			DX11::ourContext->PSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
-		case eBindType::VsAndPs:
+		case eBindType::VertexAndPixelShader:
 			DX11::ourContext->VSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			DX11::ourContext->PSSetConstantBuffers(slot, 1, myBuffer.GetAddressOf());
 			break;
 
 		default:
-			Assert(false);
 			LOG_ERROR("Can't bind CBuffer, invalid Bind Type.");
+			Assert(false);
 			break;
 	}
 }

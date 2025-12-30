@@ -92,7 +92,7 @@ void UnitManager::HandleInput()
 	// Keyboard Selection
 	if (Input::GetInstance().IsKeyDown((int)eKeys::CONTROL))
 	{
-		for (size_t key = 0; key < 10; key++)
+		for (int key = 0; key < 10; key++)
 		{
 			int keyCode = (int)eKeys::Alpha0 + key;
 			if (!Input::GetInstance().IsKeyDown(keyCode)) continue;
@@ -138,7 +138,7 @@ void UnitManager::RemoveMappedUnit(Unit* unit)
 {
 	for (auto& pair : myMappedUnits)
 	{
-		for (int u = pair.second.size() - 1; u >= 0; u--)
+		for (int u = int(pair.second.size()) - 1; u >= 0; u--)
 		{
 			if (pair.second.at(u) != unit) continue;
 

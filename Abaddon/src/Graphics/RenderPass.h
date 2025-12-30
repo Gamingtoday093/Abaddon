@@ -6,7 +6,7 @@
 class RenderPass
 {
 public:
-	void Init(std::string aVertexShaderFileName, D3D11_CULL_MODE aCullMode, std::string aPixelShaderFileName);
+	void Init(const std::string& aVertexShaderFileName, D3D11_CULL_MODE aCullMode, const std::string& aPixelShaderFileName);
 	void Bind();
 
 private:

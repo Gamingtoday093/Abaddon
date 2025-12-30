@@ -31,6 +31,8 @@ private:
 	float myRotationSpeed;
 
 private:
+	XMMATRIX myCameraMatrix;
+
 	// Variables used to calculate Camera Matrix
 	XMVECTOR Forward;
 	XMVECTOR Up;

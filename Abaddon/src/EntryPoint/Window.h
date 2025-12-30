@@ -16,7 +16,7 @@ public:
 	void CreateAndRegisterWindowClass(HINSTANCE& hInstance, LPCWSTR className);
 	bool ProcessMessages();
 
-	HWND& GetHWND();
+	HWND GetHWND() const;
 
 	std::function<void(int, int)> OnResize;
 private:

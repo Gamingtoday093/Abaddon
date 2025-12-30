@@ -2,7 +2,7 @@
 #include "IndexBuffer.h"
 #include "Graphics/DX11.h"
 
-void IndexBuffer::Init(std::vector<unsigned short> aIndexList)
+void IndexBuffer::Init(const std::vector<unsigned short>& aIndexList)
 {
 	myIndexAmount = aIndexList.size();
 
@@ -14,7 +14,7 @@ void IndexBuffer::Init(std::vector<unsigned short> aIndexList)
 	bufferDesc.CPUAccessFlags = 0u;
 	bufferDesc.MiscFlags = 0u;
 
-	D3D11_SUBRESOURCE_DATA subResData;
+	D3D11_SUBRESOURCE_DATA subResData = {};
 	subResData.pSysMem = std::data(aIndexList);
 
 	// Create
@@ -32,7 +32,7 @@ ID3D11Buffer* IndexBuffer::Get() const
 	return myBuffer.Get();
 }
 
-ID3D11Buffer* const* IndexBuffer::GetAdressOf() const
+ID3D11Buffer* const* IndexBuffer::GetAddressOf() const
 {
 	return myBuffer.GetAddressOf();
 }
