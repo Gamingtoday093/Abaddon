@@ -7,10 +7,9 @@
 void Unit::Select(bool aNewSelected)
 {
 	isSelected = aNewSelected;
-	if (aNewSelected) LOG("Selected!");
 }
 
-bool Unit::GetIsSelected()
+inline bool Unit::GetIsSelected() const
 {
 	return isSelected;
 }
@@ -18,7 +17,6 @@ bool Unit::GetIsSelected()
 void Unit::MoveTo(math::vector3<float> aTargetPosition)
 {
 	myTargetPosition = aTargetPosition;
-	//myTargetForward = math::vector3<float>::zero();
 	myTargetForward = (aTargetPosition - GetComponent<TransformComponent>().myTransform.myPosition).GetNormalized();
 }
 
@@ -74,8 +72,7 @@ void Unit::Awake()
 	bigCannon_0.myDamage = 6;
 	bigCannon_0.myFirerate = 1.7f;
 	bigCannon_0.myFiringRange = 100;
-	bigCannon_0.myFiringAngleX = XM_PIDIV2;
-	bigCannon_0.myFiringAngleY = 0.2f;
+	bigCannon_0.myFiringAngle = 0.2f;
 	bigCannon_0.myBarrel = { 2, 0.9f, 6.5f };
 	myWeapons.push_back(bigCannon_0);
 
@@ -87,8 +84,7 @@ void Unit::Awake()
 	smallBlaster_0.myDamage = 1;
 	smallBlaster_0.myFirerate = 0.4f;
 	smallBlaster_0.myFiringRange = 50;
-	smallBlaster_0.myFiringAngleX = XM_PIDIV2;
-	smallBlaster_0.myFiringAngleY = 0.5f;
+	smallBlaster_0.myFiringAngle = 0.5f;
 	smallBlaster_0.myBarrel = { 3, 0.9f, 5.35f };
 	myWeapons.push_back(smallBlaster_0);
 
@@ -117,18 +113,18 @@ void Unit::Update()
 	if (GetIsSelected())
 	{
 		mySelectionTransform.myPosition = GetComponent<TransformComponent>().myTransform.myPosition;
-		myRenderer->Render(ModelAssetHandler::GetModelData("SelectionCircle.fbx") /*ModelAssetHandler::GetPrimitiveModelData(ePrimitive::Plane)*/, ModelAssetHandler::GetMaterial("SelectionCircle2"), mySelectionTransform, myEntity.GetScene().GetCamera());
+		myRenderer->Render(ModelAssetHandler::GetModelData("SelectionCircle.fbx"), ModelAssetHandler::GetMaterial("SelectionCircle2"), mySelectionTransform, myEntity.GetScene().GetCamera());
 	}
 
-	if (myTargetUnit != nullptr && (myTargetUnit->GetComponent<TransformComponent>().myTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).LengthSqr() > 625)
+	if (myTargetUnit)
 	{
-		Transform otherTransform = myTargetUnit->GetComponent<TransformComponent>().myTransform;
-		if ((otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).LengthSqr() > 625)
-			MoveTo(GetComponent<TransformComponent>().myTransform.myPosition + (otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).GetNormalized() * ((otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).Length() - 25));
-	}
+		if ((myTargetUnit->GetComponent<TransformComponent>().myTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).LengthSqr() > 625)
+		{
+			Transform otherTransform = myTargetUnit->GetComponent<TransformComponent>().myTransform;
+			if ((otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).LengthSqr() > 625)
+				MoveTo(GetComponent<TransformComponent>().myTransform.myPosition + (otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).GetNormalized() * ((otherTransform.myPosition - GetComponent<TransformComponent>().myTransform.myPosition).Length() - 25));
+		}
 
-	if (myTargetUnit != nullptr)
-	{
 		const auto myRotationQuaternion = math::vector4<float>::RotateAngleAxis(GetComponent<TransformComponent>().myTransform.myRotation.y, math::vector3<float>::up());
 		for (Weapon& weapon : myWeapons)
 		{
@@ -229,6 +225,6 @@ void Unit::UpdateMovement()
 	else
 	{
 		myTransform.myRotation.y += angleBetween;
-		myTransform.myRotation.z = float(std::lerp(myTransform.myRotation.z, 0, myRotationBankAngleAccelaration));
+		myTransform.myRotation.z = std::lerp(myTransform.myRotation.z, 0.0f, myRotationBankAngleAccelaration);
 	}
 }
