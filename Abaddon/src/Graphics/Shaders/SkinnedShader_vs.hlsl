@@ -22,22 +22,17 @@ cbuffer transformBuffer: register(b0)
     float4x4 myModelMatrix;
 };
 
-cbuffer animationBuffer : register(b1)
-{
-    float4x4 myBones[32];
-};
-
-//StructuredBuffer<float4x4> myAnimation;
+StructuredBuffer<float4x4> myAnimation : register(t0);
 
 VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
     
     float4x4 skinningMatrix = 0;
-    skinningMatrix += mul(myBones[input.boneIDs.x], input.boneWeights.x);
-    skinningMatrix += mul(myBones[input.boneIDs.y], input.boneWeights.y);
-    skinningMatrix += mul(myBones[input.boneIDs.z], input.boneWeights.z);
-    skinningMatrix += mul(myBones[input.boneIDs.w], input.boneWeights.w);
+    skinningMatrix += mul(myAnimation[input.boneIDs.x], input.boneWeights.x);
+    skinningMatrix += mul(myAnimation[input.boneIDs.y], input.boneWeights.y);
+    skinningMatrix += mul(myAnimation[input.boneIDs.z], input.boneWeights.z);
+    skinningMatrix += mul(myAnimation[input.boneIDs.w], input.boneWeights.w);
     
     output.worldPosition = mul(myModelMatrix, mul(skinningMatrix, float4(input.position, 1.f)));
     output.position = mul(myProjectionViewMatrix, output.worldPosition);

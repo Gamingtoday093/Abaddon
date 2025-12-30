@@ -50,6 +50,10 @@ void Scene::Init()
 	material.Init({ 1,0,0,0 }, 0.4f, ModelAssetHandler::GetTextureData("ShipTexture.png"), ModelAssetHandler::GetTextureData("ShipEmission.png"));
 	material.UpdateLighting({ 0.85f,0.25f,0.125f,1 }, 0.1f, { -0.5,-0.75,-0.25 });
 
+	StandardMaterial& sandMaterial = ModelAssetHandler::CreateMaterial<StandardMaterial>("SandMaterial");
+	sandMaterial.Init({ 1,0,0,0 }, 0, ModelAssetHandler::GetTextureData("sand.jpg"), TextureData());
+	sandMaterial.UpdateLighting({ 0.85f,0.25f,0.125f,1 }, 0.1f, { -0.5,-0.75,-0.25 });
+
 	Entity unitManager = CreateEmptyEntity("UnitManager");
 	unitManager.AddComponent<ScriptComponent>().Bind<UnitManager>(unitManager);
 
@@ -74,6 +78,10 @@ void Scene::Init()
 	animated.AddComponent<ModelComponent>("AnimationTest2.fbx", "ShipMaterial");
 	animated.GetComponent<TransformComponent>().myTransform.myPosition = { 10, 10, 0 };
 	animated.AddComponent<AnimatorComponent>("Armature|Move2", ModelAssetHandler::GetAnimation("Armature|Move2").myDurationSeconds);
+	
+	Entity gremlin = CreateEntity("Gremlin");
+	gremlin.AddComponent<ModelComponent>("gremlin.fbx", "SandMaterial");
+	gremlin.GetComponent<TransformComponent>().myTransform.myPosition = { -20, 0, -20 };
 }
 
 void Scene::Update()
@@ -150,14 +158,14 @@ void Scene::Update()
 		});
 }
 
-Entity Scene::CreateEmptyEntity(std::string aName)
+Entity Scene::CreateEmptyEntity(const std::string& aName)
 {
 	Entity entity = { myRegistry.create(), this };
 	entity.AddComponent<TagComponent>(aName);
 	return entity;
 }
 
-Entity Scene::CreateEntity(std::string aName)
+Entity Scene::CreateEntity(const std::string& aName)
 {
 	Entity entity = { myRegistry.create(), this };
 	entity.AddComponent<TransformComponent>();
@@ -166,7 +174,7 @@ Entity Scene::CreateEntity(std::string aName)
 	return entity;
 }
 
-std::vector<Entity> Scene::GetAllEntities()
+std::vector<Entity> Scene::GetAllEntities() const
 {
 	auto view = myRegistry.view<entt::entity>();
 	std::vector<Entity> entities;

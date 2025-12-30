@@ -13,13 +13,13 @@ public:
 	virtual ~Camera() = default;
 
 	virtual void Update() = 0;
-	virtual math::vector3<float> GetPosition() = 0;
-	virtual math::vector4<float> GetRotation() = 0;
+	virtual math::vector3<float> GetPosition() const = 0;
+	virtual math::vector4<float> GetRotation() const = 0;
 	virtual void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) = 0;
-	virtual XMMATRIX GetMatrix() = 0;
+	virtual XMMATRIX GetMatrix() const = 0;
 
 #pragma region Methods
-	math::vector2<float> WorldSpaceToCameraSpace(math::vector3<float> aPosition)
+	math::vector2<float> WorldSpaceToCameraSpace(math::vector3<float> aPosition) const
 	{
 		XMMATRIX matrix =
 			GetMatrix() * // View Matrix
@@ -30,7 +30,7 @@ public:
 		return { XMVectorGetX(newVector), XMVectorGetY(newVector) };
 	}
 
-	math::vector3<float> CameraSpaceToWorldSpace(math::vector2<float> aPosition)
+	math::vector3<float> CameraSpaceToWorldSpace(math::vector2<float> aPosition) const
 	{
 		XMMATRIX matrix =
 			GetMatrix() * // View Matrix

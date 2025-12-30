@@ -31,17 +31,16 @@ struct Skeleton
 	// Needed for Animations to know what Bone to affect
 	std::unordered_map<std::string, BoneIndex> myBoneNameToIndex;
 
-	void GetBones(const Animation& aAnimation, double aTime, DirectX::XMMATRIX aBones[Animations::MAX_BONES])
+	void GetBones(const Animation& aAnimation, double aTime, std::vector<DirectX::XMMATRIX>& aBones) const
 	{
-		for (int i = 0; i < Animations::MAX_BONES; i++)
-			aBones[i] = DirectX::XMMatrixIdentity();
+		aBones.assign(myBones.size(), DirectX::XMMatrixIdentity());
 
 		for (int i = 0; i < aAnimation.myChannels.size(); i++)
 		{
 			auto pair = myBoneNameToIndex.find(aAnimation.myChannels[i].myName);
 			if (pair == myBoneNameToIndex.end()) continue;
 			if (pair->second >= Animations::MAX_BONES) continue; // BoneIndex is unsigned and can't be less than 0
-			
+
 			// This is based on the assumption that Animation::myChannels is ordered from RootBone and Down
 			DirectX::XMMATRIX local = aAnimation.myChannels[i].GetInterpolated(aTime).GetMatrix();
 			BoneIndex parentIndex = myBones.at(pair->second).myBoneParentIndex;

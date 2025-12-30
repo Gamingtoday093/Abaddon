@@ -25,12 +25,12 @@ void FreeLookCamera::Update()
 	CalculateMatrix();
 }
 
-math::vector3<float> FreeLookCamera::GetPosition()
+math::vector3<float> FreeLookCamera::GetPosition() const
 {
 	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
 }
 
-math::vector4<float> FreeLookCamera::GetRotation()
+math::vector4<float> FreeLookCamera::GetRotation() const
 {
 	const XMVECTOR quat = XMQuaternionRotationRollPitchYaw(myRot.x, myRot.y, 0);
 	return { XMVectorGetX(quat), XMVectorGetY(quat), XMVectorGetZ(quat), XMVectorGetW(quat) };
@@ -43,7 +43,7 @@ void FreeLookCamera::SetTransformation(math::vector3<float> aPosition, math::vec
 	myRot = { -eulerAngles.x, eulerAngles.y + XM_PI };
 }
 
-XMMATRIX FreeLookCamera::GetMatrix()
+XMMATRIX FreeLookCamera::GetMatrix() const
 {
 	return myCameraMatrix;
 }

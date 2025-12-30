@@ -1,15 +1,9 @@
 #pragma once
 #include "Graphics/DX11.h"
 #include "Graphics/CBufferStructs.h"
+#include "BufferCommon.hpp"
 
 using namespace Microsoft::WRL;
-
-enum class eBindType
-{
-	VertexShader,
-	PixelShader,
-	VertexAndPixelShader
-};
 
 template<typename T>
 class CBuffer
@@ -21,11 +15,11 @@ public:
 	void Init(eBindType aBindType);
 	void Bind(UINT slot = 0);
 	ID3D11Buffer* Get() const;
-	ID3D11Buffer* const* GetAdressOf() const;
+	ID3D11Buffer* const* GetAddressOf() const;
 
 	void ApplyChanges();
 	void SetBindType(eBindType aBindType);
-	eBindType GetBindType();
+	eBindType GetBindType() const;
 
 	T myData{};
 
@@ -103,7 +97,7 @@ inline void CBuffer<T>::SetBindType(eBindType aBindType)
 }
 
 template<typename T>
-inline eBindType CBuffer<T>::GetBindType()
+inline eBindType CBuffer<T>::GetBindType() const
 {
 	return myBindType;
 }
@@ -115,7 +109,7 @@ inline ID3D11Buffer* CBuffer<T>::Get() const
 }
 
 template<typename T>
-inline ID3D11Buffer* const* CBuffer<T>::GetAdressOf() const
+inline ID3D11Buffer* const* CBuffer<T>::GetAddressOf() const
 {
 	return myBuffer.GetAddressOf();
 }

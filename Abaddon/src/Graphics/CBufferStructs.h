@@ -13,12 +13,6 @@ struct TransformBuffer
 };
 
 __declspec(align(16))
-struct AnimationBuffer
-{
-	DirectX::XMMATRIX myBones[Animations::MAX_BONES];
-};
-
-__declspec(align(16))
 struct CameraBuffer
 {
 	DirectX::XMVECTOR CameraPosition;

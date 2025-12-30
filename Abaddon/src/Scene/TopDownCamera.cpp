@@ -28,12 +28,12 @@ void TopDownCamera::Update()
 	CalculateMatrix();
 }
 
-math::vector3<float> TopDownCamera::GetPosition()
+math::vector3<float> TopDownCamera::GetPosition() const
 {
 	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
 }
 
-math::vector4<float> TopDownCamera::GetRotation()
+math::vector4<float> TopDownCamera::GetRotation() const
 {
 	const XMVECTOR quat = XMQuaternionRotationRollPitchYaw(myRot.x, -myRot.y, 0);
 	return { XMVectorGetX(quat), XMVectorGetY(quat), XMVectorGetZ(quat), XMVectorGetW(quat) };
@@ -46,7 +46,7 @@ void TopDownCamera::SetTransformation(math::vector3<float> aPosition, math::vect
 	myRot = { eulerAngles.x, eulerAngles.y };
 }
 
-XMMATRIX TopDownCamera::GetMatrix()
+XMMATRIX TopDownCamera::GetMatrix() const
 {
 	return myCameraMatrix;
 }

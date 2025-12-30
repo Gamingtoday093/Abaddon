@@ -11,7 +11,7 @@
 void Renderer::Init()
 {
 	myCBufferTransform.Init(eBindType::VertexShader);
-	myCBufferAnimation.Init(eBindType::VertexShader);
+	myStructAnimation.Init(eBindType::VertexShader, Animations::MAX_BONES);
 	myCBufferCamera.Init(eBindType::PixelShader);
 
 	myInputLayout.Init(InputLayoutFactory::GetDescription<Vertex>(), "VertexShader_vs.cso");
@@ -33,57 +33,62 @@ inline constexpr BlendState& Renderer::GetBlendState(eBlendState aBlendState)
 	return myBlendStates.at(static_cast<size_t>(aBlendState));
 }
 
-void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTransform, Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera)
+void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera)
 {
 	Assert(aModelData.HasSkeleton());
 
-	aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds, myCBufferAnimation.myData.myBones);
-	myCBufferAnimation.ApplyChanges();
-	myCBufferAnimation.Bind(1);
+	aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds, myStructAnimation.myData);
+	myStructAnimation.ApplyChanges();
+	myStructAnimation.Bind();
 
-	Render(aModelData, aMaterial, aTransform, aCamera);
+	// Bind vertex shader
+	mySkinnedShader.Bind();
+
+	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
 }
 
-void Renderer::Render(ModelData& aModelData, Material& aMaterial, Transform& aTransform, std::shared_ptr<Camera> aCamera)
+void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, std::shared_ptr<Camera> aCamera)
+{
+	// Bind vertex shader
+	myVertexShader.Bind();
+	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
+}
+
+// Does not bind Vertex Shader!
+void Renderer::RenderInternal(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Camera& aCamera)
 {
 	// Bind model
 	aModelData.myVertexBuffer.Bind();
 	aModelData.myIndexBuffer.Bind();
 
+	if (aModelData.HasSkeleton())
+		mySkinnedInputLayout.Bind();
+	else
+		myInputLayout.Bind();
+
 	// Bind material
 	aMaterial.Bind();
 
 	// TODO: Should sort Renders into RenderCommands so BlendState and Others only has to be set when Switching Material BlendState Context
-	if (aModelData.HasSkeleton())
-	{
-		mySkinnedInputLayout.Bind();
-		mySkinnedShader.Bind(); // TODO: This should only Bind if bones are actually set! Otherwise bind regular VertexShader
-	}
-	else
-	{
-		myInputLayout.Bind();
-		myVertexShader.Bind();
-	}
-
 	GetBlendState(aMaterial.GetBlendState()).Bind();
 
 	// Set Vertex Constant Buffer
 	myCBufferTransform.myData.myProjectionViewMatrix =
-		aCamera->GetMatrix() *
+		aCamera.GetMatrix() *
 		DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
-	myCBufferTransform.myData.myModelMatrix = 
+	myCBufferTransform.myData.myModelMatrix =
 		aTransform.GetModelMatrix();
 
 	myCBufferTransform.ApplyChanges();
 	myCBufferTransform.Bind();
 
 	// Set camera
-	math::vector3<float> cameraPosition = aCamera.get()->GetPosition();
+	math::vector3<float> cameraPosition = aCamera.GetPosition();
 	myCBufferCamera.myData.CameraPosition = DirectX::XMVectorSet(cameraPosition.x, cameraPosition.y, cameraPosition.z, 0);
 	myCBufferCamera.ApplyChanges();
 	myCBufferCamera.Bind();
-	
+
 	// Draw textured model
 	DX11::ourContext->DrawIndexed(aModelData.myIndexBuffer.GetIndexAmount(), 0, 0);
 }

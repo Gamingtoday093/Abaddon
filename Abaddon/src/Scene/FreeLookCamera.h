@@ -14,10 +14,10 @@ public:
 
 	void Init(float aMovementSpeedMultiplier, float aStartMovementSpeed, float aMinMovementSpeed, float aMaxMovementSpeed, float aRotationSpeed);
 	void Update() override;
-	math::vector3<float> GetPosition() override;
-	math::vector4<float> GetRotation() override;
+	math::vector3<float> GetPosition() const override;
+	math::vector4<float> GetRotation() const override;
 	void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) override;
-	XMMATRIX GetMatrix() override;
+	XMMATRIX GetMatrix() const override;
 
 private:
 	void CalculateMatrix() override;

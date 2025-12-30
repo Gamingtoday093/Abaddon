@@ -26,12 +26,12 @@ void FirstPersonCamera::Update()
 	CalculateMatrix();
 }
 
-math::vector3<float> FirstPersonCamera::GetPosition()
+math::vector3<float> FirstPersonCamera::GetPosition() const
 {
 	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
 }
 
-math::vector4<float> FirstPersonCamera::GetRotation()
+math::vector4<float> FirstPersonCamera::GetRotation() const
 {
 	return math::vector4<float>::identity();
 }
@@ -40,7 +40,7 @@ void FirstPersonCamera::SetTransformation(math::vector3<float> aPosition, math::
 {
 }
 
-XMMATRIX FirstPersonCamera::GetMatrix()
+XMMATRIX FirstPersonCamera::GetMatrix() const
 {
 	return myCameraMatrix;
 }
