@@ -48,6 +48,9 @@ struct TagComponent
 	std::string myTag;
 };
 
+template<typename T>
+concept DerivedFromScript = std::derived_from<T, Script>;
+
 struct ScriptComponent
 {
 	Script* myInstance = nullptr;
@@ -56,7 +59,7 @@ struct ScriptComponent
 	Script*(*InitFunction)() = nullptr;
 	void(*DestroyFunction)(ScriptComponent*) = nullptr;
 
-	template<typename T>
+	template<DerivedFromScript T>
 	T* Bind(Entity& aEntity)
 	{
 		InitFunction = []() { return static_cast<Script*>(new T()); };

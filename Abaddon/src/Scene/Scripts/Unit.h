@@ -54,8 +54,6 @@ private:
 
 	std::shared_ptr<Renderer> myRenderer;
 
-	ModelData* mySelectionMesh = nullptr;
-	TextureData* mySelectionTexture = nullptr;
 	Transform mySelectionTransform;
 	math::vector3<float> mySelectionPositionOffset;
 

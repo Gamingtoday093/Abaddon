@@ -8,8 +8,10 @@
 #include "Components/Components.h"
 #include "Scene/Scripts/PlayerMovement.h"
 #include "Scene/Scripts/Unit.h"
-#include "Scene/Scripts/LightingVisualizer.h"
 #include "Scene/Scripts/Managers/UnitManager.h"
+#include "Scene/Scripts/LightingVisualizer.h"
+#include "Scene/Scripts/NavigationAgent.h"
+#include "Scene/Scripts/Managers/NavigationManager.h"
 #include "Graphics/Bindables/Materials/Materials.h"
 
 struct TextureData;
@@ -54,34 +56,41 @@ void Scene::Init()
 	sandMaterial.Init({ 1,0,0,0 }, 0, ModelAssetHandler::GetTextureData("sand.jpg"), TextureData());
 	sandMaterial.UpdateLighting({ 0.85f,0.25f,0.125f,1 }, 0.1f, { -0.5,-0.75,-0.25 });
 
-	Entity unitManager = CreateEmptyEntity("UnitManager");
-	unitManager.AddComponent<ScriptComponent>().Bind<UnitManager>(unitManager);
+	//Entity unitManager = CreateEmptyEntity("UnitManager");
+	//unitManager.AddComponent<ScriptComponent>().Bind<UnitManager>(unitManager);
+
+	Entity navManager = CreateEntity("NavigationManager");
+	navManager.AddComponent<ModelComponent>("Sphere2.fbx", "SandMaterial");
+	navManager.AddComponent<ScriptComponent>().Bind<NavigationManager>(navManager);
+	navManager.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 40 };
 
 	Entity ship = CreateEntity("Ship");
 	ship.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
-	Unit* unit = UnitManager::CreateUnit(ship);
-	unit->Init(myRenderer);
+	ship.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship);
+	//Unit* unit = UnitManager::CreateUnit(ship);
+	//unit->Init(myRenderer);
 
 	Entity ship2 = CreateEntity("Ship2");
 	ship2.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
-	ship2.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 20 };
-	Unit* unit2 = UnitManager::CreateUnit(ship2);
-	unit2->Init(myRenderer);
+	ship2.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship2);
+	//ship2.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 20 };
+	//Unit* unit2 = UnitManager::CreateUnit(ship2);
+	//unit2->Init(myRenderer);
 
-	Entity sphere = CreateEntity("Sphere");
-	sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");
-	sphere.GetComponent<TransformComponent>().myTransform.myPosition = { 0, 10, 0 };
-	LightingVisualizer* lightingVisualizer = sphere.AddComponent<ScriptComponent>().Bind<LightingVisualizer>(sphere);
-	lightingVisualizer->Init("ShipMaterial");
-
-	Entity animated = CreateEntity("Animated");
-	animated.AddComponent<ModelComponent>("AnimationTest2.fbx", "ShipMaterial");
-	animated.GetComponent<TransformComponent>().myTransform.myPosition = { 10, 10, 0 };
-	animated.AddComponent<AnimatorComponent>("Armature|Move2", ModelAssetHandler::GetAnimation("Armature|Move2").myDurationSeconds);
+	//Entity sphere = CreateEntity("Sphere");
+	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");
+	//sphere.GetComponent<TransformComponent>().myTransform.myPosition = { 0, 10, 0 };
+	//LightingVisualizer* lightingVisualizer = sphere.AddComponent<ScriptComponent>().Bind<LightingVisualizer>(sphere);
+	//lightingVisualizer->Init("ShipMaterial");
 	
-	Entity gremlin = CreateEntity("Gremlin");
-	gremlin.AddComponent<ModelComponent>("gremlin.fbx", "SandMaterial");
-	gremlin.GetComponent<TransformComponent>().myTransform.myPosition = { -20, 0, -20 };
+	//Entity animated = CreateEntity("Animated");
+	//animated.AddComponent<ModelComponent>("AnimationTest2.fbx", "ShipMaterial");
+	//animated.GetComponent<TransformComponent>().myTransform.myPosition = { 10, 10, 0 };
+	//animated.AddComponent<AnimatorComponent>("Armature|Move2", ModelAssetHandler::GetAnimation("Armature|Move2").myDurationSeconds);
+	
+	//Entity gremlin = CreateEntity("Gremlin");
+	//gremlin.AddComponent<ModelComponent>("gremlin.fbx", "SandMaterial");
+	//gremlin.GetComponent<TransformComponent>().myTransform.myPosition = { -20, 0, -20 };
 }
 
 void Scene::Update()

@@ -63,12 +63,15 @@ void UnitManager::HandleInput()
 		const math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera()->GetPosition()).GetNormalized();
 
 		const math::vector3<float> normal = math::vector3<float>::up();
+		const math::vector3<float> offset = { 0, 0, 0 };
 
 		const float normalDotRayDirectionMaybeZero = normal.Dot(rayDirection);
 
 		if (normalDotRayDirectionMaybeZero == 0) return;
 
-		const float t = -(normal.Dot(rayOrigin)) / normalDotRayDirectionMaybeZero;
+		// Solved for t from
+		// normal Dot (rayOrigin + (rayDirection * t) - offset)
+		const float t = (normal.Dot(offset - rayOrigin)) / normalDotRayDirectionMaybeZero;
 
 		if (t <= 0) return;
 
