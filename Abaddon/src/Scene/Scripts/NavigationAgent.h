@@ -1,8 +1,6 @@
 #pragma once
 #include "Script.hpp"
 
-constexpr float PREDICTION_HORIZON_SECONDS = 1.5f;
-
 class NavigationAgent : public Script
 {
 public:
@@ -25,7 +23,6 @@ public:
 	// Ideal Velocity
 	math::vector3<float> myTargetVelocity;
 
-private:
 	float myRadius = 8;
 
 	float myMass = 10;

@@ -13,48 +13,63 @@ void NavigationManager::Update()
 {
     TransformComponent& transform = GetComponent<TransformComponent>();
     
-    if (myAgents.size() > 0)
+    for (size_t i = 0; i < myAgents.size(); i++)
     {
-        int index = 0;
-        NavigationAgent& currentAgent = *myAgents.at(index);
+        NavigationAgent& currentAgent = *myAgents[i];
         TransformComponent& currentTransform = currentAgent.GetComponent<TransformComponent>();
 
-        currentAgent.myTargetVelocity = (transform.myTransform.myPosition - currentTransform.myTransform.myPosition);
+        if (i == 0)
+        {
+            currentAgent.myTargetVelocity = (transform.myTransform.myPosition - currentTransform.myTransform.myPosition);
+        }
+        else
+        {
+            currentAgent.myTargetVelocity = (math::vector3<float>::zero() - currentTransform.myTransform.myPosition);
+        }
         if (currentAgent.myTargetVelocity.LengthSqr() > 0) currentAgent.myTargetVelocity.Normalize();
 
-        math::vector3<float> totalAvoidanceVelocity = { 0, 0, 0 };
-
-        for (size_t i = 0; i < myAgents.size(); i++)
-        {
-            if (i == index) continue;
-
-            NavigationAgent& otherAgent = *myAgents.at(i);
-            TransformComponent& otherTransform = otherAgent.GetComponent<TransformComponent>();
-
-            math::vector3<float> relativePosition = otherTransform.myTransform.myPosition - currentTransform.myTransform.myPosition;
-            math::vector3<float> relativeVelocity = currentAgent.myTargetVelocity - otherAgent.myVelocity;
-
-            float t = std::clamp(relativePosition.Dot(relativeVelocity) / relativeVelocity.Dot(relativeVelocity), 0.0f, PREDICTION_HORIZON_SECONDS);
-
-            math::vector3<float> closest = relativePosition - (relativeVelocity * t);
-
-            if (closest.LengthSqr() == 0) continue;
-            float radius = currentAgent.GetRadius() + otherAgent.GetRadius();
-            if (closest.LengthSqr() > radius * radius) continue;
-
-            float avoidanceFactor = otherAgent.GetInfluence() / (currentAgent.GetInfluence() + otherAgent.GetInfluence());
-            avoidanceFactor = std::clamp(avoidanceFactor, 0.0f, 1.0f);
-
-            float penetration = radius - closest.Length();
-            float pushSpeed = penetration / std::max(t, 0.1f);
-
-            math::vector3<float> avoidanceVelocity = closest.GetNormalized() * (pushSpeed * avoidanceFactor);
-
-            totalAvoidanceVelocity += avoidanceVelocity;
-        }
-
-        currentAgent.myVelocity = currentAgent.myTargetVelocity - totalAvoidanceVelocity;
+        math::vector3<float> totalAvoidance = CalculateTotalAvoidanceVelocity(currentAgent);
+        totalAvoidance.y = 0.f;
+        currentAgent.myVelocity = currentAgent.myTargetVelocity - totalAvoidance;
+        if (currentAgent.myVelocity.LengthSqr() > 0) currentAgent.myVelocity.Normalize();
     }
+}
+
+math::vector3<float> NavigationManager::CalculateTotalAvoidanceVelocity(NavigationAgent& aAgent)
+{
+    math::vector3<float> totalAvoidanceVelocity;
+
+    for (size_t i = 0; i < myAgents.size(); i++)
+    {
+        NavigationAgent& otherAgent = *myAgents[i];
+        if (&otherAgent == &aAgent) continue;
+        if (otherAgent.myPriority < aAgent.myPriority) continue;
+        TransformComponent& otherTransform = otherAgent.GetComponent<TransformComponent>();
+
+        math::vector3<float> relativePosition = otherTransform.myTransform.myPosition - aAgent.GetComponent<TransformComponent>().myTransform.myPosition;
+        math::vector3<float> relativeVelocity = aAgent.myTargetVelocity - otherAgent.myVelocity;
+        if (relativeVelocity.LengthSqr() == 0) continue;
+
+        // Project relativePosition onto relativeVelocity
+        float t = std::clamp(relativePosition.Dot(relativeVelocity) / relativeVelocity.LengthSqr(), 0.f, 1.5f);
+        math::vector3<float> projectedClosest = relativePosition - (relativeVelocity * t);
+
+        if (projectedClosest.LengthSqr() == 0) continue;
+        float radius = aAgent.GetRadius() + otherAgent.GetRadius();
+        if (projectedClosest.LengthSqr() > radius * radius) continue;
+
+        float avoidanceFactor = otherAgent.GetInfluence() / (aAgent.GetInfluence() + otherAgent.GetInfluence());
+        avoidanceFactor = std::clamp(avoidanceFactor, 0.0f, 1.0f);
+
+        float penetration = radius - projectedClosest.Length();
+        float pushSpeed = penetration / std::max(t, 0.1f);
+
+        math::vector3<float> avoidanceVelocity = projectedClosest.GetNormalized() * (pushSpeed * avoidanceFactor);
+
+        totalAvoidanceVelocity += avoidanceVelocity;
+    }
+
+    return totalAvoidanceVelocity;
 }
 
 NavigationManager* NavigationManager::myInstance = nullptr;

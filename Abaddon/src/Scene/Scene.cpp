@@ -66,13 +66,17 @@ void Scene::Init()
 
 	Entity ship = CreateEntity("Ship");
 	ship.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
-	ship.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship);
+	NavigationAgent* agent = ship.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship);
+	agent->myMass = 100;
+	agent->myPriority = 1;
+	ship.GetComponent<TransformComponent>().myTransform.myPosition = { -30, 0, -40 };
 	//Unit* unit = UnitManager::CreateUnit(ship);
 	//unit->Init(myRenderer);
 
 	Entity ship2 = CreateEntity("Ship2");
 	ship2.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
-	ship2.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship2);
+	NavigationAgent* agent2 = ship2.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship2);
+	agent2->myMass = 10;
 	//ship2.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 20 };
 	//Unit* unit2 = UnitManager::CreateUnit(ship2);
 	//unit2->Init(myRenderer);

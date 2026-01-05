@@ -9,6 +9,8 @@ public:
 	void Awake() override;
 	void Update() override;
 
+	math::vector3<float> CalculateTotalAvoidanceVelocity(NavigationAgent& aAgent);
+
 private:
 	static NavigationManager& GetInstance();
 	static NavigationManager* myInstance;

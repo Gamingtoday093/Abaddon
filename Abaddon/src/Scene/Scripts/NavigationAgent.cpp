@@ -20,4 +20,6 @@ void NavigationAgent::Update()
 {
     TransformComponent& transform = GetComponent<TransformComponent>();
     transform.myTransform.myPosition += myVelocity * 0.3f;
+    //if (myVelocity.LengthSqr() > 0)
+    //    transform.myTransform.myRotation = math::vector4<float>::LookRotation(myVelocity, math::vector3<float>::up()).ToEuler();
 }
