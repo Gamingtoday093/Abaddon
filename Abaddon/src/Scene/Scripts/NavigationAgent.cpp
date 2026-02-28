@@ -5,7 +5,13 @@
 
 void NavigationAgent::Awake()
 {
+    myTransform = &GetComponent<TransformComponent>();
     NavigationManager::GetInstance().myAgents.push_back(this);
+}
+
+void NavigationAgent::Start()
+{
+    myStartPosition = myTransform->myTransform.myPosition;
 }
 
 void NavigationAgent::OnDestroy()
@@ -18,8 +24,7 @@ void NavigationAgent::OnDestroy()
 
 void NavigationAgent::Update()
 {
-    TransformComponent& transform = GetComponent<TransformComponent>();
-    transform.myTransform.myPosition += myVelocity * 0.3f;
+    myTransform->myTransform.myPosition += myVelocity * 0.3f;
     //if (myVelocity.LengthSqr() > 0)
     //    transform.myTransform.myRotation = math::vector4<float>::LookRotation(myVelocity, math::vector3<float>::up()).ToEuler();
 }

@@ -10,7 +10,7 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	{
 		images.emplace_back();
 		HRESULT hr = DirectX::LoadFromWICFile(AddStringsReturnWStr("Textures/" + aFolderPath + "/" + std::to_string(i), ".png").c_str(), DirectX::WIC_FLAGS_NONE, nullptr, images[i]);
-		DX11::HRASSERT(hr, "Loading Texture Image");
+		HRASSERT(hr, "Loading Texture Image");
 	}
 
 	D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -37,7 +37,7 @@ void CubeTexture::Init(const std::string& aFolderPath)
 
 	ComPtr<ID3D11Texture2D> pTexture;
 	HRESULT hr = DX11::ourDevice->CreateTexture2D(&textureDesc, data, &pTexture);
-	DX11::HRASSERT(hr, "Creating Texture");
+	HRASSERT(hr, "Creating Texture");
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = textureDesc.Format;
@@ -45,7 +45,7 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
 	hr = DX11::ourDevice->CreateShaderResourceView(pTexture.Get(), &srvDesc, &pTextureView);
-	DX11::HRASSERT(hr, "Creating Shader Resource");
+	HRASSERT(hr, "Creating Shader Resource");
 }
 
 void CubeTexture::Bind()

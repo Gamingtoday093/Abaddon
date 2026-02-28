@@ -53,7 +53,7 @@ void DX11::Initialize(bool aDebugMode)
 		nullptr,
 		&ourContext);
 
-	HRASSERT(hr, "Initializing DX11 Framework");
+	HRASSERTLOG(hr, "Initializing DX11 Framework");
 
 	CreateRenderTargetView();
 	CreateSceneTextureResources();
@@ -61,11 +61,6 @@ void DX11::Initialize(bool aDebugMode)
 	BindRenderTarget();
 	SetViewPort();
 	SetPrimitiveTopology();
-	//SetAndCreateVertexShader("VertexShader_vs.cso");
-	//SetAndCreatePixelShader("PixelShader_ps.cso
-
-	//SetAndCreateVertexShader("Skybox_vs.cso");
-	//SetAndCreatePixelShader("Skybox_ps.cso");
 }
 
 void DX11::BeginFrame(float aClearColor[4])
@@ -96,7 +91,7 @@ void DX11::Resize(int aNewWidth, int aNewHeight)
 
 	HRESULT hr = ourSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0); // Keep Previous Settings
 
-	HRASSERT(hr, "Resizing Buffers");
+	HRASSERTLOG(hr, "Resizing Buffers");
 
 	if (myWidth == 0 || myHeight == 0) return;
 
@@ -106,11 +101,11 @@ void DX11::Resize(int aNewWidth, int aNewHeight)
 	SetViewPort();
 }
 
-void DX11::HRASSERT(HRESULT aHr, const std::string& aDescription, bool aPrint)
+void DX11::HRAssert(HRESULT aHr, const std::string& aDescription, bool aPrint, const char* aFile, int aLine)
 {
 	if (FAILED(aHr))
 	{
-		LOG_ERROR(aDescription + " failed.");
+		LOG_ERROR(aDescription + " failed.\nFile: " + aFile + " on Line: " + std::to_string(aLine));
 
 		std::string message = "";
 		message = std::system_category().message(aHr);
@@ -132,7 +127,7 @@ void DX11::CreateRenderTargetView()
 	ourSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
 	HRESULT hr = ourDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, &ourBackBuffer);
 
-	HRASSERT(hr, "Creation of Render Target View");
+	HRASSERTLOG(hr, "Creation of Render Target View");
 }
 
 void DX11::CreateDepth()
@@ -146,7 +141,7 @@ void DX11::CreateDepth()
 	depthDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	HRESULT hr = ourDevice->CreateDepthStencilState(&depthDesc, &depthStencilState);
-	HRASSERT(hr, "Creation of Depth Stencil State");
+	HRASSERTLOG(hr, "Creation of Depth Stencil State");
 
 	ourContext->OMSetDepthStencilState(depthStencilState.Get(), 1);
 
@@ -170,7 +165,7 @@ void DX11::CreateDepthTexture()
 	textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
 	HRESULT hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &depthStencilTexture);
-	HRASSERT(hr, "Creation of Depth Stencil Texture 2D");
+	HRASSERTLOG(hr, "Creation of Depth Stencil Texture 2D");
 
 	// Depth Stencil View
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
@@ -179,7 +174,7 @@ void DX11::CreateDepthTexture()
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 	hr = ourDevice->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &ourDepthBuffer);
-	HRASSERT(hr, "Creation of Depth Stencil View");
+	HRASSERTLOG(hr, "Creation of Depth Stencil View");
 }
 
 void DX11::BindRenderTarget()
@@ -216,7 +211,7 @@ void DX11::SetAndCreateVertexShader(std::string aShaderFileName)
 	D3DReadFileToBlob(AddStringsReturnWStr("Shaders/", aShaderFileName).c_str(), &blob);
 
 	HRESULT hr = ourDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader);
-	HRASSERT(hr, "Creating and setting Vertex Shader");
+	HRASSERTLOG(hr, "Creating and setting Vertex Shader");
 
 	ourContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 }
@@ -228,7 +223,7 @@ void DX11::SetAndCreatePixelShader(std::string aShaderFileName)
 	D3DReadFileToBlob(AddStringsReturnWStr("Shaders/", aShaderFileName).c_str(), &blob);
 
 	HRESULT hr = ourDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader);
-	HRASSERT(hr, "Creating and setting Pixel Shader");
+	HRASSERTLOG(hr, "Creating and setting Pixel Shader");
 
 	ourContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 }
@@ -236,7 +231,7 @@ void DX11::SetAndCreatePixelShader(std::string aShaderFileName)
 void DX11::CreateSceneTextureResources()
 {
 	HRESULT hr;
-
+	
 	// Texture
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = myWidth;
@@ -251,7 +246,7 @@ void DX11::CreateSceneTextureResources()
 	textureDesc.MiscFlags = 0;
 
 	hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &ourTexture);
-	HRASSERT(hr, "Creating Texture 2D");
+	HRASSERTLOG(hr, "Creating Texture 2D");
 
 	// Render Target View
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
@@ -260,7 +255,7 @@ void DX11::CreateSceneTextureResources()
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	hr = ourDevice->CreateRenderTargetView(ourTexture.Get(), &renderTargetViewDesc, &ourTextureBuffer);
-	HRASSERT(hr, "Creating Render Target View tied to Texture 2D");
+	HRASSERTLOG(hr, "Creating Render Target View tied to Texture 2D");
 
 	// SRV
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
@@ -270,5 +265,5 @@ void DX11::CreateSceneTextureResources()
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
 	hr = ourDevice->CreateShaderResourceView(ourTexture.Get(), &shaderResourceViewDesc, &ourTextureSRV);
-	HRASSERT(hr, "Creating SRV for Scene Texture 2D");
+	HRASSERTLOG(hr, "Creating SRV for Scene Texture 2D");
 }

@@ -14,7 +14,7 @@ void InputLayout::Init(const std::vector<D3D11_INPUT_ELEMENT_DESC>& aDescription
 		blob->GetBufferPointer(),
 		blob->GetBufferSize(),
 		&myInputLayout);
-	DX11::HRASSERT(hr, "Creating Input Layout");
+	HRASSERT(hr, "Creating Input Layout");
 }
 
 void InputLayout::Bind()

@@ -8,7 +8,7 @@ void BlendState::Init(eBlendState aBlendState)
 	D3D11_BLEND_DESC blendDesc = BlendStateFactory::GetBlendDesc(aBlendState);
 
 	HRESULT hr = DX11::ourDevice->CreateBlendState(&blendDesc, &myBlendState);
-	DX11::HRASSERT(hr, "Creating BlendState", false);
+	HRASSERT(hr, "Creating BlendState");
 }
 
 void BlendState::Bind()

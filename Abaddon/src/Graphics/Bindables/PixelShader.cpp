@@ -7,10 +7,10 @@ void PixelShader::Init(std::string aShaderFileName)
 {
 	ComPtr<ID3DBlob> blob;
 	HRESULT hr = D3DReadFileToBlob(AddStringsReturnWStr("Shaders/", aShaderFileName).c_str(), &blob);
-	DX11::HRASSERT(hr, "Creating Pixel Shader Blob");
+	HRASSERT(hr, "Creating Pixel Shader Blob");
 
 	hr = DX11::ourDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &myPixelShader);
-	DX11::HRASSERT(hr, "Creating Pixel Shader");
+	HRASSERT(hr, "Creating Pixel Shader");
 }
 
 void PixelShader::Bind()

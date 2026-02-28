@@ -19,7 +19,7 @@ void VertexBuffer::Init(const void* aData, UINT aNumData, UINT aDataSize)
 
 	// Create
 	HRESULT hr = DX11::ourDevice->CreateBuffer(&bufferDesc, &subResData, &myBuffer);
-	DX11::HRASSERT(hr, "Creating Vertex Buffer");
+	HRASSERT(hr, "Creating Vertex Buffer");
 }
 
 void VertexBuffer::Bind()

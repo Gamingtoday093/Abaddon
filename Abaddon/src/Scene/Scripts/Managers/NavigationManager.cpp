@@ -16,7 +16,7 @@ void NavigationManager::Update()
     for (size_t i = 0; i < myAgents.size(); i++)
     {
         NavigationAgent& currentAgent = *myAgents[i];
-        TransformComponent& currentTransform = currentAgent.GetComponent<TransformComponent>();
+        TransformComponent& currentTransform = *currentAgent.myTransform;
 
         if (i == 0)
         {
@@ -24,7 +24,7 @@ void NavigationManager::Update()
         }
         else
         {
-            currentAgent.myTargetVelocity = (math::vector3<float>::zero() - currentTransform.myTransform.myPosition);
+            currentAgent.myTargetVelocity = (currentAgent.myStartPosition - currentTransform.myTransform.myPosition);
         }
         if (currentAgent.myTargetVelocity.LengthSqr() > 0) currentAgent.myTargetVelocity.Normalize();
 
@@ -44,9 +44,9 @@ math::vector3<float> NavigationManager::CalculateTotalAvoidanceVelocity(Navigati
         NavigationAgent& otherAgent = *myAgents[i];
         if (&otherAgent == &aAgent) continue;
         if (otherAgent.myPriority < aAgent.myPriority) continue;
-        TransformComponent& otherTransform = otherAgent.GetComponent<TransformComponent>();
+        TransformComponent& otherTransform = *otherAgent.myTransform;
 
-        math::vector3<float> relativePosition = otherTransform.myTransform.myPosition - aAgent.GetComponent<TransformComponent>().myTransform.myPosition;
+        math::vector3<float> relativePosition = otherTransform.myTransform.myPosition - aAgent.myTransform->myTransform.myPosition;
         math::vector3<float> relativeVelocity = aAgent.myTargetVelocity - otherAgent.myVelocity;
         if (relativeVelocity.LengthSqr() == 0) continue;
 

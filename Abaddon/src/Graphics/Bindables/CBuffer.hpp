@@ -48,7 +48,7 @@ inline void CBuffer<T>::Init(eBindType aBindType)
 
 	// Create
 	HRESULT hr = DX11::ourDevice->CreateBuffer(&bufferDesc, &subResData, myBuffer.GetAddressOf());
-	DX11::HRASSERT(hr, "Creating CBuffer");
+	HRASSERT(hr, "Creating CBuffer");
 }
 
 template<typename T>
@@ -83,7 +83,7 @@ inline void CBuffer<T>::ApplyChanges()
 	ZeroMemory(&bufferData, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
 	HRESULT hr = DX11::ourContext->Map(myBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-	DX11::HRASSERT(hr, "Locking CBuffer for Write", false);
+	HRASSERT(hr, "Locking CBuffer for Write");
 
 	memcpy(bufferData.pData, &myData, sizeof(myData));
 

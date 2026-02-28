@@ -18,7 +18,9 @@ public:
 	static void BindRenderTarget();
 	static void BindRenderTargetTexture();
 
-	static void HRASSERT(HRESULT aHr, const std::string& aDescription, bool aPrint = true);
+#define HRASSERTLOG(aHr, aDescription) DX11::HRAssert(aHr, aDescription, true, __FILE__, __LINE__)
+#define HRASSERT(aHr, aDescription) DX11::HRAssert(aHr, aDescription, false, __FILE__, __LINE__)
+	static void HRAssert(HRESULT aHr, const std::string& aDescription, bool aPrint = false, const char* aFile = nullptr, int aLine = 0);
 
 	static ComPtr<ID3D11Device> ourDevice;
 	static ComPtr<ID3D11DeviceContext> ourContext;

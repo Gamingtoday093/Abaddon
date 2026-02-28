@@ -19,7 +19,7 @@ void IndexBuffer::Init(const std::vector<unsigned short>& aIndexList)
 
 	// Create
 	HRESULT hr = DX11::ourDevice->CreateBuffer(&bufferDesc, &subResData, &myBuffer);
-	DX11::HRASSERT(hr, "Creating Index Buffer");
+	HRASSERT(hr, "Creating Index Buffer");
 }
 
 void IndexBuffer::Bind()

@@ -1,10 +1,13 @@
 #pragma once
 #include "Script.hpp"
 
+struct TransformComponent;
+
 class NavigationAgent : public Script
 {
 public:
 	void Awake() override;
+	void Start() override;
 	void OnDestroy() override;
 
 	void Update() override;
@@ -22,6 +25,9 @@ public:
 	math::vector3<float> myVelocity;
 	// Ideal Velocity
 	math::vector3<float> myTargetVelocity;
+
+	math::vector3<float> myStartPosition;
+	TransformComponent* myTransform;
 
 	float myRadius = 8;
 

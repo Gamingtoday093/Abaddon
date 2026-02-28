@@ -64,7 +64,7 @@ inline void StructBuffer<T>::Resize(UINT aNewMaxLength)
 	subResData.SysMemSlicePitch = 0;
 
 	HRESULT hr = DX11::ourDevice->CreateBuffer(&bufferDesc, &subResData, myBuffer.GetAddressOf());
-	DX11::HRASSERT(hr, "Creating StructBuffer");
+	HRASSERT(hr, "Creating StructBuffer");
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -73,7 +73,7 @@ inline void StructBuffer<T>::Resize(UINT aNewMaxLength)
 	srvDesc.Buffer.NumElements = myBufferLength;
 
 	hr = DX11::ourDevice->CreateShaderResourceView(myBuffer.Get(), &srvDesc, mySRV.GetAddressOf());
-	DX11::HRASSERT(hr, "Creating SRV for StructBuffer", false);
+	HRASSERT(hr, "Creating SRV for StructBuffer");
 }
 
 template<typename T>
@@ -109,7 +109,7 @@ inline void StructBuffer<T>::ApplyChanges()
 	D3D11_MAPPED_SUBRESOURCE bufferData = {};
 
 	HRESULT hr = DX11::ourContext->Map(myBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-	DX11::HRASSERT(hr, "Locking StructBuffer for Write", false);
+	HRASSERT(hr, "Locking StructBuffer for Write");
 
 	memcpy_s(bufferData.pData, sizeof(T) * myBufferLength, std::data(myData), sizeof(T) * myData.size());
 

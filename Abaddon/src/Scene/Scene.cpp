@@ -11,6 +11,7 @@
 #include "Scene/Scripts/Managers/UnitManager.h"
 #include "Scene/Scripts/LightingVisualizer.h"
 #include "Scene/Scripts/NavigationAgent.h"
+#include "Scene/Scripts/NavigationSpawner.h"
 #include "Scene/Scripts/Managers/NavigationManager.h"
 #include "Graphics/Bindables/Materials/Materials.h"
 
@@ -67,7 +68,7 @@ void Scene::Init()
 	Entity ship = CreateEntity("Ship");
 	ship.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
 	NavigationAgent* agent = ship.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship);
-	agent->myMass = 100;
+	agent->myMass = 10;
 	agent->myPriority = 1;
 	ship.GetComponent<TransformComponent>().myTransform.myPosition = { -30, 0, -40 };
 	//Unit* unit = UnitManager::CreateUnit(ship);
@@ -77,9 +78,14 @@ void Scene::Init()
 	ship2.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
 	NavigationAgent* agent2 = ship2.AddComponent<ScriptComponent>().Bind<NavigationAgent>(ship2);
 	agent2->myMass = 10;
+	agent2->myPriority = 2;
 	//ship2.GetComponent<TransformComponent>().myTransform.myPosition = { 30, 0, 20 };
 	//Unit* unit2 = UnitManager::CreateUnit(ship2);
 	//unit2->Init(myRenderer);
+
+	Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
+	NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
+	spawner->myAgentCount = 100;
 
 	//Entity sphere = CreateEntity("Sphere");
 	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");

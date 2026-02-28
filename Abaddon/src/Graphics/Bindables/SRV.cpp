@@ -10,13 +10,13 @@ void SRV::Init(const std::string& aTextureFileName)
 	HRESULT hr = DirectX::LoadFromWICFile(AddStringsReturnWStr("Textures/", aTextureFileName).c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, imageData);
 	// ALERT ALERT ALERT
 	// I have absolutely no idea what unforseen consequences DirectX::WIC_FLAGS_IGNORE_SRGB has! But it works so Yippiee
-	DX11::HRASSERT(hr, "Loading Texture Image");
+	HRASSERT(hr, "Loading Texture Image");
 
 	// Texture
 	ComPtr<ID3D11Resource> texture;
 
 	hr = DirectX::CreateTexture(DX11::ourDevice.Get(), imageData.GetImages(), imageData.GetImageCount(), imageData.GetMetadata(), &texture);
-	DX11::HRASSERT(hr, "Creating Texture");
+	HRASSERT(hr, "Creating Texture");
 
 	// Creating SRV
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -27,7 +27,7 @@ void SRV::Init(const std::string& aTextureFileName)
 	srvDesc.Texture2D.MipLevels = 1;
 
 	hr = DX11::ourDevice->CreateShaderResourceView(texture.Get(), &srvDesc, &mySRV);
-	DX11::HRASSERT(hr, "Creating Shader Resource View");
+	HRASSERT(hr, "Creating Shader Resource View");
 }
 
 void SRV::Bind(UINT slot)

@@ -36,7 +36,7 @@ inline constexpr BlendState& Renderer::GetBlendState(eBlendState aBlendState)
 void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera)
 {
 	Assert(aModelData.HasSkeleton());
-
+	
 	aModelData.mySkeleton.GetBones(aAnimation, aAnimation.myFramerate * aTimeSeconds, myStructAnimation.myData);
 	myStructAnimation.ApplyChanges();
 	myStructAnimation.Bind();
@@ -51,6 +51,7 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transfor
 {
 	// Bind vertex shader
 	myVertexShader.Bind();
+
 	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
 }
 

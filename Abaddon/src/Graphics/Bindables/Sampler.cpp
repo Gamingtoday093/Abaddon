@@ -13,7 +13,7 @@ void Sampler::Init()
 
 	// Create
 	HRESULT hr = DX11::ourDevice->CreateSamplerState(&samplerDesc, &mySamplerState);
-	DX11::HRASSERT(hr, "Creating Sampler");
+	HRASSERT(hr, "Creating Sampler");
 }
 
 void Sampler::Bind(UINT slot)

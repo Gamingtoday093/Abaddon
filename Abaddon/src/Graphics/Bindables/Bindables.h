@@ -11,7 +11,7 @@
 
 struct Skeleton
 {
-	typedef uint32_t BoneIndex;
+	using BoneIndex = uint32_t;
 
 	struct Bone
 	{
