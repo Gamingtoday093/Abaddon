@@ -115,5 +115,9 @@ void TopDownCamera::UpdateInput()
 	{
 		myDir.Normalize();
 	}
+	if (Input::GetInstance().IsKeyDown((int)eKeys::SHIFT))
+	{
+		myDir *= 2.f;
+	}
 	myDir *= myMovementSpeed;
 }

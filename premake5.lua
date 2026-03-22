@@ -14,6 +14,7 @@ workspace "Abaddon"
 group "Dependencies" 
     include "vendor/external/ImGui"
     include "vendor/external/ImGuizmo"
+	include "vendor/external/RVO2"
 group ""
     
 project "Abaddon"
@@ -43,7 +44,8 @@ project "Abaddon"
         "lib/DirectXTex.lib",
         "lib/assimp-vc143-mt.lib",
         "ImGui",
-        "ImGuizmo"
+        "ImGuizmo",
+		"RVO2"
     }
     
     files {

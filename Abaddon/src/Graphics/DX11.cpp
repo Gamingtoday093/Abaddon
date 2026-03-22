@@ -53,7 +53,7 @@ void DX11::Initialize(bool aDebugMode)
 		nullptr,
 		&ourContext);
 
-	HRASSERTLOG(hr, "Initializing DX11 Framework");
+	HRASSERT(hr, "Initializing DX11 Framework");
 
 	CreateRenderTargetView();
 	CreateSceneTextureResources();
@@ -91,7 +91,7 @@ void DX11::Resize(int aNewWidth, int aNewHeight)
 
 	HRESULT hr = ourSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0); // Keep Previous Settings
 
-	HRASSERTLOG(hr, "Resizing Buffers");
+	HRASSERT(hr, "Resizing Buffers");
 
 	if (myWidth == 0 || myHeight == 0) return;
 
@@ -127,7 +127,7 @@ void DX11::CreateRenderTargetView()
 	ourSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
 	HRESULT hr = ourDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, &ourBackBuffer);
 
-	HRASSERTLOG(hr, "Creation of Render Target View");
+	HRASSERT(hr, "Creation of Render Target View");
 }
 
 void DX11::CreateDepth()
@@ -141,7 +141,7 @@ void DX11::CreateDepth()
 	depthDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	HRESULT hr = ourDevice->CreateDepthStencilState(&depthDesc, &depthStencilState);
-	HRASSERTLOG(hr, "Creation of Depth Stencil State");
+	HRASSERT(hr, "Creation of Depth Stencil State");
 
 	ourContext->OMSetDepthStencilState(depthStencilState.Get(), 1);
 
@@ -246,7 +246,7 @@ void DX11::CreateSceneTextureResources()
 	textureDesc.MiscFlags = 0;
 
 	hr = ourDevice->CreateTexture2D(&textureDesc, nullptr, &ourTexture);
-	HRASSERTLOG(hr, "Creating Texture 2D");
+	HRASSERT(hr, "Creating Texture 2D");
 
 	// Render Target View
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
@@ -255,7 +255,7 @@ void DX11::CreateSceneTextureResources()
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	hr = ourDevice->CreateRenderTargetView(ourTexture.Get(), &renderTargetViewDesc, &ourTextureBuffer);
-	HRASSERTLOG(hr, "Creating Render Target View tied to Texture 2D");
+	HRASSERT(hr, "Creating Render Target View tied to Texture 2D");
 
 	// SRV
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
@@ -265,5 +265,5 @@ void DX11::CreateSceneTextureResources()
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
 	hr = ourDevice->CreateShaderResourceView(ourTexture.Get(), &shaderResourceViewDesc, &ourTextureSRV);
-	HRASSERTLOG(hr, "Creating SRV for Scene Texture 2D");
+	HRASSERT(hr, "Creating SRV for Scene Texture 2D");
 }

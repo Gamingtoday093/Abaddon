@@ -16,7 +16,7 @@ void Sampler::Init()
 	HRASSERT(hr, "Creating Sampler");
 }
 
-void Sampler::Bind(UINT slot)
+void Sampler::Bind(UINT slot) const
 {
 	DX11::ourContext->PSSetSamplers(slot, 1, mySamplerState.GetAddressOf());
 }

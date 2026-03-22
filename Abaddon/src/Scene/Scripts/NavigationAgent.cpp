@@ -16,6 +16,8 @@ void NavigationAgent::Start()
 
 void NavigationAgent::OnDestroy()
 {
+    myTransform = nullptr;
+
     auto& agents = NavigationManager::GetInstance().myAgents;
     auto result = std::find(agents.begin(), agents.end(), this);
     if (result == agents.end()) return;

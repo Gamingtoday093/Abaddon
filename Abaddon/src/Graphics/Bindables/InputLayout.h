@@ -13,7 +13,7 @@ public:
 	~InputLayout() = default;
 
 	void Init(const std::vector<D3D11_INPUT_ELEMENT_DESC>& aDescriptionList, const std::string& aVertexShaderFileName);
-	void Bind();
+	void Bind() const;
 	ID3D11InputLayout* Get() const;
 	ID3D11InputLayout* const* GetAddressOf() const;
 

@@ -17,7 +17,7 @@
 
 struct TextureData;
 
-Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND) : myRenderer(aRenderer), myHWND(aHWND)
+Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND) : myRenderer(std::move(aRenderer)), myHWND(aHWND)
 {
 }
 
@@ -38,7 +38,7 @@ void Scene::Init()
 	myFreeLookCamera->Init(0.125f, 0.5f, 0.1f, 3, 0.005f);
 
 	myTopDownCamera = std::make_shared<TopDownCamera>();
-	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 120, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
+	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 160, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
 
 	ModelAssetHandler::LoadModel("Ship.fbx");
 	ModelAssetHandler::LoadModel("ShipSmooth.fbx");
@@ -85,7 +85,7 @@ void Scene::Init()
 
 	Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
 	NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
-	spawner->myAgentCount = 100;
+	spawner->myAgentCount = 50;
 
 	//Entity sphere = CreateEntity("Sphere");
 	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");

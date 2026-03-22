@@ -12,7 +12,7 @@ public:
 	~Sampler() = default;
 
 	void Init();
-	void Bind(UINT slot = 0);
+	void Bind(UINT slot = 0) const;
 	ID3D11SamplerState* Get() const;
 	ID3D11SamplerState* const* GetAddressOf() const;
 

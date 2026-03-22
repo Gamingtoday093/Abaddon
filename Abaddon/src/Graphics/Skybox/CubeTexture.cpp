@@ -14,8 +14,8 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	}
 
 	D3D11_TEXTURE2D_DESC textureDesc = {};
-	textureDesc.Width = images[0].GetMetadata().width;
-	textureDesc.Height = images[0].GetMetadata().height;
+	textureDesc.Width = UINT(images[0].GetMetadata().width);
+	textureDesc.Height = UINT(images[0].GetMetadata().height);
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
 	textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -48,7 +48,7 @@ void CubeTexture::Init(const std::string& aFolderPath)
 	HRASSERT(hr, "Creating Shader Resource");
 }
 
-void CubeTexture::Bind()
+void CubeTexture::Bind() const
 {
 	DX11::ourContext->PSSetShaderResources(0, 1, pTextureView.GetAddressOf());
 }

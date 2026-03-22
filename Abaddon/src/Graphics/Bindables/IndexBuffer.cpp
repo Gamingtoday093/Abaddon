@@ -22,7 +22,7 @@ void IndexBuffer::Init(const std::vector<unsigned short>& aIndexList)
 	HRASSERT(hr, "Creating Index Buffer");
 }
 
-void IndexBuffer::Bind()
+void IndexBuffer::Bind() const
 {
 	DX11::ourContext->IASetIndexBuffer(myBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 }

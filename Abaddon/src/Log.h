@@ -28,7 +28,7 @@ namespace Log
 		switch (aLogType)
 		{
 			case eLogType::Standard:
-				std::cout << aString << std::endl;
+				std::cout << aString << '\n';
 				break;
 
 			case eLogType::Success:

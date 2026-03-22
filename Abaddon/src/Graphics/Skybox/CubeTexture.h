@@ -12,7 +12,7 @@ public:
 	~CubeTexture() = default;
 
 	void Init(const std::string& aFolderPath);
-	void Bind();
+	void Bind() const;
 
 private:
 	ComPtr<ID3D11ShaderResourceView> pTextureView;

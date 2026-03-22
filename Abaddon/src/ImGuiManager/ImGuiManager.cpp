@@ -4,11 +4,14 @@
 #include "Scene/Scene.h"
 #include "Scene/Components/Components.h"
 #include "Scene/ModelAssetHandler.h"
+#include "ImGuiLogger.h"
+#include "Scene/Entity.h"
 
-ImGuiManager::ImGuiManager(HWND aHWND, std::shared_ptr<Scene> aScene) : myHWND(aHWND), myScene(aScene), myGizmoOperation(ImGuizmo::OPERATION::TRANSLATE), myGizmoSpace(ImGuizmo::MODE::WORLD) {}
 
-void ImGuiManager::Init()
+ImGuiManager::ImGuiManager(HWND aHWND, std::shared_ptr<Scene> aScene) : myHWND(aHWND), myGizmoOperation(ImGuizmo::OPERATION::TRANSLATE), myGizmoSpace(ImGuizmo::MODE::WORLD)
 {
+	SetScene(std::move(aScene));
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -24,25 +27,23 @@ void ImGuiManager::Init()
 	myLogger->Bind();
 }
 
-void ImGuiManager::Update()
+ImGuiManager::~ImGuiManager() = default;
+
+void ImGuiManager::SetScene(std::shared_ptr<Scene> aScene)
 {
-	//ImGui::ShowDemoWindow();
-	ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-	SceneTab();
-	GameTab();
-	HierarchyTab();
-	InspectorTab();
-	AssetsTab();
-	ConsoleTab();
+	myScene = std::move(aScene);
 }
 
 void ImGuiManager::BeginFrame()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
+
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
+	
 	Update();
+	
 	ImGui::Render();
 }
 
@@ -57,7 +58,20 @@ void ImGuiManager::EndFrame()
 	}
 }
 
-void ImGuiManager::SceneTab()
+void ImGuiManager::Update()
+{
+	ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+	auto scene = myScene.lock();
+	SceneTab(scene);
+	GameTab();
+	HierarchyTab(scene);
+	InspectorTab();
+	AssetsTab();
+	ConsoleTab();
+}
+
+void ImGuiManager::SceneTab(const std::shared_ptr<Scene>& aScene)
 {
 	ImGui::Begin("Scene", nullptr, 
 		ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoNav // Disable all forms of Scrolling
@@ -98,7 +112,7 @@ void ImGuiManager::SceneTab()
 			myGizmoSpace = ImGuizmo::MODE::WORLD;
 	}
 
-	if (mySelectedEntity && mySelectedEntity->HasComponent<TransformComponent>())
+	if (aScene && mySelectedEntity && mySelectedEntity->HasComponent<TransformComponent>())
 	{
 		ImVec2 viewportMin = ImGui::GetItemRectMin();
 		ImVec2 viewportMax = ImGui::GetItemRectMax();
@@ -107,7 +121,7 @@ void ImGuiManager::SceneTab()
 		ImGuizmo::SetRect(viewportMin.x, viewportMin.y, viewportMax.x - viewportMin.x, viewportMax.y - viewportMin.y);
 
 		DirectX::XMFLOAT4X4 storedViewMatrix;
-		DirectX::XMStoreFloat4x4(&storedViewMatrix, myScene->GetCamera()->GetMatrix());
+		DirectX::XMStoreFloat4x4(&storedViewMatrix, aScene->GetCamera()->GetMatrix());
 		float* viewMatrix = &storedViewMatrix.m[0][0];
 
 		DirectX::XMFLOAT4X4 storedProjectionMatrix;
@@ -132,7 +146,7 @@ void ImGuiManager::SceneTab()
 		transform.myTransform.myScale = { DirectX::XMVectorGetX(scale), DirectX::XMVectorGetY(scale), DirectX::XMVectorGetZ(scale) };
 	}
 
-	if (ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_MouseLeft, false))
+	if (aScene && ImGui::IsWindowHovered() && !ImGuizmo::IsUsing() && ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_MouseLeft, false))
 	{
 		ImVec2 mousePos = ImGui::GetMousePos();
 		ImVec2 windowPos = ImGui::GetWindowPos();
@@ -152,10 +166,10 @@ void ImGuiManager::SceneTab()
 		insideViewportPos.x *= 2;
 		insideViewportPos.y *= -2;
 
-		math::vector3<float> rayOrigin = myScene->GetCamera()->CameraSpaceToWorldSpace(insideViewportPos);
-		math::vector3<float> rayDirection = (rayOrigin - myScene->GetCamera()->GetPosition()).GetNormalized();
+		math::vector3<float> rayOrigin = aScene->GetCamera()->CameraSpaceToWorldSpace(insideViewportPos);
+		math::vector3<float> rayDirection = (rayOrigin - aScene->GetCamera()->GetPosition()).GetNormalized();
 
-		for (const auto& entity : myScene->GetAllEntities())
+		for (const auto& entity : aScene->GetAllEntities())
 		{
 			if (!entity.HasComponent<TransformComponent>() || !entity.HasComponent<ModelComponent>()) continue;
 
@@ -180,16 +194,19 @@ void ImGuiManager::GameTab()
 	ImGui::End();
 }
 
-void ImGuiManager::HierarchyTab()
+void ImGuiManager::HierarchyTab(const std::shared_ptr<Scene>& aScene)
 {
 	ImGui::Begin("Hierarchy");
 
-	for (const auto& entity : myScene->GetAllEntities())
+	if (aScene)
 	{
-		bool selected = mySelectedEntity && entity == *mySelectedEntity;
-		const char* tag = entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().myTag.c_str() : "[Missing Tag]";
-		if (ImGui::Selectable(tag, selected))
-			mySelectedEntity = std::make_unique<Entity>(entity);
+		for (const auto& entity : aScene->GetAllEntities())
+		{
+			bool selected = mySelectedEntity && entity == *mySelectedEntity;
+			const char* tag = entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().myTag.c_str() : "[Missing Tag]";
+			if (ImGui::Selectable(tag, selected))
+				mySelectedEntity = std::make_unique<Entity>(entity);
+		}
 	}
 
 	ImGui::End();

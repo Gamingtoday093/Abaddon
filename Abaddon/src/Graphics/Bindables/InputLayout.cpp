@@ -17,7 +17,7 @@ void InputLayout::Init(const std::vector<D3D11_INPUT_ELEMENT_DESC>& aDescription
 	HRASSERT(hr, "Creating Input Layout");
 }
 
-void InputLayout::Bind()
+void InputLayout::Bind() const
 {
 	DX11::ourContext->IASetInputLayout(myInputLayout.Get());
 }

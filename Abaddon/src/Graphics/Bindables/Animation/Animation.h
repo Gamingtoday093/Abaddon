@@ -84,6 +84,7 @@ struct Animation
 		/// </summary>
 		/// <param name="aTime">Target time</param>
 		/// <returns>Index of the exact or closest lowest time Keyframe</returns>
+		/// <remarks>The reason it returns the lowest time instead of the nearest is for interpolation</remarks>
 		template<typename T>
 		size_t BinarySearchKeyframe(double aTime, const std::vector<T>& aKeyframes) const
 		{

@@ -8,7 +8,7 @@
 #include <Scene/ModelAssetHandler.h>
 #include "Bindables/InputLayoutFactory.h"
 
-void Renderer::Init()
+Renderer::Renderer()
 {
 	myCBufferTransform.Init(eBindType::VertexShader);
 	myStructAnimation.Init(eBindType::VertexShader, Animations::MAX_BONES);
@@ -43,6 +43,7 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transfor
 
 	// Bind vertex shader
 	mySkinnedShader.Bind();
+	mySkinnedInputLayout.Bind();
 
 	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
 }
@@ -51,6 +52,7 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transfor
 {
 	// Bind vertex shader
 	myVertexShader.Bind();
+	myInputLayout.Bind();
 
 	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
 }
@@ -61,11 +63,6 @@ void Renderer::RenderInternal(ModelData& aModelData, Material& aMaterial, const 
 	// Bind model
 	aModelData.myVertexBuffer.Bind();
 	aModelData.myIndexBuffer.Bind();
-
-	if (aModelData.HasSkeleton())
-		mySkinnedInputLayout.Bind();
-	else
-		myInputLayout.Bind();
 
 	// Bind material
 	aMaterial.Bind();
@@ -94,13 +91,13 @@ void Renderer::RenderInternal(ModelData& aModelData, Material& aMaterial, const 
 	DX11::ourContext->DrawIndexed(aModelData.myIndexBuffer.GetIndexAmount(), 0, 0);
 }
 
-void Renderer::RenderSkybox(std::shared_ptr<Cube> aCube, std::shared_ptr<CubeTexture> aCubeTexture, std::shared_ptr<Camera> aCamera)
+void Renderer::RenderSkybox(SkyboxCube& aCube, CubeTexture& aCubeTexture, std::shared_ptr<Camera> aCamera)
 {
 	// Bind Mesh
-	aCube->Bind();
+	aCube.Bind();
 
 	// Bind Texture
-	aCubeTexture->Bind();
+	aCubeTexture.Bind();
 
 	// Set View Projection Matrix
 	myCBufferTransform.myData.myProjectionViewMatrix =

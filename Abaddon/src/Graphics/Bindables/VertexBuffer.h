@@ -15,7 +15,7 @@ public:
 	template<VertexType TVertex>
 	void Init(const std::vector<TVertex>& aVertexList);
 	void Init(const void* aData, UINT aNumData, UINT aDataSize);
-	void Bind();
+	void Bind() const;
 	ID3D11Buffer* Get() const;
 	ID3D11Buffer* const* GetAdressOf() const;
 

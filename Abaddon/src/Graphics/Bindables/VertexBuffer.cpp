@@ -22,7 +22,7 @@ void VertexBuffer::Init(const void* aData, UINT aNumData, UINT aDataSize)
 	HRASSERT(hr, "Creating Vertex Buffer");
 }
 
-void VertexBuffer::Bind()
+void VertexBuffer::Bind() const
 {
 	const UINT offset = 0u;
 	DX11::ourContext->IASetVertexBuffers(0u, 1u, myBuffer.GetAddressOf(), &myDataSize, &offset);

@@ -8,25 +8,24 @@
 
 #include "Graphics/RenderPass.h"
 #include "Graphics/Skybox/CubeTexture.h"
-#include "Graphics/Skybox/Cube.h"
+#include "Graphics/Skybox/SkyboxCube.h"
 
 #ifdef enableImGui
 #include "ImGuiManager/ImGuiManager.h"
 #endif
 
 Engine::Engine(HWND aHWND) : myHWND(aHWND)
-{}
-
-Engine::~Engine()
-{}
-
-void Engine::Init()
 {
-	myFramework = std::make_shared<DX11>(myHWND);
-	myFramework->Initialize(true);
+	myFramework = std::make_unique<DX11>(myHWND);
+	myFramework->Initialize(
+#ifdef DEBUG
+		true
+#else
+		false
+#endif
+	);
 
 	myRenderer = std::make_shared<Renderer>();
-	myRenderer->Init();
 
 	myScene = std::make_shared<Scene>(myRenderer, myHWND);
 	myScene->Init();
@@ -39,28 +38,28 @@ void Engine::Init()
 	mySkyboxPass->Init("Skybox_vs.cso", D3D11_CULL_NONE, "Skybox_ps.cso");
 
 	// Skybox
-	mySkyboxTexture = std::make_shared<CubeTexture>();
+	mySkyboxTexture = std::make_unique<CubeTexture>();
 	mySkyboxTexture->Init("Skybox");
 
-	mySkyboxMesh = std::make_shared<Cube>();
-	mySkyboxMesh->Init();
+	mySkyboxMesh = std::make_unique<SkyboxCube>();
 
 #ifdef enableImGui
 	// ImGui
-	myImGui = std::make_shared<ImGuiManager>(myHWND, myScene);
-	myImGui->Init();
+	myImGui = std::make_unique<ImGuiManager>(myHWND, myScene);
 #endif
 }
+
+Engine::~Engine() = default;
 
 void Engine::Update()
 {
 	BeginFrame();
 	//-----------------------
-	
+
 	if (!myIsMinimized)
 	{
 		mySkyboxPass->Bind();
-		myRenderer->RenderSkybox(mySkyboxMesh, mySkyboxTexture, myScene->GetCamera());
+		myRenderer->RenderSkybox(*mySkyboxMesh, *mySkyboxTexture, myScene->GetCamera());
 
 		myDefaultPass->Bind();
 		myScene->Update();
@@ -75,10 +74,10 @@ void Engine::BeginFrame()
 #ifdef enableImGui
 	myImGui->BeginFrame();
 #endif
+	Input::GetInstance().Update();
 	if (myIsMinimized) return;
 	myFramework->BindRenderTarget();
 	myFramework->BeginFrame(myClearColor);
-	Input::GetInstance().Update();
 
 #ifdef enableImGui
 	DX11::BindRenderTargetTexture();

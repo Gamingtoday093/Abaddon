@@ -12,7 +12,7 @@ public:
 	~IndexBuffer() = default;
 
 	void Init(const std::vector<unsigned short>& aIndexList);
-	void Bind();
+	void Bind() const;
 	ID3D11Buffer* Get() const;
 	ID3D11Buffer* const* GetAddressOf() const;
 

@@ -22,7 +22,7 @@ void SRV::Init(const std::string& aTextureFileName)
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = imageData.GetMetadata().format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = imageData.GetMetadata().mipLevels;
+	srvDesc.Texture2D.MipLevels = UINT(imageData.GetMetadata().mipLevels);
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
 

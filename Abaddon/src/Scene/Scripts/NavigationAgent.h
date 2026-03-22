@@ -12,10 +12,6 @@ public:
 
 	void Update() override;
 
-	inline float GetRadius() const
-	{
-		return myRadius;
-	}
 	inline float GetInfluence() const
 	{
 		return myMass * myPriority;

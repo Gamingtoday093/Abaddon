@@ -5,7 +5,7 @@ class Renderer;
 class Scene;
 class RenderPass;
 class CubeTexture;
-class Cube;
+class SkyboxCube;
 
 #ifdef enableImGui
 class ImGuiManager;
@@ -17,26 +17,27 @@ public:
 	Engine(HWND aHWND);
 	~Engine();
 
-	void Init();
 	void Update();
-	void BeginFrame();
-	void EndFrame();
 	void Resize(int aWidth, int aHeight);
 
 private:
+	void BeginFrame();
+	void EndFrame();
+
 	HWND myHWND;
-	std::shared_ptr<DX11> myFramework;
+
+	std::unique_ptr<DX11> myFramework;
 	std::shared_ptr<Renderer> myRenderer;
 	std::shared_ptr<Scene> myScene;
 
 	std::unique_ptr<RenderPass> myDefaultPass;
 	std::unique_ptr<RenderPass> mySkyboxPass;
 
-	std::shared_ptr<CubeTexture> mySkyboxTexture;
-	std::shared_ptr<Cube> mySkyboxMesh;
+	std::unique_ptr<CubeTexture> mySkyboxTexture;
+	std::unique_ptr<SkyboxCube> mySkyboxMesh;
 
 #ifdef enableImGui
-	std::shared_ptr<ImGuiManager> myImGui;
+	std::unique_ptr<ImGuiManager> myImGui;
 #endif
 
 	bool myIsMinimized = false;

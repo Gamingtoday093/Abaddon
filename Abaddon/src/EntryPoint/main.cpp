@@ -4,19 +4,18 @@
 #include <format>
 
 #include "ImGui/ImGui.h"
+#include "Tools/Stopwatch.h"
 
 int main()
 {
 	std::unique_ptr<Window> window = std::make_unique<Window>();
 	Engine* engine = new Engine(window->GetHWND());
-	
+
 	window->OnResize = [engine](int width, int height)
 	{
 		engine->Resize(width, height);
 		engine->Update();
 	};
-
-	engine->Init();
 
 	while (window->ProcessMessages())
 	{
@@ -27,7 +26,7 @@ int main()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-#endif 
+#endif
 
 	delete engine;
 	engine = nullptr;
