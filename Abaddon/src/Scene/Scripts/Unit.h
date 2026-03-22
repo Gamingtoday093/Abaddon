@@ -13,7 +13,7 @@ class Unit : public Script
 {
 public:
 	void Select(bool aNewSelected);
-	inline bool GetIsSelected() const;
+	bool GetIsSelected() const;
 
 	void MoveTo(math::vector3<float> aTargetPosition);
 	void MoveTo(math::vector3<float> aTargetPosition, math::vector3<float> aTargetForward);

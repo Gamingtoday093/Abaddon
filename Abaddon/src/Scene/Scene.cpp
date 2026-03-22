@@ -85,7 +85,7 @@ void Scene::Init()
 
 	Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
 	NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
-	spawner->myAgentCount = 50;
+	spawner->myAgentCount = 1000;
 
 	//Entity sphere = CreateEntity("Sphere");
 	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");

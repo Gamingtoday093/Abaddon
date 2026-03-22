@@ -6,7 +6,7 @@ class Script
 {
 public:
 	Script() = default;
-	virtual ~Script() {};
+	virtual ~Script() = default;
 
 	template<typename T>
 	T& GetComponent()

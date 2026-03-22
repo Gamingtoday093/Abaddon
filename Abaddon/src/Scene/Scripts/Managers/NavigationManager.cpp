@@ -10,12 +10,77 @@ void NavigationManager::Awake()
     myInstance = this;
 }
 
+void NavigationManager::Start()
+{
+    myRVOSimulator = std::make_unique<RVO::RVOSimulator>();
+    myRVOSimulator->setTimeStep(0.25f);
+    myRVOSimulator->setAgentDefaults(25.0f, 12, 16.0f, 16.0f, 8.0f, 2.0f);
+
+    for (auto agent : myAgents)
+    {
+        auto& position = agent->myTransform->myTransform.myPosition;
+        agent->myRVOIndex = myRVOSimulator->addAgent({ position.x, position.z });
+    }
+}
+
 void NavigationManager::Update()
+{
+    auto sw = Stopwatch::StartNew();
+    NewUpdate();
+    sw.Stop();
+    float newMs = sw.GetElapsedMilliseconds();
+    sw.Restart();
+    OldUpdate();
+    sw.Stop();
+    LOG("OLD: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms NEW: " + std::to_string(newMs) + "ms"); // OLD: 6ms vs NEW: 4ms
+}
+
+void NavigationManager::NewUpdate()
+{
+    for (size_t i = 0; i < myAgents.size(); i++)
+    {
+        NavigationAgent& currentAgent = *myAgents[i];
+        TransformComponent& currentTransform = *currentAgent.myTransform;
+
+        myRVOSimulator->setAgentPosition(currentAgent.myRVOIndex, { currentTransform.myTransform.myPosition.x, currentTransform.myTransform.myPosition.z });
+
+        if (i == 0)
+        {
+            currentAgent.myTargetVelocity = (GetComponent<TransformComponent>().myTransform.myPosition - currentTransform.myTransform.myPosition);
+        }
+        else
+        {
+            currentAgent.myTargetVelocity = (currentAgent.myStartPosition - currentTransform.myTransform.myPosition);
+        }
+        if (currentAgent.myTargetVelocity.LengthSqr() > 0.1f)
+        {
+            currentAgent.myTargetVelocity.Normalize();
+        }
+        else
+        {
+            currentAgent.myTargetVelocity = math::vector3<float>::zero();
+        }
+        myRVOSimulator->setAgentPrefVelocity(currentAgent.myRVOIndex, { currentAgent.myTargetVelocity.x, currentAgent.myTargetVelocity.z });
+
+        //if (i == 0)
+        //{
+        auto& velocity = myRVOSimulator->getAgentVelocity(currentAgent.myRVOIndex);
+        currentAgent.myVelocity = { velocity.x(), 0, velocity.y() };
+        //}
+        //else
+        //{
+        //    myRVOSimulator->setAgentVelocity(currentAgent.myRVOIndex, { 0, 0 });
+        //}
+    }
+    myRVOSimulator->doStep();
+}
+
+void NavigationManager::OldUpdate()
 {
     TransformComponent& transform = GetComponent<TransformComponent>();
     bool useSpatialHash = myAgents.size() > 200;
     if (useSpatialHash) mySpatialHash.Rebuild(myAgents);
-    
+
     for (size_t i = 0; i < myAgents.size(); i++)
     {
         NavigationAgent& currentAgent = *myAgents[i];

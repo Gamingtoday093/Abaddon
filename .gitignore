@@ -401,6 +401,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Exlusions
+# Exclusions
 !lib/*.pdb
 !Assets/*.obj

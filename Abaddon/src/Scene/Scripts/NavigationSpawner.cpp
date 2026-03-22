@@ -11,6 +11,6 @@ void NavigationSpawner::Start()
 		Entity agent = myEntity.GetScene().CreateEntity("Agent " + std::to_string(i));
 		agent.AddComponent<ModelComponent>("ShipSmooth.fbx", "ShipMaterial");
 		NavigationAgent* script = agent.AddComponent<ScriptComponent>().Bind<NavigationAgent>(agent);
-		agent.GetComponent<TransformComponent>().myTransform.myPosition = { float(50 + 25 * (i / rows)), 0, float(20 * (i % rows)) };
+		agent.GetComponent<TransformComponent>().myTransform.myPosition = { float(50 + 40 * (i / rows)), 0, float(35 * (i % rows)) };
 	}
 }

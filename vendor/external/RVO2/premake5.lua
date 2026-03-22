@@ -2,11 +2,10 @@ project "RVO2"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
-    staticruntime "on"
     
 	targetdir ("bin/" .. TargetDir .. "/%{prj.name}")
     objdir ("bin-int/" .. ObjectDir .. "/%{prj.name}")
-
+	
 	files {
         "src/**.h",
         "src/**.cpp"

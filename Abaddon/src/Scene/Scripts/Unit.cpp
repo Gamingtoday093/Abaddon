@@ -9,7 +9,7 @@ void Unit::Select(bool aNewSelected)
 	isSelected = aNewSelected;
 }
 
-inline bool Unit::GetIsSelected() const
+bool Unit::GetIsSelected() const
 {
 	return isSelected;
 }

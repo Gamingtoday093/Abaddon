@@ -29,5 +29,7 @@ public:
 
 	float myMass = 10;
 	float myPriority = 1;
+
+	size_t myRVOIndex = 0;
 };
 

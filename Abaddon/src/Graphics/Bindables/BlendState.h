@@ -12,7 +12,7 @@ public:
 	~BlendState() = default;
 
 	void Init(eBlendState aBlendState);
-	void Bind();
+	void Bind() const;
 	ID3D11BlendState* Get() const;
 	ID3D11BlendState* const* GetAddressOf() const;
 private:

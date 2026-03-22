@@ -4,7 +4,6 @@
 #include <format>
 
 #include "ImGui/ImGui.h"
-#include "Tools/Stopwatch.h"
 
 int main()
 {

@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene/Scripts/Script.hpp"
-
-class Unit;
+#include "Scene/Scripts/Unit.h"
 
 class UnitManager : public Script
 {

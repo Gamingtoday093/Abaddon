@@ -11,7 +11,7 @@ void BlendState::Init(eBlendState aBlendState)
 	HRASSERT(hr, "Creating BlendState");
 }
 
-void BlendState::Bind()
+void BlendState::Bind() const
 {
 	const float blendFactor[4] = { 0, 0, 0, 0 };
 	DX11::ourContext->OMSetBlendState(myBlendState.Get(), blendFactor, 0xffffffff);

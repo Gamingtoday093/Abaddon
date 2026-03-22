@@ -4,8 +4,7 @@ workspace "Abaddon"
     configurations
     {
         "Debug",
-        "Release",
-        "Dist"
+        "Release"
     }
 
     TargetDir = "bin/%{cfg.buildcfg}"
@@ -38,11 +37,15 @@ project "Abaddon"
         "NOMINMAX"
     }
     
+	libdirs 
+	{
+		"libs"
+	}
+	
     links {
         "d3d11.lib",
         "D3DCompiler.lib",
-        "lib/DirectXTex.lib",
-        "lib/assimp-vc143-mt.lib",
+        "assimp-vc143-mt.lib",
         "ImGui",
         "ImGuizmo",
 		"RVO2"
@@ -64,7 +67,8 @@ project "Abaddon"
     includedirs {
         "%{prj.name}/src",
         "%{prj.name}/vendor",
-        "vendor"
+        "vendor",
+		"vendor/external/RVO2/src"
     }
 
     -- Shader options
@@ -83,13 +87,12 @@ project "Abaddon"
         defines "DEBUG"
         runtime "Debug"
         symbols "on"
+		libdirs {"libs/DebugLibs"}
+        links {"DirectXTex_Debug.lib"}
 
     filter "configurations:Release"
         defines "RELEASE"
         runtime "Release"
         optimize "on"
-
-    filter "configurations:Dist"
-        defines "DIST"
-        runtime "Release"
-        optimize "on"
+		libdirs {"libs/ReleaseLibs"}
+        links {"DirectXTex_Release.lib"}
