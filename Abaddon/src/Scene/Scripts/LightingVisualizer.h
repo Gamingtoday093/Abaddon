@@ -4,6 +4,7 @@
 
 class LightingVisualizer : public Script
 {
+	SCRIPT_NAME(LightingVisualizer)
 public:
 	void Init(const std::string& aStandardMaterial);
 

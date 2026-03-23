@@ -1,6 +1,5 @@
 #pragma once
 #include "Scene/Entity.h"
-#include <typeinfo>
 
 class Script
 {
@@ -14,7 +13,12 @@ public:
 		return myEntity.GetComponent<T>();
 	}
 
-#define SCRIPT_NAME(ScriptName) const char* GetScriptName() const override { return #ScriptName; };
+#define SCRIPT_NAME(ScriptName)												\
+	const char* GetScriptName() const override								\
+	{																		\
+		static constexpr auto scriptName = FormatScriptName(#ScriptName);	\
+		return scriptName.c_str();											\
+	};
 	virtual const char* GetScriptName() const = 0;
 
 protected:
@@ -24,6 +28,53 @@ protected:
 	virtual void Update() {};
 
 	Entity myEntity;
+
+	template<size_t N>
+	struct FixedString
+	{
+		std::array<char, N> data{};
+
+		constexpr const char* c_str() const { return data.data(); }
+	};
+
+	static constexpr bool IsUpper(char ch)
+	{
+		return ch >= 'A' && ch <= 'Z';
+	}
+
+	template<size_t N>
+	static constexpr auto FormatScriptName(const char (&aScriptName)[N])
+	{
+		std::string_view nameView = std::string_view(aScriptName);
+
+		size_t nextBufferIndex = 0;
+		FixedString<((N - 1) * 2) + 1 + 7> scriptName;
+
+		scriptName.data[nextBufferIndex++] = nameView[0];
+		for (size_t i = 1; i < nameView.size(); i++)
+		{
+			char c = nameView[i];
+
+			if (IsUpper(c) && !IsUpper(nameView[i - 1]))
+				scriptName.data[nextBufferIndex++] = ' ';
+
+			scriptName.data[nextBufferIndex++] = c;
+		}
+
+		if (!nameView.ends_with("Script"))
+		{
+			scriptName.data[nextBufferIndex++] = ' ';
+			scriptName.data[nextBufferIndex++] = 'S';
+			scriptName.data[nextBufferIndex++] = 'c';
+			scriptName.data[nextBufferIndex++] = 'r';
+			scriptName.data[nextBufferIndex++] = 'i';
+			scriptName.data[nextBufferIndex++] = 'p';
+			scriptName.data[nextBufferIndex++] = 't';
+		}
+
+		scriptName.data.at(nextBufferIndex++) = '\0';
+		return scriptName;
+	}
 
 private:
 	friend class Scene;

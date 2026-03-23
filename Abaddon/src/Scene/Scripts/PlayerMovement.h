@@ -4,6 +4,7 @@
 
 class PlayerMovement : public Script
 {
+	SCRIPT_NAME(PlayerMovement)
 public:
 	PlayerMovement() = default;
 

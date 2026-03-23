@@ -4,6 +4,7 @@
 
 class UnitManager : public Script
 {
+	SCRIPT_NAME(UnitManager)
 public:
 	void Awake() override;
 	void Update() override;
