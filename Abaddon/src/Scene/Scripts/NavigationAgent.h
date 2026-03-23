@@ -5,6 +5,7 @@ struct TransformComponent;
 
 class NavigationAgent : public Script
 {
+	SCRIPT_NAME(NavigationAgent)
 public:
 	void Awake() override;
 	void Start() override;

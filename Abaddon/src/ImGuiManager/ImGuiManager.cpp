@@ -330,6 +330,10 @@ void ImGuiManager::InspectorTab()
 		if (entity.HasComponent<ScriptComponent>())
 		{
 			ImGui::SeparatorText("Script");
+			ScriptComponent& script = entity.GetComponent<ScriptComponent>();
+			bool isEnabled = script.myIsEnabled;
+			ImGui::Checkbox("Enabled", &isEnabled);
+			script.SetEnabled(isEnabled);
 		}
 	}
 

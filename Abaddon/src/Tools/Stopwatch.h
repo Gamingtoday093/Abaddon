@@ -11,6 +11,7 @@ public:
 
 	void Start();
 	void Stop();
+	void Reset();
 	void Restart();
 
 	float GetElapsedMilliseconds() const;

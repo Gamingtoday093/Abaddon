@@ -3,9 +3,10 @@
 
 class NavigationSpawner : public Script
 {
+	SCRIPT_NAME(NavigationSpawner)
 public:
 	void Start() override;
 
-	size_t myAgentCount = 10;
+	size_t myAgentRowCount = 5;
 };
 

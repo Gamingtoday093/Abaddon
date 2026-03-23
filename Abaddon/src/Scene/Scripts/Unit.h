@@ -11,6 +11,7 @@ struct TextureData;
 
 class Unit : public Script
 {
+	SCRIPT_NAME(Unit)
 public:
 	void Select(bool aNewSelected);
 	bool GetIsSelected() const;

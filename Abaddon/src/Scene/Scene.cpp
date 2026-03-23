@@ -85,7 +85,7 @@ void Scene::Init()
 
 	Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
 	NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
-	spawner->myAgentCount = 1000;
+	spawner->myAgentRowCount = 7;
 
 	//Entity sphere = CreateEntity("Sphere");
 	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");
@@ -167,6 +167,7 @@ void Scene::Update()
 
 	myRegistry.view<ScriptComponent>().each([=](entt::entity aEntity, ScriptComponent& aScriptComponent)
 		{
+			if (!aScriptComponent.myIsEnabled) return;
 			if (!aScriptComponent.myHasStarted) 
 			{
 				aScriptComponent.myInstance->Start();

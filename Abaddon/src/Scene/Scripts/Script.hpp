@@ -14,6 +14,9 @@ public:
 		return myEntity.GetComponent<T>();
 	}
 
+#define SCRIPT_NAME(ScriptName) const char* GetScriptName() const override { return #ScriptName; };
+	virtual const char* GetScriptName() const = 0;
+
 protected:
 	virtual void Awake() {};
 	virtual void Start() {};

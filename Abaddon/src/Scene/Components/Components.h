@@ -55,6 +55,14 @@ struct ScriptComponent
 {
 	Script* myInstance = nullptr;
 	bool myHasStarted = false;
+	bool myIsEnabled = true;
+	
+	void SetEnabled(bool aNewEnabled)
+	{
+		if (myIsEnabled == aNewEnabled) return;
+		myIsEnabled = aNewEnabled;
+		myHasStarted = false;
+	}
 
 	Script*(*InitFunction)() = nullptr;
 	void(*DestroyFunction)(ScriptComponent*) = nullptr;

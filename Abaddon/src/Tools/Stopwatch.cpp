@@ -26,11 +26,15 @@ void Stopwatch::Stop()
 	myElapsedNanoSeconds += (high_resolution_clock::now() - myStartTime).count();
 }
 
-void Stopwatch::Restart()
+void Stopwatch::Reset()
 {
 	myIsRunning = false;
 	myElapsedNanoSeconds = 0;
+}
 
+void Stopwatch::Restart()
+{
+	Reset();
 	Start();
 }
 

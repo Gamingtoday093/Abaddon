@@ -1,3 +1,4 @@
+#pragma warning(push, 0)
 // IWYU pragma: begin_exports
 // #include "config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H
@@ -89898,3 +89899,4 @@ sink(sigh<Ret(Args...), Allocator> &) -> sink<sigh<Ret(Args...), Allocator>>;
 #endif
 
 // IWYU pragma: end_exports
+#pragma warning(pop)
