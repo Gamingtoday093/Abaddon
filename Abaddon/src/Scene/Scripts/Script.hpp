@@ -7,6 +7,18 @@ public:
 	Script() = default;
 	virtual ~Script() = default;
 
+	inline bool GetEnabled() const
+	{
+		return myIsEnabled;
+	}
+
+	void SetEnabled(bool aNewEnabled)
+	{
+		if (myIsEnabled == aNewEnabled) return;
+		myIsEnabled = aNewEnabled;
+		myHasStarted = false;
+	}
+
 	template<typename T>
 	T& GetComponent()
 	{
@@ -63,13 +75,13 @@ protected:
 
 		if (!nameView.ends_with("Script"))
 		{
-			scriptName.data[nextBufferIndex++] = ' ';
-			scriptName.data[nextBufferIndex++] = 'S';
-			scriptName.data[nextBufferIndex++] = 'c';
-			scriptName.data[nextBufferIndex++] = 'r';
-			scriptName.data[nextBufferIndex++] = 'i';
-			scriptName.data[nextBufferIndex++] = 'p';
-			scriptName.data[nextBufferIndex++] = 't';
+			scriptName.data.at(nextBufferIndex++) = ' ';
+			scriptName.data.at(nextBufferIndex++) = 'S';
+			scriptName.data.at(nextBufferIndex++) = 'c';
+			scriptName.data.at(nextBufferIndex++) = 'r';
+			scriptName.data.at(nextBufferIndex++) = 'i';
+			scriptName.data.at(nextBufferIndex++) = 'p';
+			scriptName.data.at(nextBufferIndex++) = 't';
 		}
 
 		scriptName.data.at(nextBufferIndex++) = '\0';
@@ -77,6 +89,9 @@ protected:
 	}
 
 private:
+	bool myHasStarted = false;
+	bool myIsEnabled = true;
+
 	friend class Scene;
 	friend struct ScriptComponent;
 };

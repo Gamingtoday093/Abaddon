@@ -24,7 +24,7 @@ public:
 	math::vector3<float> myTargetVelocity;
 
 	math::vector3<float> myStartPosition;
-	TransformComponent* myTransform;
+	TransformComponent* myTransform = nullptr;
 
 	float myRadius = 8;
 

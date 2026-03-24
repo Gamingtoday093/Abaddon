@@ -11,7 +11,7 @@ public:
 	~Material() = default;
 
 	eBlendState GetBlendState() const;
-	virtual void Bind();
+	virtual void Bind() const;
 
 private:
 	eBlendState myBlendState;
@@ -29,7 +29,7 @@ inline eBlendState Material::GetBlendState() const
 	return myBlendState;
 }
 
-inline void Material::Bind()
+inline void Material::Bind() const
 {
 	myPixelShader.Bind();
 }

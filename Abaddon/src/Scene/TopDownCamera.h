@@ -10,7 +10,7 @@ using namespace DirectX;
 class TopDownCamera : public Camera
 {
 public:
-	TopDownCamera() : Camera() { }
+	TopDownCamera();
 
 	void Init(float aMovementSpeed, float aRotationSpeed, float aZoomSpeed, float aStartZoom, float aMinZoom, float aMaxZoom, math::vector3<float> aStartOrbit, math::vector2<float> aStartRotation, float aMinRotation, float aMaxRotation);
 	void Update() override;

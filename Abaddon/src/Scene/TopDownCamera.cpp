@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "TopDownCamera.h"
 
+inline TopDownCamera::TopDownCamera() : Camera() 
+{
+
+}
+
 void TopDownCamera::Init(float aMovementSpeed, float aRotationSpeed, float aZoomSpeed, float aStartZoom, float aMinZoom, float aMaxZoom, math::vector3<float> aStartOrbit, math::vector2<float> aStartRotation, float aMinRotation, float aMaxRotation)
 {
 	myMovementSpeed = aMovementSpeed;
@@ -60,13 +65,10 @@ void TopDownCamera::CalculateMatrix()
 	newMove = XMVector3Transform(-newMove, XMMatrixRotationRollPitchYaw(0, -myRot.y, 0));
 
 	// Set new Orbit Target
-	myCamOrbitTarget = XMVectorAdd(myCamOrbitTarget, newMove);
+	myCamOrbitTarget += newMove;
 
 	// Update Position
 	myCamPosition = XMVectorAdd(myCamOrbitTarget, XMVector3Transform(XMVectorSet(0, 0, myZoom, 0), XMMatrixRotationRollPitchYaw(myRot.x, -myRot.y, 0)));
-
-	// Reset Direction Vector
-	myDir = math::vector3<float>::zero();
 
 	// Set Camera Matrix
 	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, myCamOrbitTarget, myCamUp);
@@ -95,6 +97,7 @@ void TopDownCamera::UpdateInput()
 	else if (myZoom > myMaxZoom) myZoom = myMaxZoom;
 
 	// Keyboard
+	myDir = math::vector3<float>::zero();
 	if (Input::GetInstance().IsKeyDown((int)eKeys::W))
 	{
 		myDir.z += 1;
@@ -111,13 +114,13 @@ void TopDownCamera::UpdateInput()
 	{
 		myDir.x += 1;
 	}
-	if (myDir.LengthSqr() > 1)
+	if (myDir.LengthSqr() > 0)
 	{
 		myDir.Normalize();
+		myDir *= myMovementSpeed;
+		if (Input::GetInstance().IsKeyDown((int)eKeys::SHIFT))
+		{
+			myDir *= 2.f;
+		}
 	}
-	if (Input::GetInstance().IsKeyDown((int)eKeys::SHIFT))
-	{
-		myDir *= 2.f;
-	}
-	myDir *= myMovementSpeed;
 }

@@ -6,13 +6,10 @@
 class ColorMaterial : public Material
 {
 public:
-	ColorMaterial() : Material("ColorShader_ps.cso")
-	{
-		myMaterialSettings.Init(eBindType::PixelShader);
-	}
+	ColorMaterial();
 
 	void Init(math::vector3<float> aColor);
-	void Bind() override;
+	void Bind() const override;
 
 private:
 	CBuffer<ColorBuffer> myMaterialSettings;

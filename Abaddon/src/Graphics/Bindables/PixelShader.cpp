@@ -13,7 +13,7 @@ void PixelShader::Init(std::string aShaderFileName)
 	HRASSERT(hr, "Creating Pixel Shader");
 }
 
-void PixelShader::Bind()
+void PixelShader::Bind() const
 {
 	DX11::ourContext->PSSetShader(myPixelShader.Get(), nullptr, 0);
 }

@@ -34,10 +34,14 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-	myFreeLookCamera = std::make_shared<FreeLookCamera>();
-	myFreeLookCamera->Init(0.125f, 0.5f, 0.1f, 3, 0.005f);
+	myFreeLookCamera = std::make_unique<FreeLookCamera>();
+	myFreeLookCamera->myMovementSpeed = 1.2f;
+	myFreeLookCamera->myMinMovementSpeed = 0.1f;
+	myFreeLookCamera->myMaxMovementSpeed = 3.0f;
+	myFreeLookCamera->myMovementSpeedMultiplier = 0.125f;
+	myFreeLookCamera->myRotationSpeed = 0.005f;
 
-	myTopDownCamera = std::make_shared<TopDownCamera>();
+	myTopDownCamera = std::make_unique<TopDownCamera>();
 	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 160, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
 
 	ModelAssetHandler::LoadModel("Ship.fbx");
@@ -167,11 +171,12 @@ void Scene::Update()
 
 	myRegistry.view<ScriptComponent>().each([=](entt::entity aEntity, ScriptComponent& aScriptComponent)
 		{
-			if (!aScriptComponent.myIsEnabled) return;
-			if (!aScriptComponent.myHasStarted) 
+			if (!aScriptComponent.myInstance || !aScriptComponent.myInstance->GetEnabled()) return;
+
+			if (!aScriptComponent.myInstance->myHasStarted) 
 			{
 				aScriptComponent.myInstance->Start();
-				aScriptComponent.myHasStarted = true;
+				aScriptComponent.myInstance->myHasStarted = true;
 			}
 
 			aScriptComponent.myInstance->Update();
@@ -211,10 +216,10 @@ std::shared_ptr<Renderer> Scene::GetRenderer()
 	return myRenderer;
 }
 
-std::shared_ptr<Camera> Scene::GetCamera()
+Camera& Scene::GetCamera() const
 {
 	if (myUsingFreeLookCamera)
-		return myFreeLookCamera;
-	return myTopDownCamera;
+		return *myFreeLookCamera;
+	return *myTopDownCamera;
 }
 

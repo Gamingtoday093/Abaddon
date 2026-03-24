@@ -1,21 +1,9 @@
 #include "pch.h"
 #include "FreeLookCamera.h"
 
-void FreeLookCamera::Init(float aMovementSpeedMultiplier, float aStartMovementSpeed, float aMinMovementSpeed, float aMaxMovementSpeed, float aRotationSpeed)
+FreeLookCamera::FreeLookCamera() : Camera()
 {
-	myMovementSpeed = aStartMovementSpeed;
-	myMovementSpeedMultiplier = aMovementSpeedMultiplier;
-	myMinMovementSpeed = aMinMovementSpeed;
-	myMaxMovementSpeed = aMaxMovementSpeed;
-	myRotationSpeed = aRotationSpeed;
-
-	Forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	myCamTarget = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	myCamPosition = DirectX::XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f);
-	myCamUp = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
+	myCamPosition = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	CalculateMatrix();
 }
 
@@ -32,7 +20,7 @@ math::vector3<float> FreeLookCamera::GetPosition() const
 
 math::vector4<float> FreeLookCamera::GetRotation() const
 {
-	const XMVECTOR quat = XMQuaternionRotationRollPitchYaw(myRot.x, myRot.y, 0);
+	const XMVECTOR quat = XMQuaternionRotationRollPitchYaw(myYawPitch.x, myYawPitch.y, 0);
 	return { XMVectorGetX(quat), XMVectorGetY(quat), XMVectorGetZ(quat), XMVectorGetW(quat) };
 }
 
@@ -40,7 +28,7 @@ void FreeLookCamera::SetTransformation(math::vector3<float> aPosition, math::vec
 {
 	myCamPosition = XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0);
 	const math::vector3<float> eulerAngles = aRotation.ToEuler();
-	myRot = { -eulerAngles.x, eulerAngles.y + XM_PI };
+	myYawPitch = { -eulerAngles.x, eulerAngles.y + XM_PI };
 }
 
 XMMATRIX FreeLookCamera::GetMatrix() const
@@ -50,29 +38,18 @@ XMMATRIX FreeLookCamera::GetMatrix() const
 
 void FreeLookCamera::CalculateMatrix()
 {
-	// Calculate Rotation Matrix
-	myCamRotationMatrix = XMMatrixRotationRollPitchYaw(myRot.x, myRot.y, 0);
+	XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(myYawPitch.x, myYawPitch.y, 0);
 
-	// Calculates Forward direction
-	myCamTarget = XMVector3TransformCoord(Forward, myCamRotationMatrix);
+	XMVECTOR cameraForward = XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotationMatrix);
+	XMVECTOR cameraUp = XMVector3TransformCoord(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotationMatrix);
 
-	// Calculate Up direction
-	myCamUp = XMVector3TransformCoord(Up, myCamRotationMatrix);
+	XMVECTOR newMove = XMVectorSet(myMoveDir.x, myMoveDir.y, myMoveDir.z, 0);
+	newMove = XMVector3TransformCoord(newMove, rotationMatrix);
 
-	// Create new Move Vector from myDir
-	XMVECTOR newMove = XMVectorSet(myDir.x, myDir.y, myDir.z, 0);
-	newMove = XMVector3TransformCoord(newMove, myCamRotationMatrix);
-
-	// Update position
 	myCamPosition += newMove;
+	cameraForward += myCamPosition;
 
-	myDir = math::vector3<float>::zero();
-
-	// Calculate final target
-	myCamTarget = XMVectorAdd(myCamPosition, myCamTarget);
-
-	// Set camera matrix
-	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, myCamTarget, myCamUp);
+	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, cameraForward, cameraUp);
 }
 
 void FreeLookCamera::UpdateInput()
@@ -80,8 +57,8 @@ void FreeLookCamera::UpdateInput()
 	// Mouse
 	if (Input::GetInstance().IsMouseButtonDown((int)eKeys::MOUSERBUTTON))
 	{
-		myRot.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
-		myRot.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
+		myYawPitch.x += Input::GetInstance().GetMouseDelta().y * myRotationSpeed;
+		myYawPitch.y += Input::GetInstance().GetMouseDelta().x * myRotationSpeed;
 	}
 
 	// Speed
@@ -90,33 +67,38 @@ void FreeLookCamera::UpdateInput()
 	else if (myMovementSpeed > myMaxMovementSpeed) myMovementSpeed = myMaxMovementSpeed;
 
 	// Keyboard
+	myMoveDir = math::vector3<float>::zero();
 	if (Input::GetInstance().IsKeyDown((int)eKeys::W))
 	{
-		myDir.z += 1;
+		myMoveDir.z += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::A))
 	{
-		myDir.x -= 1;
+		myMoveDir.x -= 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::S))
 	{
-		myDir.z -= 1;
+		myMoveDir.z -= 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::D))
 	{
-		myDir.x += 1;
+		myMoveDir.x += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::Q))
 	{
-		myDir.y += 1;
+		myMoveDir.y += 1;
 	}
 	if (Input::GetInstance().IsKeyDown((int)eKeys::E))
 	{
-		myDir.y -= 1;
+		myMoveDir.y -= 1;
 	}
-	if (myDir.LengthSqr() > 1)
+	if (myMoveDir.LengthSqr() > 0)
 	{
-		myDir.Normalize();
+		myMoveDir.Normalize();
+		myMoveDir *= myMovementSpeed;
+		if (Input::GetInstance().IsKeyDown((int)eKeys::SHIFT))
+		{
+			myMoveDir *= 2.f;
+		}
 	}
-	myDir *= myMovementSpeed;
 }

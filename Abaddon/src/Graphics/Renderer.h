@@ -20,12 +20,12 @@ public:
 	Renderer();
 	~Renderer() = default;
 
-	void Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera);
-	void Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, std::shared_ptr<Camera> aCamera);
-	void RenderSkybox(SkyboxCube& aCube, CubeTexture& aCubeTexture, std::shared_ptr<Camera> aCamera);
+	void Render(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, const Camera& aCamera);
+	void Render(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Camera& aCamera);
+	void RenderSkybox(const SkyboxCube& aCube, const CubeTexture& aCubeTexture, const Camera& aCamera);
 
 private:
-	void RenderInternal(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Camera& aCamera);
+	void RenderInternal(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Camera& aCamera);
 
 	CBuffer<TransformBuffer> myCBufferTransform;
 	StructBuffer<DirectX::XMMATRIX> myStructAnimation;

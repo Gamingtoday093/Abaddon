@@ -15,7 +15,7 @@ public:
 	void Init(eBindType aBindType, UINT aMaxLength);
 	void Resize(UINT aNewMaxLength);
 	void ApplyChanges();
-	void Bind(UINT slot = 0);
+	void Bind(UINT slot = 0) const;
 
 	ID3D11Buffer* Get() const;
 	ID3D11Buffer* const* GetAddressOf() const;
@@ -77,7 +77,7 @@ inline void StructBuffer<T>::Resize(UINT aNewMaxLength)
 }
 
 template<typename T>
-inline void StructBuffer<T>::Bind(UINT slot)
+inline void StructBuffer<T>::Bind(UINT slot) const
 {
 	switch (myBindType)
 	{

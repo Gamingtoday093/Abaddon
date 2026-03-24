@@ -30,7 +30,7 @@ void SRV::Init(const std::string& aTextureFileName)
 	HRASSERT(hr, "Creating Shader Resource View");
 }
 
-void SRV::Bind(UINT slot)
+void SRV::Bind(UINT slot) const
 {
 	DX11::ourContext->PSSetShaderResources(slot, 1, mySRV.GetAddressOf());
 }

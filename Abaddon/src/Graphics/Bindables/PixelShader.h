@@ -11,7 +11,7 @@ public:
 	~PixelShader() = default;
 
 	void Init(std::string aShaderFileName);
-	void Bind();
+	void Bind() const;
 	ID3D11PixelShader* Get() const;
 	ID3D11PixelShader* const* GetAddressOf() const;
 private:

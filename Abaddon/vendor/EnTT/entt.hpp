@@ -7873,7 +7873,10 @@ operator|(const Type lhs, const Type rhs) noexcept {
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<entt::enum_as_bitmask_v<Type>, Type>
 operator&(const Type lhs, const Type rhs) noexcept {
+#pragma warning(push)
+#pragma warning(disable: 26827)
     return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) & static_cast<std::underlying_type_t<Type>>(rhs));
+#pragma warning(pop)
 }
 
 /*! @copydoc operator| */

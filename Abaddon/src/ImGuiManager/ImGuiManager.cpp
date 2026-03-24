@@ -121,7 +121,7 @@ void ImGuiManager::SceneTab(const std::shared_ptr<Scene>& aScene)
 		ImGuizmo::SetRect(viewportMin.x, viewportMin.y, viewportMax.x - viewportMin.x, viewportMax.y - viewportMin.y);
 
 		DirectX::XMFLOAT4X4 storedViewMatrix;
-		DirectX::XMStoreFloat4x4(&storedViewMatrix, aScene->GetCamera()->GetMatrix());
+		DirectX::XMStoreFloat4x4(&storedViewMatrix, aScene->GetCamera().GetMatrix());
 		float* viewMatrix = &storedViewMatrix.m[0][0];
 
 		DirectX::XMFLOAT4X4 storedProjectionMatrix;
@@ -166,8 +166,8 @@ void ImGuiManager::SceneTab(const std::shared_ptr<Scene>& aScene)
 		insideViewportPos.x *= 2;
 		insideViewportPos.y *= -2;
 
-		math::vector3<float> rayOrigin = aScene->GetCamera()->CameraSpaceToWorldSpace(insideViewportPos);
-		math::vector3<float> rayDirection = (rayOrigin - aScene->GetCamera()->GetPosition()).GetNormalized();
+		math::vector3<float> rayOrigin = aScene->GetCamera().CameraSpaceToWorldSpace(insideViewportPos);
+		math::vector3<float> rayDirection = (rayOrigin - aScene->GetCamera().GetPosition()).GetNormalized();
 
 		for (const auto& entity : aScene->GetAllEntities())
 		{
@@ -330,9 +330,16 @@ void ImGuiManager::InspectorTab()
 		if (entity.HasComponent<ScriptComponent>())
 		{
 			ScriptComponent& script = entity.GetComponent<ScriptComponent>();
-			bool isEnabled = script.myIsEnabled;
-			ImGui::SeparatorTextCheckbox(script.myInstance->GetScriptName(), "##Enabled", &isEnabled);
-			script.SetEnabled(isEnabled);
+			if (script.myInstance)
+			{
+				bool isEnabled = script.myInstance->GetEnabled();
+				ImGui::SeparatorTextCheckbox(script.myInstance->GetScriptName(), "##Enabled", &isEnabled);
+				script.myInstance->SetEnabled(isEnabled);
+			}
+			else
+			{
+				ImGui::SeparatorText("Empty Script");
+			}
 		}
 	}
 

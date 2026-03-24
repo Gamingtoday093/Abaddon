@@ -22,7 +22,7 @@ struct TransformComponent
 			XMVectorSet(aAABB.myMax.x, aAABB.myMax.y, aAABB.myMin.z, 0),
 			XMVectorSet(aAABB.myMin.x, aAABB.myMin.y, aAABB.myMin.z, 0)
 		};
-			
+		
 		AABB newAABB(myTransform.myPosition, myTransform.myPosition);
 
 		DirectX::XMMATRIX modelMatrix = myTransform.GetModelMatrix();
@@ -54,15 +54,6 @@ concept DerivedFromScript = std::derived_from<T, Script>;
 struct ScriptComponent
 {
 	Script* myInstance = nullptr;
-	bool myHasStarted = false;
-	bool myIsEnabled = true;
-	
-	void SetEnabled(bool aNewEnabled)
-	{
-		if (myIsEnabled == aNewEnabled) return;
-		myIsEnabled = aNewEnabled;
-		myHasStarted = false;
-	}
 
 	Script*(*InitFunction)() = nullptr;
 	void(*DestroyFunction)(ScriptComponent*) = nullptr;

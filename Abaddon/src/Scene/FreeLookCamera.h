@@ -10,39 +10,29 @@ using namespace DirectX;
 class FreeLookCamera : public Camera
 {
 public:
-	FreeLookCamera() : Camera() {}
+	FreeLookCamera();
 
-	void Init(float aMovementSpeedMultiplier, float aStartMovementSpeed, float aMinMovementSpeed, float aMaxMovementSpeed, float aRotationSpeed);
 	void Update() override;
 	math::vector3<float> GetPosition() const override;
 	math::vector4<float> GetRotation() const override;
 	void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) override;
 	XMMATRIX GetMatrix() const override;
 
-private:
+	float myMovementSpeed = 1.2f;
+	float myMinMovementSpeed = 0.1f;
+	float myMaxMovementSpeed = 3.0f;
+	float myMovementSpeedMultiplier = 0.125f;
+	float myRotationSpeed = 0.005f;
+
+protected:
 	void CalculateMatrix() override;
 	void UpdateInput() override;
-
-	float myMovementSpeed;
-
-	float myMovementSpeedMultiplier;
-	float myMinMovementSpeed;
-	float myMaxMovementSpeed;
-	float myRotationSpeed;
 
 private:
 	XMMATRIX myCameraMatrix;
 
-	// Variables used to calculate Camera Matrix
-	XMVECTOR Forward;
-	XMVECTOR Up;
-	XMMATRIX myCamRotationMatrix;
-
 	XMVECTOR myCamPosition;
-	XMVECTOR myCamTarget;
-	XMVECTOR myCamUp;
-
-	math::vector3<float> myDir;
-	math::vector2<float> myRot;
+	math::vector3<float> myMoveDir;
+	math::vector2<float> myYawPitch;
 };
 

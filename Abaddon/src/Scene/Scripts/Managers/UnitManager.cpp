@@ -58,8 +58,8 @@ void UnitManager::HandleInput()
 	// Interact
 	if (Input::GetInstance().IsMouseButtonPressed((int)eKeys::MOUSERBUTTON))
 	{
-		const math::vector3<float> rayOrigin = myEntity.GetScene().GetCamera()->CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(myEntity.GetScene().myHWND));
-		const math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera()->GetPosition()).GetNormalized();
+		const math::vector3<float> rayOrigin = myEntity.GetScene().GetCamera().CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(myEntity.GetScene().myHWND));
+		const math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera().GetPosition()).GetNormalized();
 
 		const math::vector3<float> normal = math::vector3<float>::up();
 		const math::vector3<float> offset = { 0, 0, 0 };
@@ -211,7 +211,7 @@ void UnitManager::InputSelectMouse()
 
 		for (const auto unit : myUnits)
 		{
-			math::vector2<float> unitPosition = myEntity.GetScene().GetCamera()->WorldSpaceToCameraSpace(unit->GetComponent<TransformComponent>().myTransform.myPosition);
+			math::vector2<float> unitPosition = myEntity.GetScene().GetCamera().WorldSpaceToCameraSpace(unit->GetComponent<TransformComponent>().myTransform.myPosition);
 
 			unit->Select(unitPosition.x > std::min(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y > std::min(dragSelectStart.y, dragSelectEnd.y) &&
 				unitPosition.x < std::max(dragSelectStart.x, dragSelectEnd.x) && unitPosition.y < std::max(dragSelectStart.y, dragSelectEnd.y));
@@ -224,8 +224,8 @@ void UnitManager::InputSelectMouse()
 	}
 	else // Click
 	{
-		math::vector3<float> rayOrigin = myEntity.GetScene().GetCamera()->CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(myEntity.GetScene().myHWND));
-		math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera()->GetPosition()).GetNormalized();
+		math::vector3<float> rayOrigin = myEntity.GetScene().GetCamera().CameraSpaceToWorldSpace(Camera::MousePositionToCameraSpace(myEntity.GetScene().myHWND));
+		math::vector3<float> rayDirection = (rayOrigin - myEntity.GetScene().GetCamera().GetPosition()).GetNormalized();
 
 		int selected = 0;
 

@@ -23,14 +23,14 @@ public:
 	std::shared_ptr<Renderer> GetRenderer();
 	HWND myHWND;
 	
-	std::shared_ptr<Camera> GetCamera();
+	Camera& GetCamera() const;
 
 private:
 	friend class Entity;
 
 	std::shared_ptr<Renderer> myRenderer;
 	bool myUsingFreeLookCamera = false;
-	std::shared_ptr<FreeLookCamera> myFreeLookCamera;
-	std::shared_ptr<TopDownCamera> myTopDownCamera;
+	std::unique_ptr<FreeLookCamera> myFreeLookCamera;
+	std::unique_ptr<TopDownCamera> myTopDownCamera;
 	entt::registry myRegistry;
 };

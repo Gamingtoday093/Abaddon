@@ -13,7 +13,7 @@ public:
 	~CBuffer() = default;
 
 	void Init(eBindType aBindType);
-	void Bind(UINT slot = 0);
+	void Bind(UINT slot = 0) const;
 	ID3D11Buffer* Get() const;
 	ID3D11Buffer* const* GetAddressOf() const;
 
@@ -52,7 +52,7 @@ inline void CBuffer<T>::Init(eBindType aBindType)
 }
 
 template<typename T>
-inline void CBuffer<T>::Bind(UINT slot)
+inline void CBuffer<T>::Bind(UINT slot) const
 {
 	switch (myBindType)
 	{

@@ -33,7 +33,7 @@ inline constexpr BlendState& Renderer::GetBlendState(eBlendState aBlendState)
 	return myBlendStates.at(static_cast<size_t>(aBlendState));
 }
 
-void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, std::shared_ptr<Camera> aCamera)
+void Renderer::Render(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Animation& aAnimation, double aTimeSeconds, const Camera& aCamera)
 {
 	Assert(aModelData.HasSkeleton());
 	
@@ -45,20 +45,20 @@ void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transfor
 	mySkinnedShader.Bind();
 	mySkinnedInputLayout.Bind();
 
-	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
+	RenderInternal(aModelData, aMaterial, aTransform, aCamera);
 }
 
-void Renderer::Render(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, std::shared_ptr<Camera> aCamera)
+void Renderer::Render(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Camera& aCamera)
 {
 	// Bind vertex shader
 	myVertexShader.Bind();
 	myInputLayout.Bind();
 
-	RenderInternal(aModelData, aMaterial, aTransform, *aCamera);
+	RenderInternal(aModelData, aMaterial, aTransform, aCamera);
 }
 
 // Does not bind Vertex Shader!
-void Renderer::RenderInternal(ModelData& aModelData, Material& aMaterial, const Transform& aTransform, const Camera& aCamera)
+void Renderer::RenderInternal(const ModelData& aModelData, const Material& aMaterial, const Transform& aTransform, const Camera& aCamera)
 {
 	// Bind model
 	aModelData.myVertexBuffer.Bind();
@@ -91,7 +91,7 @@ void Renderer::RenderInternal(ModelData& aModelData, Material& aMaterial, const 
 	DX11::ourContext->DrawIndexed(aModelData.myIndexBuffer.GetIndexAmount(), 0, 0);
 }
 
-void Renderer::RenderSkybox(SkyboxCube& aCube, CubeTexture& aCubeTexture, std::shared_ptr<Camera> aCamera)
+void Renderer::RenderSkybox(const SkyboxCube& aCube, const CubeTexture& aCubeTexture, const Camera& aCamera)
 {
 	// Bind Mesh
 	aCube.Bind();
@@ -101,7 +101,7 @@ void Renderer::RenderSkybox(SkyboxCube& aCube, CubeTexture& aCubeTexture, std::s
 
 	// Set View Projection Matrix
 	myCBufferTransform.myData.myProjectionViewMatrix =
-		aCamera->GetMatrix() *
+		aCamera.GetMatrix() *
 		DirectX::XMMatrixPerspectiveFovLH(1.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 	myCBufferTransform.ApplyChanges();
 	myCBufferTransform.Bind();

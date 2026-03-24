@@ -1,6 +1,12 @@
 #include "pch.h"
 #include "StandardMaterial.h"
 
+StandardMaterial::StandardMaterial() : Material("PixelShader_ps.cso")
+{
+	myMaterialSettings.Init(eBindType::PixelShader);
+	myLighting.Init(eBindType::PixelShader);
+}
+
 void StandardMaterial::Init(math::vector4<float> aColor, float aRoughness, TextureData aMainTexture, TextureData aEmissionTexture)
 {
 	myMaterialSettings.myData.Color = DirectX::XMVectorSet(aColor.x, aColor.y, aColor.z, aColor.w);
@@ -11,7 +17,7 @@ void StandardMaterial::Init(math::vector4<float> aColor, float aRoughness, Textu
 	myEmissionTexture = aEmissionTexture;
 }
 
-void StandardMaterial::Bind()
+void StandardMaterial::Bind() const
 {
 	Material::Bind();
 

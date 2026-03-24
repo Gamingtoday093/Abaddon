@@ -6,14 +6,10 @@
 class StandardMaterial : public Material
 {
 public:
-	StandardMaterial() : Material("PixelShader_ps.cso")
-	{
-		myMaterialSettings.Init(eBindType::PixelShader);
-		myLighting.Init(eBindType::PixelShader);
-	}
+	StandardMaterial();
 
 	void Init(math::vector4<float> aColor, float aRoughness, TextureData aMainTexture, TextureData aEmissionTexture);
-	void Bind() override;
+	void Bind() const override;
 
 	void UpdateLighting(math::vector4<float> aColor, float aStrength, math::vector3<float> aDirection);
 	math::vector3<float> GetLightingDirection() const;

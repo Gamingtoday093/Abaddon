@@ -1,6 +1,12 @@
 #include "pch.h"
 #include "SelectCircleMaterial.h"
 
+SelectCircleMaterial::SelectCircleMaterial() : Material("SelectCircleShader_ps.cso", eBlendState::Alpha)
+{
+	myNextCirclePositionIndex = 0;
+	myMaterialSettings.Init(eBindType::PixelShader);
+}
+
 void SelectCircleMaterial::SetColor(math::vector3<float> aColor)
 {
 	myMaterialSettings.myData.Color = DirectX::XMVectorSet(aColor.x, aColor.y, aColor.z, 1);
@@ -20,7 +26,7 @@ void SelectCircleMaterial::ApplyCirclePositions()
 	myMaterialSettings.ApplyChanges();
 }
 
-void SelectCircleMaterial::Bind()
+void SelectCircleMaterial::Bind() const
 {
 	Material::Bind();
 
