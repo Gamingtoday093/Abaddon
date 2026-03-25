@@ -34,15 +34,13 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-	myFreeLookCamera = std::make_unique<FreeLookCamera>();
-	myFreeLookCamera->myMovementSpeed = 1.2f;
-	myFreeLookCamera->myMinMovementSpeed = 0.1f;
-	myFreeLookCamera->myMaxMovementSpeed = 3.0f;
-	myFreeLookCamera->myMovementSpeedMultiplier = 0.125f;
-	myFreeLookCamera->myRotationSpeed = 0.005f;
+	myFreeLookCamera.myMovementSpeed = 1.2f;
+	myFreeLookCamera.myMinMovementSpeed = 0.1f;
+	myFreeLookCamera.myMaxMovementSpeed = 3.0f;
+	myFreeLookCamera.myMovementSpeedMultiplier = 0.125f;
+	myFreeLookCamera.myRotationSpeed = 0.005f;
 
-	myTopDownCamera = std::make_unique<TopDownCamera>();
-	myTopDownCamera->Init(1.2f, 0.005f, 6, 80, 50, 160, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
+	myTopDownCamera.Init(1.2f, 0.005f, 6, 80, 50, 160, { 0, 0, 0 }, { -0.9f, 0 }, -0.1f, -1.3f);
 
 	ModelAssetHandler::LoadModel("Ship.fbx");
 	ModelAssetHandler::LoadModel("ShipSmooth.fbx");
@@ -87,9 +85,9 @@ void Scene::Init()
 	//Unit* unit2 = UnitManager::CreateUnit(ship2);
 	//unit2->Init(myRenderer);
 
-	Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
-	NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
-	spawner->myAgentRowCount = 7;
+	//Entity navSpawner = CreateEmptyEntity("NavigationSpawner");
+	//NavigationSpawner* spawner = navSpawner.AddComponent<ScriptComponent>().Bind<NavigationSpawner>(navSpawner);
+	//spawner->myAgentRowCount = 7;
 
 	//Entity sphere = CreateEntity("Sphere");
 	//sphere.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");
@@ -113,13 +111,13 @@ void Scene::Update()
 	{
 		myUsingFreeLookCamera = !myUsingFreeLookCamera;
 		if (myUsingFreeLookCamera)
-			myFreeLookCamera->SetTransformation(myTopDownCamera->GetPosition(), myTopDownCamera->GetRotation());
+			myFreeLookCamera.SetTransformation(myTopDownCamera.GetPosition(), myTopDownCamera.GetRotation());
 	}
 
 	if (myUsingFreeLookCamera)
-		myFreeLookCamera->Update();
+		myFreeLookCamera.Update();
 	else
-		myTopDownCamera->Update();
+		myTopDownCamera.Update();
 
 	if (Input::GetInstance().IsKeyPressed((int)eKeys::UP))
 	{
@@ -216,10 +214,23 @@ std::shared_ptr<Renderer> Scene::GetRenderer()
 	return myRenderer;
 }
 
-Camera& Scene::GetCamera() const
+const Camera& Scene::GetCamera() const
 {
 	if (myUsingFreeLookCamera)
-		return *myFreeLookCamera;
-	return *myTopDownCamera;
+		return myFreeLookCamera;
+	return myTopDownCamera;
 }
 
+void Scene::FocusCamera(const math::vector3<float>& aPosition)
+{
+	if (myUsingFreeLookCamera)
+	{
+		math::vector3<float> cameraPosition = { 8, 10, 8 };
+		cameraPosition += aPosition;
+		myFreeLookCamera.SetTransformation(cameraPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), cameraPosition));
+	}
+	else
+	{
+		myTopDownCamera.SetTransformation(aPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), { 1.f, 1.75f, 1.f }));
+	}
+}

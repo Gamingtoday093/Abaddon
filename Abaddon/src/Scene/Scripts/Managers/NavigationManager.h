@@ -2,6 +2,7 @@
 #include "Scene/Scripts/Script.hpp"
 #include "../Models/SpatialHash.h"
 #include "RVO.h"
+#include "../Models/Navigation/NavGrid.h"
 
 class NavigationAgent;
 
@@ -19,6 +20,7 @@ private:
 
 	std::vector<NavigationAgent*> myAgents;
 	std::unique_ptr<RVO::RVOSimulator> myRVOSimulator;
+	Navigation::NavGrid myNavGrid;
 
 	friend class NavigationAgent;
 };

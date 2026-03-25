@@ -52,6 +52,7 @@ public:
 	}
 
 	Scene& GetScene();
+	entt::entity GetHandle() const;
 
 	bool operator==(entt::entity aEntity);
 	bool operator==(Entity aEntity);

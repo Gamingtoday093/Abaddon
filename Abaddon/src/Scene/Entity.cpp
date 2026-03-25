@@ -16,6 +16,11 @@ Scene& Entity::GetScene()
 	return *myScene;
 }
 
+entt::entity Entity::GetHandle() const
+{
+	return myEntityHandle;
+}
+
 bool Entity::operator==(entt::entity aEntity)
 {
 	return myEntityHandle == aEntity;

@@ -1,5 +1,13 @@
 #pragma once
 #include "Scene/Entity.h"
+#include <typeinfo>
+
+struct PropertyDescriptor
+{
+	std::type_info Type;
+	std::string PropertyName;
+	void* PropertyValue;
+};
 
 class Script
 {
@@ -44,9 +52,9 @@ protected:
 	template<size_t N>
 	struct FixedString
 	{
-		std::array<char, N> data{};
+		std::array<char, N> myData{};
 
-		constexpr const char* c_str() const { return data.data(); }
+		constexpr const char* c_str() const { return myData.data(); }
 	};
 
 	static constexpr bool IsUpper(char ch)
@@ -62,29 +70,29 @@ protected:
 		size_t nextBufferIndex = 0;
 		FixedString<((N - 1) * 2) + 1 + 7> scriptName;
 
-		scriptName.data[nextBufferIndex++] = nameView[0];
+		scriptName.myData[nextBufferIndex++] = nameView[0];
 		for (size_t i = 1; i < nameView.size(); i++)
 		{
 			char c = nameView[i];
 
 			if (IsUpper(c) && !IsUpper(nameView[i - 1]))
-				scriptName.data[nextBufferIndex++] = ' ';
+				scriptName.myData[nextBufferIndex++] = ' ';
 
-			scriptName.data[nextBufferIndex++] = c;
+			scriptName.myData[nextBufferIndex++] = c;
 		}
 
 		if (!nameView.ends_with("Script"))
 		{
-			scriptName.data.at(nextBufferIndex++) = ' ';
-			scriptName.data.at(nextBufferIndex++) = 'S';
-			scriptName.data.at(nextBufferIndex++) = 'c';
-			scriptName.data.at(nextBufferIndex++) = 'r';
-			scriptName.data.at(nextBufferIndex++) = 'i';
-			scriptName.data.at(nextBufferIndex++) = 'p';
-			scriptName.data.at(nextBufferIndex++) = 't';
+			scriptName.myData.at(nextBufferIndex++) = ' ';
+			scriptName.myData.at(nextBufferIndex++) = 'S';
+			scriptName.myData.at(nextBufferIndex++) = 'c';
+			scriptName.myData.at(nextBufferIndex++) = 'r';
+			scriptName.myData.at(nextBufferIndex++) = 'i';
+			scriptName.myData.at(nextBufferIndex++) = 'p';
+			scriptName.myData.at(nextBufferIndex++) = 't';
 		}
 
-		scriptName.data.at(nextBufferIndex++) = '\0';
+		scriptName.myData.at(nextBufferIndex++) = '\0';
 		return scriptName;
 	}
 

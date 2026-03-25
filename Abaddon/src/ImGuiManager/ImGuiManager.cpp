@@ -203,9 +203,17 @@ void ImGuiManager::HierarchyTab(const std::shared_ptr<Scene>& aScene)
 		for (const auto& entity : aScene->GetAllEntities())
 		{
 			bool selected = mySelectedEntity && entity == *mySelectedEntity;
-			const char* tag = entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().myTag.c_str() : "[Missing Tag]";
-			if (ImGui::Selectable(tag, selected))
+
+			std::string tag = entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().myTag : "[Missing Tag]";
+			tag += "##" + std::to_string(static_cast<uint32_t>(entity.GetHandle())); // ImGui needs each 'tag' to be unique so adding invisible entity handle
+
+			if (ImGui::Selectable(tag.c_str(), selected))
+			{
+				if (selected && entity.HasComponent<TransformComponent>())
+					aScene->FocusCamera(entity.GetComponent<TransformComponent>().myTransform.myPosition);
+
 				mySelectedEntity = std::make_unique<Entity>(entity);
+			}
 		}
 	}
 

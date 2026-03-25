@@ -36,7 +36,6 @@ private:
 
 private:
 	// Variables used to calculate Camera Matrix
-	XMVECTOR myCamPosition;
 	XMVECTOR myCamOrbitTarget;
 	XMVECTOR myCamUp;
 

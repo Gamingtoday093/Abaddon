@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TopDownCamera.h"
 
-inline TopDownCamera::TopDownCamera() : Camera() 
+TopDownCamera::TopDownCamera() : Camera() 
 {
 
 }
@@ -18,7 +18,6 @@ void TopDownCamera::Init(float aMovementSpeed, float aRotationSpeed, float aZoom
 	myDefaultRotation = aStartRotation;
 
 	myCamOrbitTarget = XMVectorSet(aStartOrbit.x, aStartOrbit.y, aStartOrbit.z, 0.0f);
-	myCamPosition = XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f);
 	myCamUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	myRot = aStartRotation;
@@ -35,7 +34,7 @@ void TopDownCamera::Update()
 
 math::vector3<float> TopDownCamera::GetPosition() const
 {
-	return { XMVectorGetX(myCamPosition), XMVectorGetY(myCamPosition), XMVectorGetZ(myCamPosition) };
+	return { XMVectorGetX(myCamOrbitTarget), XMVectorGetY(myCamOrbitTarget), XMVectorGetZ(myCamOrbitTarget) };
 }
 
 math::vector4<float> TopDownCamera::GetRotation() const
@@ -46,7 +45,7 @@ math::vector4<float> TopDownCamera::GetRotation() const
 
 void TopDownCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
 {
-	myCamPosition = XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0);
+	myCamOrbitTarget = XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0);
 	const math::vector3<float> eulerAngles = aRotation.ToEuler();
 	myRot = { eulerAngles.x, eulerAngles.y };
 }
@@ -68,10 +67,10 @@ void TopDownCamera::CalculateMatrix()
 	myCamOrbitTarget += newMove;
 
 	// Update Position
-	myCamPosition = XMVectorAdd(myCamOrbitTarget, XMVector3Transform(XMVectorSet(0, 0, myZoom, 0), XMMatrixRotationRollPitchYaw(myRot.x, -myRot.y, 0)));
+	XMVECTOR camPosition = XMVectorAdd(myCamOrbitTarget, XMVector3Transform(XMVectorSet(0, 0, myZoom, 0), XMMatrixRotationRollPitchYaw(myRot.x, -myRot.y, 0)));
 
 	// Set Camera Matrix
-	myCameraMatrix = XMMatrixLookAtLH(myCamPosition, myCamOrbitTarget, myCamUp);
+	myCameraMatrix = XMMatrixLookAtLH(camPosition, myCamOrbitTarget, myCamUp);
 }
 
 void TopDownCamera::UpdateInput()
