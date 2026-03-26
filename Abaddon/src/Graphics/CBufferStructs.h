@@ -13,6 +13,12 @@ struct TransformBuffer
 };
 
 __declspec(align(16))
+struct ProjectionBuffer
+{
+	DirectX::XMMATRIX myProjectionViewMatrix;
+};
+
+__declspec(align(16))
 struct CameraBuffer
 {
 	DirectX::XMVECTOR CameraPosition;

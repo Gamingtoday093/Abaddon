@@ -86,6 +86,12 @@ struct SkinnedVertex
 	float myBoneWeights[Animations::MAX_WEIGHTS];
 };
 
+struct GizmoVertex
+{
+	math::vector3<float> myPosition;
+	math::vector4<float> myColor;
+};
+
 struct SkyboxVertex
 {
 	SkyboxVertex()
@@ -105,4 +111,5 @@ template<typename TVertex>
 concept VertexType =
 std::same_as<std::remove_cvref_t<TVertex>, Vertex> ||
 std::same_as<std::remove_cvref_t<TVertex>, SkinnedVertex> ||
+std::same_as<std::remove_cvref_t<TVertex>, GizmoVertex> ||
 std::same_as<std::remove_cvref_t<TVertex>, SkyboxVertex>;

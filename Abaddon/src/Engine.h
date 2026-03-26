@@ -2,6 +2,7 @@
 
 class DX11;
 class Renderer;
+class GizmoRenderer;
 class Scene;
 class RenderPass;
 class CubeTexture;
@@ -28,6 +29,7 @@ private:
 
 	std::unique_ptr<DX11> myFramework;
 	std::shared_ptr<Renderer> myRenderer;
+	std::shared_ptr<GizmoRenderer> myGizmoRenderer;
 	std::shared_ptr<Scene> myScene;
 
 	std::unique_ptr<RenderPass> myDefaultPass;

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Scene.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/GizmoRenderer.h"
 #include "ModelAssetHandler.h"
 
 #include "Entity.h"
@@ -17,7 +18,8 @@
 
 struct TextureData;
 
-Scene::Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND) : myRenderer(std::move(aRenderer)), myHWND(aHWND)
+Scene::Scene(std::shared_ptr<Renderer> aRenderer, std::shared_ptr<GizmoRenderer> aGizmoRenderer, HWND aHWND) : 
+	myRenderer(std::move(aRenderer)), myGizmoRenderer(std::move(aGizmoRenderer)), myHWND(aHWND)
 {
 }
 
@@ -212,6 +214,11 @@ std::vector<Entity> Scene::GetAllEntities()
 std::shared_ptr<Renderer> Scene::GetRenderer()
 {
 	return myRenderer;
+}
+
+std::shared_ptr<GizmoRenderer> Scene::GetGizmoRenderer()
+{
+	return myGizmoRenderer;
 }
 
 const Camera& Scene::GetCamera() const

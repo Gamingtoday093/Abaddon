@@ -3,6 +3,7 @@
 
 #include "Graphics/DX11.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/GizmoRenderer.h"
 #include "Scene/Scene.h"
 #include "Tools/Input.h"
 
@@ -26,8 +27,9 @@ Engine::Engine(HWND aHWND) : myHWND(aHWND)
 	);
 
 	myRenderer = std::make_shared<Renderer>();
+	myGizmoRenderer = std::make_shared<GizmoRenderer>();
 
-	myScene = std::make_shared<Scene>(myRenderer, myHWND);
+	myScene = std::make_shared<Scene>(myRenderer, myGizmoRenderer, myHWND);
 	myScene->Init();
 
 	// Create Render Passes
@@ -63,6 +65,8 @@ void Engine::Update()
 
 		myDefaultPass->Bind();
 		myScene->Update();
+
+		myGizmoRenderer->ExecuteCommands(myScene->GetCamera());
 	}
 
 	//-----------------------

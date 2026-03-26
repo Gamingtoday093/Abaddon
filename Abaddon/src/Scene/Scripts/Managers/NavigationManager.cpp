@@ -3,6 +3,7 @@
 #include "Scene/Scripts/NavigationAgent.h"
 #include "Scene/Components/Components.h"
 #include "Tools/Stopwatch.h"
+#include "Graphics/GizmoRenderer.h"
 
 void NavigationManager::Awake()
 {
@@ -12,37 +13,15 @@ void NavigationManager::Awake()
 
 void NavigationManager::Start()
 {
-    myNavGrid.Resize(512, 512);
+    myNavGrid.Resize(256, 256);
     myNavGrid.StampCircle(myNavGrid.GetNearest({ 50, 10 }), 0xff, 8);
+    myNavGrid.StampSquare(myNavGrid.GetNearest({ 50, 0 }), 0xff, 2);
     myNavGrid.myNodeSize = 8;
 
-    std::vector<math::vector2<float>> resultPath;
     Stopwatch sw = Stopwatch::StartNew();
-    myNavGrid.Pathfind({ -20.5f, 0.5f }, { 250.f * 4, 100.f}, resultPath);
+    myNavGrid.Pathfind({ -20.5f, 0.5f }, { 250.f * 4, 100.f}, myResultPath);
     sw.Stop();
 
-    for (size_t i = 0; i < myNavGrid.myNodes.size(); i++)
-    {
-        if (myNavGrid.myNodes[i] == 0) continue;
-        Entity line = myEntity.GetScene().CreateEntity("Block");
-        line.AddComponent<ModelComponent>("Sphere2.fbx", "ShipMaterial");
-        TransformComponent& transform = line.GetComponent<TransformComponent>();
-        auto pos = myNavGrid.GetWorldPosition(i);
-        transform.myTransform.myPosition = { pos.x, 0, pos.y };
-        float scale = float(myNavGrid.myNodes[i]) / 255.f;
-        scale *= 2;
-        transform.myTransform.myScale = { scale, scale, scale };
-    }
-
-    for (size_t i = 0; i < resultPath.size(); i++)
-    {
-        auto node = resultPath[i];
-
-        Entity line = myEntity.GetScene().CreateEntity("Line");
-        line.AddComponent<ModelComponent>("Sphere2.fbx", "SandMaterial");
-        TransformComponent& transform = line.GetComponent<TransformComponent>();
-        transform.myTransform.myPosition = { node.x, 0, node.y };
-    }
     LOG("Pathfinding took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms");
 
     myRVOSimulator = std::make_unique<RVO::RVOSimulator>();
@@ -58,6 +37,30 @@ void NavigationManager::Start()
 
 void NavigationManager::Update()
 {
+    auto gridCenter = myNavGrid.GetWorldPosition(((myNavGrid.GetWidth() / 2) * myNavGrid.GetHeight()) + myNavGrid.GetHeight() / 2);
+    myEntity.GetScene().GetGizmoRenderer()->RenderPlane({ gridCenter.x, 0, gridCenter.y }, 
+        { (myNavGrid.myNodeSize * myNavGrid.GetWidth() / 2) + myNavGrid.myNodeSize / 2, (myNavGrid.myNodeSize * myNavGrid.GetHeight() / 2) + myNavGrid.myNodeSize / 2 },
+        { 0, 1, 0, 0.3f });
+
+    gridCenter = myNavGrid.GetWorldPosition(0);
+    myEntity.GetScene().GetGizmoRenderer()->RenderPlane({ gridCenter.x, 0, gridCenter.y }, { myNavGrid.myNodeSize / 2, myNavGrid.myNodeSize / 2 });
+    
+    for (size_t i = 0; i < myResultPath.size() - 1; i++)
+    {
+        auto fromPosition = myResultPath[i];
+        auto toPosition = myResultPath[i + 1];
+        myEntity.GetScene().GetGizmoRenderer()->RenderLine({ fromPosition.x, 0, fromPosition.y }, { toPosition.x, 0, toPosition.y }, { 1, 1, 0, 1 });
+        myEntity.GetScene().GetGizmoRenderer()->RenderCube({ fromPosition.x, 0, fromPosition.y }, { 1, 1, 1 }, { 1, 1, 0, 1 });
+    }
+    if (!myResultPath.empty()) myEntity.GetScene().GetGizmoRenderer()->RenderCube({ myResultPath.back().x, 0, myResultPath.back().y}, {1, 1, 1}, {1, 1, 0, 1});
+
+    for (size_t i = 0; i < myNavGrid.myNodes.size(); i++)
+    {
+        if (myNavGrid.myNodes[i] == 0) continue;
+        auto worldPosition = myNavGrid.GetWorldPosition(i);
+        myEntity.GetScene().GetGizmoRenderer()->RenderPlane({ worldPosition.x, 0, worldPosition.y }, { myNavGrid.myNodeSize / 2, myNavGrid.myNodeSize / 2 }, { 1, 0, 0, 1 });
+    }
+
     for (size_t i = 0; i < myAgents.size(); i++)
     {
         NavigationAgent& currentAgent = *myAgents[i];

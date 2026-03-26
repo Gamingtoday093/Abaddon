@@ -18,6 +18,7 @@ private:
 	static NavigationManager& GetInstance();
 	static NavigationManager* myInstance;
 
+	std::vector<math::vector2<float>> myResultPath;
 	std::vector<NavigationAgent*> myAgents;
 	std::unique_ptr<RVO::RVOSimulator> myRVOSimulator;
 	Navigation::NavGrid myNavGrid;

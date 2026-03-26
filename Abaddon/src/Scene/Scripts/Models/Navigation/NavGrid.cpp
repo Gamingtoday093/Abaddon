@@ -104,6 +104,7 @@ namespace Navigation
 		OpenNodes.push(new ValuedNode(startNode, *this, nullptr, aOrigin, aTarget));
 
 		Stopwatch sw = Stopwatch::StartNew();
+		Stopwatch swNeighbours;
 		while (OpenNodes.size() > 0)
 		{
 			ValuedNode& lowestNode = *OpenNodes.top();
@@ -116,13 +117,16 @@ namespace Navigation
 				break;
 			}
 
+			swNeighbours.Start();
 			for (const ValuedNode& valuedNode : GetNeighbours(lowestNode, aOrigin, aTarget))
 			{
 				if (ClosedNodes.contains(valuedNode.myNodeIndex)) continue;
 				else if (!OpenNodes.ContainsValuedNode(valuedNode)) OpenNodes.push(new ValuedNode(valuedNode));
 			}
+			swNeighbours.Stop();
 		}
 		sw.Stop();
+		LOG("Pathfinding Get Neighbours took: " + std::to_string(swNeighbours.GetElapsedMilliseconds()));
 		LOG("Pathfinding Internal took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms (OpenNodes: " + std::to_string(OpenNodes.size()) + ") (ClosedNodes: " + std::to_string(ClosedNodes.size()) + ")");
 		
 		for (auto& pair : ClosedNodes)
@@ -150,6 +154,16 @@ namespace Navigation
 		int64_t width = (aNodeIndex - Mod(aNodeIndex, myHeight)) / myHeight;
 		int64_t height = Mod(aNodeIndex, myHeight);
 		return { (width * myNodeSize) + (myNodeSize * 0.5f), (height * myNodeSize) + (myNodeSize * 0.5f) };
+	}
+
+	uint32_t NavGrid::GetWidth() const
+	{
+		return myWidth;
+	}
+
+	uint32_t NavGrid::GetHeight() const
+	{
+		return myHeight;
 	}
 
 	void NavGrid::GetResultPath(ValuedNode& aValuedNode, std::vector<math::vector2<float>>& aResultPath) const

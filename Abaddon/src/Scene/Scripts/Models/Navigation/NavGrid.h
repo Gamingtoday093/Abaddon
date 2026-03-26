@@ -18,6 +18,8 @@ namespace Navigation
 		math::vector2<float> GetWorldPosition(int64_t aNodeIndex) const;
 
 		float myNodeSize = 1.f;
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
 
 		std::vector<uint8_t> myNodes;
 	private:

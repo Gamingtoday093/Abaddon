@@ -3,6 +3,7 @@
 #include "EnTT/entt.hpp"
 
 class Renderer;
+class GizmoRenderer;
 class Script;
 class Entity;
 struct ScriptComponent;
@@ -10,7 +11,7 @@ struct ScriptComponent;
 class Scene
 {
 public:
-	Scene(std::shared_ptr<Renderer> aRenderer, HWND aHWND);
+	Scene(std::shared_ptr<Renderer> aRenderer, std::shared_ptr<GizmoRenderer> aGizmoRenderer, HWND aHWND);
 	~Scene();
 
 	void Init();
@@ -21,6 +22,7 @@ public:
 	std::vector<Entity> GetAllEntities();
 
 	std::shared_ptr<Renderer> GetRenderer();
+	std::shared_ptr<GizmoRenderer> GetGizmoRenderer();
 	HWND myHWND;
 	
 	const Camera& GetCamera() const;
@@ -30,6 +32,7 @@ private:
 	friend class Entity;
 
 	std::shared_ptr<Renderer> myRenderer;
+	std::shared_ptr<GizmoRenderer> myGizmoRenderer;
 	bool myUsingFreeLookCamera = false;
 	FreeLookCamera myFreeLookCamera;
 	TopDownCamera myTopDownCamera;
