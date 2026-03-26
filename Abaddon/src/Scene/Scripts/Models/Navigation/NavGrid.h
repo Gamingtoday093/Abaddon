@@ -21,6 +21,7 @@ namespace Navigation
 
 		std::vector<uint8_t> myNodes;
 	private:
+		void StampCircleLine(int64_t aX, int64_t aY, int64_t aEndX, int64_t aEndY, int64_t aRadius, uint8_t aValue);
 		void GetResultPath(ValuedNode& aValuedNode, std::vector<math::vector2<float>>& aResultPath) const;
 		bool HasLineOfSight(int64_t aNodeIndexLhs, int64_t aNodeIndexRhs) const;
 		std::vector<ValuedNode> GetNeighbours(ValuedNode& aValuedNode, math::vector2<float> aOrigin, math::vector2<float> aTarget) const;
@@ -33,6 +34,6 @@ namespace Navigation
 			return (aLhs % aRhs + aRhs) % aRhs;
 		}
 
-		uint32_t myWidth, myHeight = 1;
+		uint32_t myWidth = 1, myHeight = 1;
 	};
 }

@@ -7,20 +7,8 @@ namespace Navigation
 	class OpenNodesHeap : public std::priority_queue<ValuedNode*, std::vector<ValuedNode*>, ValuedNodePtrComparer>
 	{
 	public:
-		~OpenNodesHeap()
-		{
-			for (ValuedNode* valuedNode : c)
-				delete valuedNode;
+		~OpenNodesHeap();
 
-			c.clear();
-		}
-
-		bool ContainsValuedNode(const ValuedNode& aValuedNode)
-		{
-			for (ValuedNode* valuedNode : c)
-				if (valuedNode->myNodeIndex == aValuedNode.myNodeIndex) return true;
-
-			return false;
-		}
+		bool ContainsValuedNode(const ValuedNode& aValuedNode);
 	};
 }

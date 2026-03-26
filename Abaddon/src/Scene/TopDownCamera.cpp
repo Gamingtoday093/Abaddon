@@ -34,7 +34,8 @@ void TopDownCamera::Update()
 
 math::vector3<float> TopDownCamera::GetPosition() const
 {
-	return { XMVectorGetX(myCamOrbitTarget), XMVectorGetY(myCamOrbitTarget), XMVectorGetZ(myCamOrbitTarget) };
+	XMVECTOR camPosition = XMVectorAdd(myCamOrbitTarget, XMVector3Transform(XMVectorSet(0, 0, myZoom, 0), XMMatrixRotationRollPitchYaw(myRot.x, -myRot.y, 0)));
+	return { XMVectorGetX(camPosition), XMVectorGetY(camPosition), XMVectorGetZ(camPosition) };
 }
 
 math::vector4<float> TopDownCamera::GetRotation() const

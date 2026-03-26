@@ -36,7 +36,53 @@ namespace Navigation
 
 	void NavGrid::StampCircle(size_t aNodeIndex, uint8_t aValue, int32_t aRadius)
 	{
-		// Implement
+		int64_t cx = (aNodeIndex - Mod(aNodeIndex, myHeight)) / myHeight;
+		int64_t cy = Mod(aNodeIndex, myHeight);
+
+		int64_t x = 0;
+		int64_t y = -aRadius;
+		int64_t p = -aRadius;
+
+		// Fill Center
+		StampSquare(aNodeIndex, aValue, aRadius - (aRadius / 3));
+		while (x < -y)
+		{
+			if (p > 0)
+			{
+				y++;
+				p += 2 * (x + y) + 1;
+			}
+			else
+			{
+				p += 2 * x + 1;
+			}
+
+			int64_t lineLength = (aRadius / 3) - (aRadius + y);
+			StampCircleLine(cx + x, cy + y, cx + x, cy - y, lineLength, aValue);
+			StampCircleLine(cx - x, cy + y, cx - x, cy - y, lineLength, aValue);
+			
+			StampCircleLine(cx + y, cy + x, cx - y, cy + x, lineLength, aValue);
+			StampCircleLine(cx + y, cy - x, cx - y, cy - x, lineLength, aValue);
+
+			x++;
+		}
+	}
+
+	void NavGrid::StampCircleLine(int64_t aX, int64_t aY, int64_t aEndX, int64_t aEndY, int64_t aRadius, uint8_t aValue)
+	{
+		int64_t stepX = 0;
+		int64_t stepY = 0;
+		if (aX == aEndX) stepY = aY > aEndY ? -1 : 1;
+		else stepX = aX > aEndX ? -1 : 1;
+
+		for (size_t i = 0; i < aRadius; i++)
+		{
+			int64_t index = ((aX + (stepX * i)) * int64_t(myHeight)) + aY + (stepY * i);
+			if (index >= 0 && size_t(index) < myNodes.size()) myNodes[index] = aValue;
+
+			index = ((aEndX + (-stepX * i)) * int64_t(myHeight)) + aEndY + (-stepY * i);
+			if (index >= 0 && size_t(index) < myNodes.size()) myNodes[index] = aValue;
+		}
 	}
 
 	bool NavGrid::Pathfind(math::vector2<float> aOrigin, math::vector2<float> aTarget, std::vector<math::vector2<float>>& aResultPath) const
@@ -78,7 +124,7 @@ namespace Navigation
 		}
 		sw.Stop();
 		LOG("Pathfinding Internal took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms (OpenNodes: " + std::to_string(OpenNodes.size()) + ") (ClosedNodes: " + std::to_string(ClosedNodes.size()) + ")");
-
+		
 		for (auto& pair : ClosedNodes)
 			delete pair.second;
 		

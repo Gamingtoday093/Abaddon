@@ -13,7 +13,7 @@ void NavigationManager::Awake()
 void NavigationManager::Start()
 {
     myNavGrid.Resize(512, 512);
-    myNavGrid.StampSquare(myNavGrid.GetNearest({ 50, 6 }), 0xff, 3);
+    myNavGrid.StampCircle(myNavGrid.GetNearest({ 50, 10 }), 0xff, 8);
     myNavGrid.myNodeSize = 8;
 
     std::vector<math::vector2<float>> resultPath;
