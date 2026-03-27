@@ -24,9 +24,8 @@ namespace Navigation
 		std::vector<uint8_t> myNodes;
 	private:
 		void StampCircleLine(int64_t aX, int64_t aY, int64_t aEndX, int64_t aEndY, int64_t aRadius, uint8_t aValue);
-		void GetResultPath(ValuedNode& aValuedNode, std::vector<math::vector2<float>>& aResultPath) const;
+		void GetResultPath(size_t aFinalNodeIndex, size_t aStartNodeIndex, const std::unordered_map<size_t, size_t>& aParents, std::vector<math::vector2<float>>& aResultPath) const;
 		bool HasLineOfSight(int64_t aNodeIndexLhs, int64_t aNodeIndexRhs) const;
-		std::vector<ValuedNode> GetNeighbours(ValuedNode& aValuedNode, math::vector2<float> aOrigin, math::vector2<float> aTarget) const;
 		std::vector<size_t> GetNeighbours(int64_t aNodeIndex) const;
 		bool HasSameWidthIndex(int64_t aOriginNodeIndex, int64_t aTargetNodeIndex) const;
 

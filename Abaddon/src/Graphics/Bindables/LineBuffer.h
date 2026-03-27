@@ -1,7 +1,6 @@
 #pragma once
 #include "Graphics/DX11.h"
 #include "Graphics/Line.h"
-#include "Graphics/Vertex.h"
 
 using namespace Microsoft::WRL;
 

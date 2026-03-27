@@ -9,7 +9,6 @@
 
 struct ModelData;
 struct Animation;
-struct TextureData;
 struct Transform;
 class Camera;
 class Material;

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LineBuffer.h"
+#include "Graphics/Vertex.h"
 
 void LineBuffer::Init(UINT aMaxLines)
 {

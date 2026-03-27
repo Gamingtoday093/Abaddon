@@ -75,7 +75,7 @@ namespace Navigation
 		if (aX == aEndX) stepY = aY > aEndY ? -1 : 1;
 		else stepX = aX > aEndX ? -1 : 1;
 
-		for (size_t i = 0; i < aRadius; i++)
+		for (size_t i = 0; i < size_t(aRadius); i++)
 		{
 			int64_t index = ((aX + (stepX * i)) * int64_t(myHeight)) + aY + (stepY * i);
 			if (index >= 0 && size_t(index) < myNodes.size()) myNodes[index] = aValue;
@@ -98,41 +98,44 @@ namespace Navigation
 			return true;
 		}
 
+		std::unordered_map<size_t, size_t> Parents;
 		OpenNodesHeap OpenNodes;
-		std::unordered_map<size_t, ValuedNode*> ClosedNodes;
+		std::unordered_set<size_t> ClosedNodes;
 
-		OpenNodes.push(new ValuedNode(startNode, *this, nullptr, aOrigin, aTarget));
+		Parents[startNode] = startNode;
+		OpenNodes.emplace(startNode, *this, aOrigin, aTarget);
 
-		Stopwatch sw = Stopwatch::StartNew();
-		Stopwatch swNeighbours;
-		while (OpenNodes.size() > 0)
+		while (!OpenNodes.empty())
 		{
-			ValuedNode& lowestNode = *OpenNodes.top();
-			ClosedNodes.try_emplace(lowestNode.myNodeIndex, &lowestNode);
+			ValuedNode lowestNode = OpenNodes.top();
 			OpenNodes.pop();
+			ClosedNodes.insert(lowestNode.myNodeIndex);
 
 			if (lowestNode.myNodeIndex == endNode)
 			{
-				GetResultPath(lowestNode, aResultPath);
+			EndNodeFound:
+				GetResultPath(endNode, startNode, Parents, aResultPath);
 				break;
 			}
 
-			swNeighbours.Start();
-			for (const ValuedNode& valuedNode : GetNeighbours(lowestNode, aOrigin, aTarget))
+			for (size_t neighbourIndex : GetNeighbours(lowestNode.myNodeIndex))
 			{
-				if (ClosedNodes.contains(valuedNode.myNodeIndex)) continue;
-				else if (!OpenNodes.ContainsValuedNode(valuedNode)) OpenNodes.push(new ValuedNode(valuedNode));
+				if (myNodes[neighbourIndex] == 0xff) continue; // Should be moved into GetNeighbours
+				if (neighbourIndex == endNode)
+				{
+					Parents.insert_or_assign(neighbourIndex, lowestNode.myNodeIndex);
+					goto EndNodeFound;
+				}
+				if (ClosedNodes.contains(neighbourIndex)) continue;
+				else if (!OpenNodes.ContainsNodeIndex(neighbourIndex))
+				{
+					OpenNodes.emplace(neighbourIndex, *this, aOrigin, aTarget);
+					Parents.insert_or_assign(neighbourIndex, lowestNode.myNodeIndex);
+				}
 			}
-			swNeighbours.Stop();
 		}
-		sw.Stop();
-		LOG("Pathfinding Get Neighbours took: " + std::to_string(swNeighbours.GetElapsedMilliseconds()));
-		LOG("Pathfinding Internal took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms (OpenNodes: " + std::to_string(OpenNodes.size()) + ") (ClosedNodes: " + std::to_string(ClosedNodes.size()) + ")");
-		
-		for (auto& pair : ClosedNodes)
-			delete pair.second;
-		
-		return aResultPath.size() > 0;
+
+		return !aResultPath.empty();
 	}
 
 	size_t NavGrid::GetNearest(math::vector2<float> aPosition) const
@@ -166,30 +169,33 @@ namespace Navigation
 		return myHeight;
 	}
 
-	void NavGrid::GetResultPath(ValuedNode& aValuedNode, std::vector<math::vector2<float>>& aResultPath) const
+	void NavGrid::GetResultPath(size_t aFinalNodeIndex, size_t aStartNodeIndex, const std::unordered_map<size_t, size_t>& aParents, std::vector<math::vector2<float>>& aResultPath) const
 	{
-		ValuedNode* currentNode = &aValuedNode;
-
-		while (currentNode != nullptr)
+		while (aParents.at(aFinalNodeIndex) != aFinalNodeIndex)
 		{
-			aResultPath.push_back(GetWorldPosition(currentNode->myNodeIndex));
+			aResultPath.push_back(GetWorldPosition(aFinalNodeIndex));
 
-			ValuedNode* lineOfSightTarget = currentNode;
-			currentNode = currentNode->myParent;
-			while (lineOfSightTarget->myParent != nullptr)
+			size_t lineOfSightTarget = aFinalNodeIndex;
+			aFinalNodeIndex = aParents.at(aFinalNodeIndex);
+			while (aParents.at(lineOfSightTarget) != lineOfSightTarget)
 			{
-				if (HasLineOfSight(currentNode->myNodeIndex, lineOfSightTarget->myParent->myNodeIndex))
+				if (HasLineOfSight(aFinalNodeIndex, lineOfSightTarget))
 				{
-					lineOfSightTarget = lineOfSightTarget->myParent;
-					if (lineOfSightTarget->myParent == nullptr)
+					lineOfSightTarget = aParents.at(lineOfSightTarget);
+					if (aParents.at(lineOfSightTarget) == lineOfSightTarget)
 					{
-						currentNode = lineOfSightTarget;
+						aFinalNodeIndex = lineOfSightTarget;
+						aResultPath.push_back(GetWorldPosition(lineOfSightTarget));
 						break;
 					}
 				}
+				else if (HasLineOfSight(aFinalNodeIndex, aStartNodeIndex))
+				{
+					lineOfSightTarget = aParents.at(lineOfSightTarget);
+				}
 				else
 				{
-					currentNode = lineOfSightTarget;
+					aFinalNodeIndex = lineOfSightTarget;
 					break;
 				}
 			}
@@ -253,19 +259,6 @@ namespace Navigation
 		}
 
 		return true;
-	}
-	
-	std::vector<ValuedNode> NavGrid::GetNeighbours(ValuedNode& aValuedNode, math::vector2<float> aOrigin, math::vector2<float> aTarget) const
-	{
-		std::vector<ValuedNode> neighbours;
-
-		for (size_t nodeIndex : GetNeighbours(aValuedNode.myNodeIndex))
-		{
-			if (myNodes[nodeIndex] == 0xff) continue;
-			neighbours.emplace_back(nodeIndex, *this, &aValuedNode, aOrigin, aTarget);
-		}
-
-		return neighbours;
 	}
 	
 	std::vector<size_t> NavGrid::GetNeighbours(int64_t aNodeIndex) const

@@ -4,7 +4,7 @@
 #include "Bindables/BlendState.h"
 #include "Bindables/VertexShader.h"
 #include "Bindables/InputLayout.h"
-#include "Bindables/Materials/DebugColorMaterial.h"
+#include "Bindables/PixelShader.h"
 
 struct ModelData;
 class Camera;
@@ -19,6 +19,7 @@ public:
 	void RenderCube(const math::vector3<float>& aPosition, const math::vector3<float>& aScale, const math::vector4<float>& aColor = { 0, 1, 0, 1 });
 
 private:
+	static constexpr UINT MAX_LINES_PER_RENDER = LineBuffer::MAX_LINES;
 	void ExecuteCommands(const Camera& aCamera);
 
 	LineBuffer myLineBuffer;

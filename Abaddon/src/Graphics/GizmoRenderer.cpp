@@ -2,10 +2,11 @@
 #include "GizmoRenderer.h"
 #include "Bindables/InputLayoutFactory.h"
 #include "Scene/Camera.h"
+#include "Tools/Stopwatch.h"
 
 GizmoRenderer::GizmoRenderer()
 {
-	myLineBuffer.Init(LineBuffer::MAX_LINES);
+	myLineBuffer.Init(MAX_LINES_PER_RENDER);
 
 	myCBufferTransform.Init(eBindType::VertexShader);
 
@@ -41,11 +42,13 @@ void GizmoRenderer::RenderCube(const math::vector3<float>& aPosition, const math
 
 void GizmoRenderer::ExecuteCommands(const Camera& aCamera)
 {
-	if (myLineBuffer.myLines.size() == 0) return;
-	if (myLineBuffer.myLines.size() > LineBuffer::MAX_LINES)
+	if (myLineBuffer.myLines.empty()) return;
+	std::vector<Line> tempLines;
+	if (myLineBuffer.myLines.size() > MAX_LINES_PER_RENDER)
 	{
-		LOG_ERROR("Too Many Lines! Removing Extra");
-		myLineBuffer.myLines.resize(LineBuffer::MAX_LINES);
+		tempLines.reserve(myLineBuffer.myLines.size() - MAX_LINES_PER_RENDER);
+		tempLines.insert(tempLines.begin(), myLineBuffer.myLines.begin() + MAX_LINES_PER_RENDER, myLineBuffer.myLines.end());
+		myLineBuffer.myLines.resize(MAX_LINES_PER_RENDER);
 	}
 
 	DX11::ourContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -62,10 +65,25 @@ void GizmoRenderer::ExecuteCommands(const Camera& aCamera)
 	myPixelShader.Bind();
 	myBlendState.Bind();
 
+ApplyLineBuffer:
 	myLineBuffer.ApplyChanges();
 	myLineBuffer.Bind();
 
 	DX11::ourContext->DrawIndexed(UINT(myLineBuffer.myLines.size() * 2), 0, 0);
 	myLineBuffer.myLines.clear();
+	if (!tempLines.empty())
+	{
+		if (tempLines.size() > MAX_LINES_PER_RENDER)
+		{
+			myLineBuffer.myLines.insert(myLineBuffer.myLines.end(), tempLines.end() - MAX_LINES_PER_RENDER, tempLines.end()); // Use end to avoid tempLines copying elements
+			tempLines.resize(tempLines.size() - MAX_LINES_PER_RENDER);
+		}
+		else
+		{
+			myLineBuffer.myLines.insert(myLineBuffer.myLines.end(), tempLines.begin(), tempLines.end());
+			tempLines.clear();
+		}
+		goto ApplyLineBuffer;
+	}
 	DX11::ourContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

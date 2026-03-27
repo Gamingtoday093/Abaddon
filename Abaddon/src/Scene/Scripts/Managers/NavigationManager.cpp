@@ -19,7 +19,7 @@ void NavigationManager::Start()
     myNavGrid.myNodeSize = 8;
 
     Stopwatch sw = Stopwatch::StartNew();
-    myNavGrid.Pathfind({ -20.5f, 0.5f }, { 250.f * 4, 100.f}, myResultPath);
+    myNavGrid.Pathfind({ 0, 0 }, { 250.f * 4, 100.f}, myResultPath);
     sw.Stop();
 
     LOG("Pathfinding took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms");
@@ -44,8 +44,8 @@ void NavigationManager::Update()
 
     gridCenter = myNavGrid.GetWorldPosition(0);
     myEntity.GetScene().GetGizmoRenderer()->RenderPlane({ gridCenter.x, 0, gridCenter.y }, { myNavGrid.myNodeSize / 2, myNavGrid.myNodeSize / 2 });
-    
-    for (size_t i = 0; i < myResultPath.size() - 1; i++)
+
+    for (int64_t i = 0; i < int64_t(myResultPath.size()) - 1; i++)
     {
         auto fromPosition = myResultPath[i];
         auto toPosition = myResultPath[i + 1];
@@ -56,7 +56,7 @@ void NavigationManager::Update()
 
     for (size_t i = 0; i < myNavGrid.myNodes.size(); i++)
     {
-        if (myNavGrid.myNodes[i] == 0) continue;
+        if (myNavGrid.myNodes.at(i) == 0) continue;
         auto worldPosition = myNavGrid.GetWorldPosition(i);
         myEntity.GetScene().GetGizmoRenderer()->RenderPlane({ worldPosition.x, 0, worldPosition.y }, { myNavGrid.myNodeSize / 2, myNavGrid.myNodeSize / 2 }, { 1, 0, 0, 1 });
     }

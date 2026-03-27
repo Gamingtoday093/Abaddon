@@ -6,14 +6,13 @@ namespace Navigation
 	
 	struct ValuedNode
 	{
-		ValuedNode(size_t aNodeIndex, const NavGrid& aNodeGrid, ValuedNode* aParent, math::vector2<float> aOrigin, math::vector2<float> aTarget);
+		ValuedNode(size_t aNodeIndex, const NavGrid& aNodeGrid, math::vector2<float> aOrigin, math::vector2<float> aTarget);
 
 		inline float GetFCost() const
 		{
 			return myGCost + (GoalBias * myHCost);
 		}
 
-		ValuedNode* myParent;
 		size_t myNodeIndex;
 
 		static constexpr float GoalBias = 2.f;

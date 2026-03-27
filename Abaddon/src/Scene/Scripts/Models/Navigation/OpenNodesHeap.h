@@ -4,11 +4,10 @@
 
 namespace Navigation
 {
-	class OpenNodesHeap : public std::priority_queue<ValuedNode*, std::vector<ValuedNode*>, ValuedNodePtrComparer>
+	class OpenNodesHeap : public std::priority_queue<ValuedNode, std::vector<ValuedNode>, ValuedNodeComparer>
 	{
 	public:
-		~OpenNodesHeap();
-
 		bool ContainsValuedNode(const ValuedNode& aValuedNode);
+		bool ContainsNodeIndex(size_t aNodeIndex);
 	};
 }
