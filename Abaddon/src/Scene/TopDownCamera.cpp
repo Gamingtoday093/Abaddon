@@ -44,11 +44,16 @@ math::vector4<float> TopDownCamera::GetRotation() const
 	return { XMVectorGetX(quat), XMVectorGetY(quat), XMVectorGetZ(quat), XMVectorGetW(quat) };
 }
 
-void TopDownCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
+void TopDownCamera::SetTransformation(const math::vector3<float>& aPosition, const math::vector4<float>& aRotation)
 {
 	myCamOrbitTarget = XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0);
 	const math::vector3<float> eulerAngles = aRotation.ToEuler();
 	myRot = { eulerAngles.x, eulerAngles.y };
+}
+
+void TopDownCamera::Focus(const math::vector3<float>& aPosition)
+{
+	SetTransformation(aPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), { 1.f, 1.75f, 1.f }));
 }
 
 XMMATRIX TopDownCamera::GetMatrix() const

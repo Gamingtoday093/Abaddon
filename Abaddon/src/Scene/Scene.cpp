@@ -231,13 +231,7 @@ const Camera& Scene::GetCamera() const
 void Scene::FocusCamera(const math::vector3<float>& aPosition)
 {
 	if (myUsingFreeLookCamera)
-	{
-		math::vector3<float> cameraPosition = { 8, 10, 8 };
-		cameraPosition += aPosition;
-		myFreeLookCamera.SetTransformation(cameraPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), cameraPosition));
-	}
+		myFreeLookCamera.Focus(aPosition);
 	else
-	{
-		myTopDownCamera.SetTransformation(aPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), { 1.f, 1.75f, 1.f }));
-	}
+		myTopDownCamera.Focus(aPosition);
 }

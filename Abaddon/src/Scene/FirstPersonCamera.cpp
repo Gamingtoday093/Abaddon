@@ -36,8 +36,14 @@ math::vector4<float> FirstPersonCamera::GetRotation() const
 	return math::vector4<float>::identity();
 }
 
-void FirstPersonCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
+void FirstPersonCamera::SetTransformation(const math::vector3<float>& aPosition, const math::vector4<float>& aRotation)
 {
+
+}
+
+void FirstPersonCamera::Focus(const math::vector3<float>& aPosition)
+{
+
 }
 
 XMMATRIX FirstPersonCamera::GetMatrix() const

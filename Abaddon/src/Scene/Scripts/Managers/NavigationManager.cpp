@@ -14,12 +14,13 @@ void NavigationManager::Awake()
 void NavigationManager::Start()
 {
     myNavGrid.Resize(256, 256);
+    myNavGrid.myNodeSize = 1;
     myNavGrid.StampCircle(myNavGrid.GetNearest({ 50, 10 }), 0xff, 8);
     myNavGrid.StampSquare(myNavGrid.GetNearest({ 50, 0 }), 0xff, 2);
     myNavGrid.myNodeSize = 8;
 
     Stopwatch sw = Stopwatch::StartNew();
-    myNavGrid.Pathfind({ 0, 0 }, { 250.f * 4, 100.f}, myResultPath);
+    myNavGrid.Pathfind({ 0, 0 }, { 250.f * 4, 100.f }, myResultPath);
     sw.Stop();
 
     LOG("Pathfinding took: " + std::to_string(sw.GetElapsedMilliseconds()) + "ms");

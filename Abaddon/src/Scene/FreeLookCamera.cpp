@@ -24,11 +24,18 @@ math::vector4<float> FreeLookCamera::GetRotation() const
 	return { XMVectorGetX(quat), XMVectorGetY(quat), XMVectorGetZ(quat), XMVectorGetW(quat) };
 }
 
-void FreeLookCamera::SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation)
+void FreeLookCamera::SetTransformation(const math::vector3<float>& aPosition, const math::vector4<float>& aRotation)
 {
 	myCamPosition = XMVectorSet(aPosition.x, aPosition.y, aPosition.z, 0);
 	const math::vector3<float> eulerAngles = aRotation.ToEuler();
 	myYawPitch = { -eulerAngles.x, eulerAngles.y + XM_PI };
+}
+
+void FreeLookCamera::Focus(const math::vector3<float>& aPosition)
+{
+	math::vector3<float> cameraPosition = { 8, 10, 8 };
+	cameraPosition += aPosition;
+	SetTransformation(cameraPosition, math::vector4<float>::FromToRotation(math::vector3<float>::forward(), (cameraPosition - aPosition)));
 }
 
 XMMATRIX FreeLookCamera::GetMatrix() const

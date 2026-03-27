@@ -15,7 +15,8 @@ public:
 	virtual void Update() = 0;
 	virtual math::vector3<float> GetPosition() const = 0;
 	virtual math::vector4<float> GetRotation() const = 0;
-	virtual void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) = 0;
+	virtual void SetTransformation(const math::vector3<float>& aPosition, const math::vector4<float>& aRotation) = 0;
+	virtual void Focus(const math::vector3<float>& aPosition) = 0;
 	virtual XMMATRIX GetMatrix() const = 0;
 
 #pragma region Methods

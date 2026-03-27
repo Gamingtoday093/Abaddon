@@ -175,12 +175,14 @@ namespace Navigation
 		{
 			aResultPath.push_back(GetWorldPosition(aFinalNodeIndex));
 
-			size_t lineOfSightTarget = aFinalNodeIndex;
 			aFinalNodeIndex = aParents.at(aFinalNodeIndex);
+			size_t lineOfSightTarget = aFinalNodeIndex;
+			size_t LOSChild = lineOfSightTarget;
 			while (aParents.at(lineOfSightTarget) != lineOfSightTarget)
 			{
 				if (HasLineOfSight(aFinalNodeIndex, lineOfSightTarget))
 				{
+					LOSChild = lineOfSightTarget;
 					lineOfSightTarget = aParents.at(lineOfSightTarget);
 					if (aParents.at(lineOfSightTarget) == lineOfSightTarget)
 					{
@@ -191,11 +193,12 @@ namespace Navigation
 				}
 				else if (HasLineOfSight(aFinalNodeIndex, aStartNodeIndex))
 				{
+					LOSChild = lineOfSightTarget;
 					lineOfSightTarget = aParents.at(lineOfSightTarget);
 				}
 				else
 				{
-					aFinalNodeIndex = lineOfSightTarget;
+					aFinalNodeIndex = LOSChild;
 					break;
 				}
 			}

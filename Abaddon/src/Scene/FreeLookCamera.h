@@ -15,7 +15,8 @@ public:
 	void Update() override;
 	math::vector3<float> GetPosition() const override;
 	math::vector4<float> GetRotation() const override;
-	void SetTransformation(math::vector3<float> aPosition, math::vector4<float> aRotation) override;
+	void SetTransformation(const math::vector3<float>& aPosition, const math::vector4<float>& aRotation) override;
+	void Focus(const math::vector3<float>& aPosition) override;
 	XMMATRIX GetMatrix() const override;
 
 	float myMovementSpeed = 1.2f;
