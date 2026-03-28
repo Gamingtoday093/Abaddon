@@ -11,7 +11,7 @@ namespace Navigation
 		return false;
 	}
 
-	bool OpenNodesHeap::ContainsNodeIndex(size_t aNodeIndex)
+	bool OpenNodesHeap::ContainsNodeIndex(int32_t aNodeIndex)
 	{
 		for (const ValuedNode& valuedNode : c)
 			if (valuedNode.myNodeIndex == aNodeIndex) return true;

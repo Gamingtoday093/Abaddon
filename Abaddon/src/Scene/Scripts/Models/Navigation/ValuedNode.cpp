@@ -4,7 +4,7 @@
 
 namespace Navigation
 {
-	ValuedNode::ValuedNode(size_t aNodeIndex, const NavGrid& aNodeGrid, math::vector2<float> aOrigin, math::vector2<float> aTarget)
+	ValuedNode::ValuedNode(int32_t aNodeIndex, const NavGrid& aNodeGrid, math::vector2<float> aOrigin, math::vector2<float> aTarget)
 		: myNodeIndex(aNodeIndex)
 	{
 		math::vector2<float> worldPosition = aNodeGrid.GetWorldPosition(aNodeIndex);

@@ -8,6 +8,6 @@ namespace Navigation
 	{
 	public:
 		bool ContainsValuedNode(const ValuedNode& aValuedNode);
-		bool ContainsNodeIndex(size_t aNodeIndex);
+		bool ContainsNodeIndex(int32_t aNodeIndex);
 	};
 }

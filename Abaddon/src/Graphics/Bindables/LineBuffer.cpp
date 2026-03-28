@@ -32,7 +32,7 @@ void LineBuffer::Resize(UINT aNewMaxLines)
 	bufferDesc.MiscFlags = 0u;
 	bufferDesc.ByteWidth = sizeof(USHORT) * myMaxLines * 2;
 	bufferDesc.StructureByteStride = 0;
-
+	
 	HRASSERT(DX11::ourDevice->CreateBuffer(&bufferDesc, nullptr, &myIndexBuffer), "Create LineBuffer IndexBuffer");
 }
 
