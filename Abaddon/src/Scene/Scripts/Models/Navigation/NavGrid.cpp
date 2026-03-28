@@ -94,6 +94,13 @@ namespace Navigation
 			return true;
 		}
 
+		if (HasLineOfSight(startNode, endNode))
+		{
+			aResultPath.push_back(GetWorldPosition(startNode));
+			aResultPath.push_back(GetWorldPosition(endNode));
+			return true;
+		}
+
 		std::unordered_map<int32_t, int32_t> Parents;
 		OpenNodesHeap OpenNodes;
 		std::unordered_set<int32_t> ClosedNodes;
@@ -112,6 +119,12 @@ namespace Navigation
 			EndNodeFound:
 				GetResultPath(endNode, startNode, Parents, aResultPath);
 				break;
+			}
+
+			if (lowestNode.myNodeIndex != startNode && HasLineOfSight(lowestNode.myNodeIndex, endNode))
+			{
+				Parents.insert_or_assign(endNode, lowestNode.myNodeIndex);
+				goto EndNodeFound;
 			}
 
 			for (int32_t neighbourIndex : GetNeighbours(lowestNode.myNodeIndex))
@@ -191,34 +204,40 @@ namespace Navigation
 
 	void NavGrid::GetResultPath(int32_t aFinalNodeIndex, int32_t aStartNodeIndex, const std::unordered_map<int32_t, int32_t>& aParents, std::vector<math::vector2<float>>& aResultPath) const
 	{
-		while (aParents.at(aFinalNodeIndex) != aFinalNodeIndex)
+		int32_t currentNodeIndex = aFinalNodeIndex;
+		while (true)
 		{
-			aResultPath.push_back(GetWorldPosition(aFinalNodeIndex));
+			aResultPath.push_back(GetWorldPosition(currentNodeIndex));
 
-			int32_t lineOfSightTarget = aFinalNodeIndex;
+			if (aParents.at(currentNodeIndex) == currentNodeIndex) break;
+
+			int32_t lineOfSightTarget = currentNodeIndex;
+			currentNodeIndex = aParents.at(currentNodeIndex);
+
+			// Pathfind already performs a LineOfSight check to try and reach it's final node
+			if (lineOfSightTarget == aFinalNodeIndex) continue;
 			int32_t LOSChild = lineOfSightTarget;
-			aFinalNodeIndex = aParents.at(aFinalNodeIndex);
 			while (aParents.at(lineOfSightTarget) != lineOfSightTarget)
 			{
-				if (HasLineOfSight(aFinalNodeIndex, lineOfSightTarget))
+				if (HasLineOfSight(currentNodeIndex, lineOfSightTarget))
 				{
 					LOSChild = lineOfSightTarget;
 					lineOfSightTarget = aParents.at(lineOfSightTarget);
 					if (aParents.at(lineOfSightTarget) == lineOfSightTarget)
 					{
-						aFinalNodeIndex = lineOfSightTarget;
-						aResultPath.push_back(GetWorldPosition(lineOfSightTarget));
+						currentNodeIndex = lineOfSightTarget;
+						//aResultPath.push_back(GetWorldPosition(lineOfSightTarget));
 						break;
 					}
 				}
-				else if (HasLineOfSight(aFinalNodeIndex, aStartNodeIndex))
+				else if (HasLineOfSight(currentNodeIndex, aStartNodeIndex))
 				{
 					LOSChild = lineOfSightTarget;
 					lineOfSightTarget = aParents.at(lineOfSightTarget);
 				}
 				else
 				{
-					aFinalNodeIndex = LOSChild;
+					currentNodeIndex = LOSChild;
 					break;
 				}
 			}
